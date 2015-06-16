@@ -29,7 +29,7 @@ img/ List of images used.
 css/ Style for the app.    
 
 Team Members:  
-
+-----------------  
 Nick Rose  
 Yuan Yuan  
 Alex Jones  

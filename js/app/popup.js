@@ -1,31 +1,33 @@
+// Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 var USER_EMAIL = 'nrose@clicktime.com';
 var USER_PASSWORD = 'berkeleycs17';
+var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your request.";
 
-myApp.controller("PageController", ['$scope', 'SessionService', 'CompanyService', '$http',
-    function ($scope, SessionService, CompanyService, $http) {
+
+// Main controller for the extension. 
+myApp.controller("PageController", ['$scope', 'APIService', '$http',
+    function ($scope, APIService, $http) {
     $scope.message = "Hello from AngularJS";
 
-    SessionService.getSession(USER_EMAIL, USER_PASSWORD, function (session) {
+    var sessionURL =  API_BASE + "Session";
+    APIService.apiCall(sessionURL, USER_EMAIL, USER_PASSWORD, 'GET', function (session) {
         if (session == null) {
-            alert("We're sorry, there was an error processing your request.");
+            alert(REQUEST_ERROR_MESSAGE);
             return;
         }
         $scope.UserName = session.UserName;
-        
-        CompanyService.getCompany(USER_EMAIL, USER_PASSWORD, session.CompanyID, function (company) {
-            console.log(company);
+
+        var companyURL = API_BASE + "Companies/" + session.CompanyID;
+        APIService.apiCall(companyURL, USER_EMAIL, USER_PASSWORD, 'GET', function (company) {
             if (company == null) {
-                alert("We're sorry, there was an error processing your request.");
+                alert(REQUEST_ERROR_MESSAGE);
                 return;
             }
-            console.log(company.Name);
             $scope.CompanyName = company.Name;
         })
-
-    });
-
-   
+    })
+    
 
 }]);
 

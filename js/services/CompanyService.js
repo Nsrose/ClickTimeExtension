@@ -1,17 +1,16 @@
-// Service for requesting the session of a user. Requires user to be logged in.
+// Service for requesting the company of a user. Requires user to be logged in.
 
-myApp.service('SessionService', function($http) {
-    
-    this.getSession = function (email, password, callback) {
-        var sessionURL = API_BASE + "Session";
+myApp.service('CompanyService', function($http) {
+
+    this.getCompany = function (email, password, companyID, callback) {
+        var companyURL = API_BASE + "Companies/" + companyID;
         var credentials = btoa(email + ":" + password);
         var request = {
             method: 'GET',
-            url: sessionURL,
+            url: companyURL,
             headers: {
                 'Authorization' : 'Basic ' + credentials
             }
-           
         };
         $http(request)
         .success(function(data, status, headers, config) {

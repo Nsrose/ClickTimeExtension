@@ -10,8 +10,9 @@
 
         <!-- Services -->
         <script src="js/services/SessionService.js"></script>
+        <script src="js/services/CompanyService.js"></script>
 
-        <script src="js/services/PageInfoService.js"></script>
+        <!--||||||||||-->
 
 
         <script src="js/app/popup.js"></script>
@@ -22,17 +23,8 @@
         </header>
 
         <div ng-controller="PageController">
-            <h1>{{user_name}}</div>
-            <div>{{message}}</div>
-            <h2>Page:</h2>
-            <div>{{title}}</div>
-            <div>{{url}}</div>
-            <h2>Has Links:</h2>
-            <ul>
-                <li ng-repeat="pageInfo in pageInfos">
-                    <div>{{pageInfo.url}}</div>
-                </li>                       
-            </ul>
+            <h1>Username: {{UserName}}</div>
+            <h1>Company: {{CompanyName}}</div>
         </div>
     </body>
 </html>

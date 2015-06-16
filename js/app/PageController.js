@@ -13,7 +13,7 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
             alert(REQUEST_ERROR_MESSAGE);
             return;
         }
-        console.log(session);
+        
     })
 
 }]);

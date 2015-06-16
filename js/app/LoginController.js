@@ -1,4 +1,4 @@
-
+// Login controller. 
 myApp.controller("LoginController", ['$scope', 'APIService', '$http', 
 	function ($scope, APIService, $http) {
 
@@ -11,8 +11,10 @@ myApp.controller("LoginController", ['$scope', 'APIService', '$http',
         }
     })
 
+
 	$scope.login = function (user) {
 		var sessionURL = API_BASE + "Session";
+		// Get the session for the user. If it exists, store it in local storage.
         APIService.apiCall(sessionURL, user.email, user.password, 'GET',
             function (session) {
                 if (session == null) {

@@ -18,7 +18,8 @@ js/
 &nbsp;&nbsp;app/  
 &nbsp;&nbsp;&nbsp;&nbsp;app.js: Main module for the app.  
 &nbsp;&nbsp;&nbsp;&nbsp;content.js: Script injected into each page.  
-&nbsp;&nbsp;&nbsp;&nbsp;controller.js: Script for the app controller.  
+&nbsp;&nbsp;&nbsp;&nbsp;LoginController.js: Script for the login controller.  
+&nbsp;&nbsp;&nbsp;&nbsp;PageController.js: Script for the main controller.    
 &nbsp;&nbsp;lib/  
 &nbsp;&nbsp;&nbsp;&nbsp;Jquery and Angular files.  
 &nbsp;&nbsp;services/  

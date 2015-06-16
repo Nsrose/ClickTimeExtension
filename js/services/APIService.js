@@ -1,6 +1,6 @@
 // All services for making API requests. All of these require user to be logged in.
 
-myApp.service('APIService', function($http) {
+myApp.service('APIService', function ($http) {
     // Standard API call method. Params:
     // requestURL - URL to make a reques to.
     // email - user email

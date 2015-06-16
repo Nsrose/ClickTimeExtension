@@ -10,8 +10,23 @@ Development Guide
 -----------------  
 This is a chrome extension, so it's a little different than a regular app, but still fairly similar.  
 
-manifest.json: file that encodes basic app information.
-node_modules/
+manifest.json: file that encodes basic app information.  
+templates/ List of views for the extension:  
+&nbsp;&nbsp;&nbsp;&nbsp;popup.html: general API testing platform  
+
+js/   
+&nbsp;&nbsp;app/  
+&nbsp;&nbsp;&nbsp;&nbsp;app.js: Main module for the app.  
+&nbsp;&nbsp;&nbsp;&nbsp;content.js: Script injected into each page.  
+&nbsp;&nbsp;&nbsp;&nbsp;controller.js: Script for the app controller.  
+&nbsp;&nbsp;lib/  
+&nbsp;&nbsp;&nbsp;&nbsp;Jquery and Angular files.  
+&nbsp;&nbsp;services/  
+&nbsp;&nbsp;&nbsp;&nbsp;API service that includes a general function to make API calls.  
+
+img/ List of images used.    
+
+css/ Style for the app.    
 
 Team Members:  
 

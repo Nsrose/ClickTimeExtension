@@ -21,8 +21,11 @@
         </header>
 
         <div ng-controller="PageController">
-            <h1>{{UserName}}</h1>
-            <h1>{{CompanyName}}</h1>
+            <h1>Client: </h1>
+            <select ng-model="ClientID" ng-options="client.DisplayName for client in clients">
+            </select>
+            <h1>Job: </h1>
+            <h1>Task: </h1>
         </div>
     </body>
 </html>

@@ -7,13 +7,16 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
     
     // Get the session of the user from storage.
     chrome.storage.sync.get('session', function (items) {
-        var session = items['session'];
-        if (session == null) {
-            // This should never happen, but just in case
-            alert(REQUEST_ERROR_MESSAGE);
-            return;
+        if ('session' in items) {
+            var session = items['session'];
+            if (session != null) {
+                // Everything's good to go here
+                return;
+            }
         }
-        
+        // Session couldn't be found
+        alert(REQUEST_ERROR_MESSAGE);
+        return;
     })
 
 }]);

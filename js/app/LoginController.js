@@ -4,11 +4,14 @@ myApp.controller("LoginController", ['$scope', 'APIService', '$http',
 
 	// Get the session, if it exists, go to popup. Otherwise, stay here.
     chrome.storage.sync.get('session', function (items) {
-        var session = items['session'];
-        if (session != null) {
-            // User does not need to login.
-            window.location.href = "../../templates/popup.html";
-        }
+    	if ('session' in items) {
+    		// Session variable exists
+    	 	var session = items['session'];
+        	if (session != null) {
+            	// User does not need to login.
+            	window.location.href = "../../templates/popup.html";
+        	}
+    	}
     })
 
 
@@ -18,6 +21,7 @@ myApp.controller("LoginController", ['$scope', 'APIService', '$http',
         APIService.apiCall(sessionURL, user.email, user.password, 'GET',
             function (session) {
                 if (session == null) {
+                	// bad request
                     alert(REQUEST_ERROR_MESSAGE);
                     return;
                 }

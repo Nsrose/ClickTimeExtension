@@ -20,7 +20,7 @@
         <!-- TODO: Add required fields and anuglar directives  -->
 
         <div ng-controller="LoginController">
-            <form name="loginForm" novalidate>
+            <form name="loginForm">
                 <p>Email:<br>
                     <input type="email" name="email" ng-model="user.email" required><br>
                     <span style="color:red" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
@@ -30,9 +30,11 @@
                 </p>
 
                 <p>Password:<br>
-                    <input type="password" name="password" ng-model="user.password" required><br>
+                    <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required><br>
                     <span style="color:red" ng-show="loginForm.password.$dirty && loginForm.password.$invalid">
                         <span ng-show="loginForm.password.$error.required">no hacking please.</span>
+                        <span ng-show="loginForm.password.$error.minlength">minimum is 3 characters.</span>
+                        <span ng-show="loginForm.password.$error.maxlength">maximum is 24 characters.</span>
                     </span> 
                 </p>
             </form>

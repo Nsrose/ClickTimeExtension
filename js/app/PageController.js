@@ -61,7 +61,13 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                 $scope.CompanyID = session.CompanyID;
                 $scope.UserEmail = session.UserEmail;
                 $scope.Token = session.Token;
+                $scope.SecurityLevel = session.SecurityLevel;
 
+                $scope.IsManagerOrAdmin = session.SecurityLevel == 'manager'
+                    || session.SecurityLevel == "admin";
+
+                // If there are any empty entity drop downs (job, task, client), this is true
+                $scope.HasEmptyEntities = false;
 
 
                 baseURL = API_BASE + "Companies/" + $scope.CompanyID + "/Users/" + $scope.UserID;
@@ -73,6 +79,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                     $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
                     .then(function (response) {
                         $scope.clients = response.data;
+                        if (response.data.length == 0) {
+                            $scope.HasEmptyEntities = true;
+                        }
                         $scope.client = response.data[0];
                         return response;
                     })
@@ -87,6 +96,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                     $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
                     .then( function (response) {
                         $scope.jobs = response.data;
+                        if (response.data.length == 0) {
+                            $scope.HasEmptyEntities = true;
+                        }
                         $scope.job = response.data[0];
                         return response;
                     })
@@ -101,6 +113,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                     $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
                     .then( function (response) {
                         $scope.tasks = response.data;
+                        if (response.data.length == 0) {
+                            $scope.HasEmptyEntities = true;
+                        }
                         $scope.task = response.data[0];
                         return response;
                     })
@@ -125,6 +140,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         if (clientsList != null) {
                             console.log("Fetched clients list from local storage");
                             $scope.clients = clientsList;
+                            if (clientsList.length == 0) {
+                                $scope.HasEmptyEntities = true;
+                            }
                             $scope.client = clientsList[0];
                             $scope.$apply();
                             return;
@@ -134,6 +152,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
                         .then( function (response) {
                             $scope.clients = response.data;
+                            if (response.data.length == 0) {
+                               $scope.HasEmptyEntities = true;
+                            }
                             $scope.client = response.data[0];
                             return response;
                         })
@@ -156,6 +177,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         if (jobsList != null) {
                             console.log("Fetched jobs list from local storage");
                             $scope.jobs = jobsList;
+                            if (jobsList.length == 0) {
+                                $scope.HasEmptyEntities = true;
+                            }
                             $scope.job = jobsList[0];
                             $scope.$apply();
                             return;
@@ -165,6 +189,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
                         .then( function (response) {
                             $scope.jobs = response.data;
+                            if (response.data.length == 0) {
+                               $scope.HasEmptyEntities = true;
+                            }
                             $scope.job = response.data[0];
                             return response;
                         })
@@ -187,6 +214,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         if (tasksList != null) {
                             console.log("Fetched tasks list from local storage");
                             $scope.tasks = tasksList;
+                            if (tasksList.length == 0) {
+                                $scope.HasEmptyEntities = true;
+                            }
                             $scope.task = tasksList[0];
                             $scope.$apply();
                             return;
@@ -196,6 +226,9 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                         $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
                         .then( function (response) {
                             $scope.tasks = response.data;
+                            if (response.data.length == 0) {
+                               $scope.HasEmptyEntities = true;
+                            }
                             $scope.task = response.data[0];
                             return response;
                         })

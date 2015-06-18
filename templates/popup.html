@@ -25,6 +25,12 @@
 
 
             <input type="submit" ng-click="logout()" value="Logout"/>
+
+            <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
+
+            <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
+            </div>
+            
             <h1>Client: </h1>
             <select ng-model="client" ng-options="client as client.DisplayName for client in clients">
             </select>

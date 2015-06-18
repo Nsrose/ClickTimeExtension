@@ -21,17 +21,21 @@
 
         <div ng-controller="PageController">
 
+            <input type="submit" ng-click="refresh()" value="Refresh"/>
+
 
             <input type="submit" ng-click="logout()" value="Logout"/>
             <h1>Client: </h1>
-            <select ng-model="Client" ng-options="client.DisplayName for client in clients">
+            <select ng-model="client" ng-options="client as client.DisplayName for client in clients">
             </select>
             <h1>Job: </h1>
-             <select ng-model="Job" ng-options="job.DisplayName for job in jobs">
+            <select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
             </select>
             <h1>Task: </h1>
-             <select ng-model="Task" ng-options="task.DisplayName for task in tasks">
+            <select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
             </select>
+
+
         </div>
     </body>
 </html>

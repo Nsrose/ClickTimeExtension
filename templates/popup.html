@@ -18,12 +18,20 @@
             <h1>ClickTime Tracking!</h1>
         </header>
 
+
         <div ng-controller="PageController">
+
+
+            <input type="submit" ng-click="logout()" value="Logout"/>
             <h1>Client: </h1>
-            <select ng-model="ClientID" ng-options="client.DisplayName for client in clients">
+            <select ng-model="Client" ng-options="client.DisplayName for client in clients">
             </select>
             <h1>Job: </h1>
+             <select ng-model="Job" ng-options="job.DisplayName for job in jobs">
+            </select>
             <h1>Task: </h1>
+             <select ng-model="Task" ng-options="task.DisplayName for task in tasks">
+            </select>
         </div>
     </body>
 </html>

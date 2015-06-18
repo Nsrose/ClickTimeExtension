@@ -1,4 +1,5 @@
 // All services for making API requests. All of these require user to be logged in.
+// The apiCall function is intended to be used with promises, not callbacks.
 
 myApp.service('APIService', function ($http) {
     // Standard API call method. Params:
@@ -6,8 +7,7 @@ myApp.service('APIService', function ($http) {
     // email - user email
     // password - user password
     // requestMethod - GET or POST
-    // callback - function that decides what to do with the data returned.
-    this.apiCall = function (requestURL, email, password, requestMethod, callback) {
+    this.apiCall = function (requestURL, email, password, requestMethod) {
         var credentials = btoa(email + ":" + password);
         var request = {
             method: requestMethod,
@@ -16,13 +16,13 @@ myApp.service('APIService', function ($http) {
                 'Authorization' : 'Basic ' + credentials
             }
         };
-        $http(request)
-        .success(function(data, status, headers, config) {
-            callback(data);
-        }).
-        error(function(data, status, headers, config) {
-            callback(null); 
-        });
+        return $http(request)
+                .success(function(data, status, headers, config) {
+                    return data;
+                }).
+                error(function(data, status, headers, config) {
+                    return null; 
+                });
     }
 })
 

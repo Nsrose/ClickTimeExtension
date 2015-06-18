@@ -1,39 +1,46 @@
 <!Doctype html>
 <html ng-app="ClickTimeExtension" ng-csp>
-	<head>
+    <head>
         <link rel="stylesheet" href="../css/popup.css">
 
         <!--<script src="js/lib/jquery-1.8.2.min.js"></script>-->
         <script src="../js/lib/angular.min.js"></script>
-
         <script src="../js/app/app.js"></script>
 
         <!-- Services -->
         <script src="../js/services/APIService.js"></script>
-        <!--||||||||||-->
-
         <script src="../js/app/LoginController.js"></script>
     </head>
+
     <body id="popup">
-    	<header>
-    		<h1>Login</h1>
-    	</header>
+        <header>
+            <h1>Login</h1>
+        </header>
 
+        <!-- TODO: Add required fields and anuglar directives  -->
 
-    	<!-- TODO: Add required fields and anuglar directives  -->
+        <div ng-controller="LoginController">
+            <form name="loginForm" novalidate>
+                <p>Email:<br>
+                    <input type="email" name="email" ng-model="user.email" required><br>
+                    <span style="color:red" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
+                        <span ng-show="loginForm.email.$error.required">Email is required.</span>
+                        <span ng-show="loginForm.email.$error.email">bad emails make cats sad.</span>
+                    </span>
+                </p>
 
-    	<div ng-controller="LoginController">
-    		<form>
-			Email:<br>
-				<input type="text" ng-model="user.email" placeholder="santa@clicktime.com">
-			<br>
-			Password:<br>
-				<input type="password" ng-model="user.password" placeholder="********">
-			</form>
-
-            <h2>Don't have an account? <a href="http://www.clicktime.com/forms/free-trial" target="_blank">Sign up here.</a></h2>
-
-			<input type="submit" ng-click="login(user)" value="Login"/>
-    	</div>
+                <p>Password:<br>
+                    <input type="password" name="password" ng-model="user.password" required><br>
+                    <span style="color:red" ng-show="loginForm.password.$dirty && loginForm.password.$invalid">
+                        <span ng-show="loginForm.password.$error.required">no hacking please.</span>
+                    </span> 
+                </p>
+            </form>
+            <h2>
+                Don't have an account? <a href="http://www.clicktime.com/forms/free-trial" target="_blank">Sign up here.</a>
+            </h2>
+            <input type="submit" ng-click="login(user)" value="Login"/>
+        </div>
     </body>
 </html>
+

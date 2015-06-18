@@ -31,7 +31,7 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
 
 
 
-                // Async calls to the API to fill out fields //
+                ////// Async calls to the API to fill out fields //////
                 var baseURL = API_BASE + "Companies/" + $scope.CompanyID + "/Users/" + $scope.UserID;
 
                 // Fetch the clients
@@ -69,6 +69,8 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                     $scope.tasks = response.data;
                     $scope.Task = response.data[0];
                 })
+
+                ////////////////////////////////////////////////////////////
 
 
 

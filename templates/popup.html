@@ -5,33 +5,32 @@
 
         <!--<script src="js/lib/jquery-1.8.2.min.js"></script>-->
         <script src="../js/lib/angular.min.js"></script>
-
         <script src="../js/app/app.js"></script>
 
         <!-- Services -->
         <script src="../js/services/APIService.js"></script>
-
         <script src="../js/app/PageController.js"></script>
+
+        <!-- Objects -->
+        <script src="../js/services/StopWatch.js"></script>
     </head>
     <body id="popup">
         <header>
-            <h1>ClickTime Tracking!</h1>
+            <h1>Time Tracking!</h1>
         </header>
-
-
         <div ng-controller="PageController">
+            <button ng-click="startStopWatch()">Start time</button>
+            <button ng-click="stopStopWatch()">Stop time</button>
+            <button ng-click="logout()">Sign Out</button>
+            <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
 
-
-            <input type="submit" ng-click="logout()" value="Logout"/>
-            <h1>Client: </h1>
-            <select ng-model="Client" ng-options="client.DisplayName for client in clients">
-            </select>
-            <h1>Job: </h1>
-             <select ng-model="Job" ng-options="job.DisplayName for job in jobs">
-            </select>
-            <h1>Task: </h1>
-             <select ng-model="Task" ng-options="task.DisplayName for task in tasks">
-            </select>
+            <h1>Client:</h1>
+                <select ng-model="Client" ng-options="client.DisplayName for client in clients"></select>
+            <h1>Job:</h1>
+                <select ng-model="Job" ng-options="job.DisplayName for job in jobs"></select>
+            <h1>Task:</h1>
+                <select ng-model="Task" ng-options="task.DisplayName for task in tasks"></select>
         </div>
     </body>
 </html>
+

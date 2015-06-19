@@ -1,9 +1,29 @@
-
 // Main controller for the extension. By this point, user must be logged in. 
-myApp.controller("PageController", ['$scope', 'APIService', '$http',
-    function ($scope, APIService, $http) {
+myApp.controller("PageController", ['$scope', 'APIService', '$http', function ($scope, APIService, $http) {
+    var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
+    $scope.DisplayTime = _StopWatch.formatTime(0);
+
+    // stopwatch
+    $scope.startStopWatch = function() {
+        _StopWatch.start();
+    }
+        
+    $scope.stopStopWatch = function() {
+        _StopWatch.stop();
+        $scope.DisplayTime = _StopWatch.duration();
+        setTimeout(function() {
+            _StopWatch.reset();
+            }, 1000
+        );
+    }
+
+    setInterval(function() {
+        $scope.DisplayTime = _StopWatch.formatTime(_StopWatch.time());
+        $scope.$apply();
+        }, 1000
+    );
 
     // Logout function
     $scope.logout = function() {
@@ -70,10 +90,6 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
                     $scope.Task = response.data[0];
                 })
 
-                ////////////////////////////////////////////////////////////
-
-
-
                 return;
             }
         }
@@ -83,6 +99,4 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http',
     })
 
 }]);
-
-
 

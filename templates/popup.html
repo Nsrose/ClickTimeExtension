@@ -22,14 +22,23 @@
             <button ng-click="startStopWatch()">Start time</button>
             <button ng-click="stopStopWatch()">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
+            <button ng-click="refresh()">Refresh</button>
             <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
 
-            <h1>Client:</h1>
-                <select ng-model="Client" ng-options="client.DisplayName for client in clients"></select>
-            <h1>Job:</h1>
-                <select ng-model="Job" ng-options="job.DisplayName for job in jobs"></select>
-            <h1>Task:</h1>
-                <select ng-model="Task" ng-options="task.DisplayName for task in tasks"></select>
+            <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
+
+            <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
+            </div>
+            
+            <h1>Client: </h1>
+            <select ng-model="client" ng-options="client as client.DisplayName for client in clients">
+            </select>
+            <h1>Job: </h1>
+            <select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
+            </select>
+            <h1>Task: </h1>
+            <select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
+            </select>
         </div>
     </body>
 </html>

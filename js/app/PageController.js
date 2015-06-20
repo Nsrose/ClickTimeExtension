@@ -1,5 +1,5 @@
 // Main controller for the extension. By this point, user must be logged in. 
-myApp.controller("PageController", ['$scope', 'APIService', '$http', function ($scope, APIService, $http) {
+myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$http', function ($scope, APIService, EntityService, $http) {
     var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
@@ -49,6 +49,7 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http', function ($
             })
     }
 
+
     // Logout function
     $scope.logout = function() {
         chrome.storage.sync.remove('session', function () {
@@ -65,209 +66,255 @@ myApp.controller("PageController", ['$scope', 'APIService', '$http', function ($
             window.location.href = "../../templates/login.html";
         })
     }
+
     
     // Get the session of the user from storage.
-    chrome.storage.sync.get('session', function (items) {
-        if ('session' in items) {
-            var session = items.session.data;
-            if (session != null) {
-                // Everything's good to go here
-
-
-
-                // Session values
-                $scope.UserName = session.UserName;
-                $scope.UserID = session.UserID;
-                $scope.CompanyID = session.CompanyID;
-                $scope.UserEmail = session.UserEmail;
-                $scope.Token = session.Token;
-                $scope.SecurityLevel = session.SecurityLevel;
-
-                $scope.IsManagerOrAdmin = session.SecurityLevel == 'manager'
-                    || session.SecurityLevel == "admin";
-
-                // If there are any empty entity drop downs (job, task, client), this is true
-                $scope.HasEmptyEntities = false;
-
-
-                baseURL = API_BASE + "Companies/" + $scope.CompanyID + "/Users/" + $scope.UserID;
-
-                // Refresh function
-                // This forces an API call for the jobs, clients, and tasks dropdown menus
-                $scope.refresh = function() {
-                    console.log("Fetching most recent data from Clicktime");
-                    $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
-                    .then(function (response) {
-                        $scope.clients = response.data;
-                        if (response.data.length == 0) {
-                            $scope.HasEmptyEntities = true;
-                        }
-                        $scope.client = response.data[0];
-                        return response;
-                    })
-                    .then (function (response) {
-                        chrome.storage.sync.set({
-                            'clientsList' : response,
-                        }, function () {
-                            console.log("Set clients list to local storage");
-                        })
-                    })
-
-                    $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
-                    .then( function (response) {
-                        $scope.jobs = response.data;
-                        if (response.data.length == 0) {
-                            $scope.HasEmptyEntities = true;
-                        }
-                        $scope.job = response.data[0];
-                        return response;
-                    })
-                    .then (function (response) {
-                        chrome.storage.sync.set({
-                            'jobsList' : response,
-                        }, function () {
-                            console.log("Set jobs list to local storage");
-                        })
-                    })
-
-                    $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
-                    .then( function (response) {
-                        $scope.tasks = response.data;
-                        if (response.data.length == 0) {
-                            $scope.HasEmptyEntities = true;
-                        }
-                        $scope.task = response.data[0];
-                        return response;
-                    })
-                    .then (function (response) {
-                        chrome.storage.sync.set({
-                            'tasksList' : response,
-                        }, function () {
-                            console.log("Set tasks list to local storage");
-                        })
-                    })
-                }
-
-
-                //////////////// Initialization calls ///////////////////////////////////
-
-                // Fetch the clients
-                // First check local storage. 
-                chrome.storage.sync.get('clientsList', function (items) {
-                    if ('clientsList' in items) {
-                        // Clients were stored locally, great!
-                        var clientsList = items.clientsList.data;
-                        if (clientsList != null) {
-                            console.log("Fetched clients list from local storage");
-                            $scope.clients = clientsList;
-                            if (clientsList.length == 0) {
-                                $scope.HasEmptyEntities = true;
-                            }
-                            $scope.client = clientsList[0];
-                            $scope.$apply();
-                            return;
-                        } 
-                    } else {
-                        // Clients don't exist in local storage. Need to call API
-                        $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
-                        .then( function (response) {
-                            $scope.clients = response.data;
-                            if (response.data.length == 0) {
-                               $scope.HasEmptyEntities = true;
-                            }
-                            $scope.client = response.data[0];
-                            return response;
-                        })
-                        .then (function (response) {
-                            chrome.storage.sync.set({
-                                'clientsList' : response,
-                            }, function () {
-                                console.log("Set clients list to local storage");
-                            })
-                        })
-                    }
-                })
-
-                // Fetch the jobs
-                // First check local storage. 
-                chrome.storage.sync.get('jobsList', function (items) {
-                    if ('jobsList' in items) {
-                        // Jobs were stored locally, great!
-                        var jobsList = items.jobsList.data;
-                        if (jobsList != null) {
-                            console.log("Fetched jobs list from local storage");
-                            $scope.jobs = jobsList;
-                            if (jobsList.length == 0) {
-                                $scope.HasEmptyEntities = true;
-                            }
-                            $scope.job = jobsList[0];
-                            $scope.$apply();
-                            return;
-                        } 
-                    } else {
-                        // Jobs don't exist in local storage. Need to call API
-                        $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
-                        .then( function (response) {
-                            $scope.jobs = response.data;
-                            if (response.data.length == 0) {
-                               $scope.HasEmptyEntities = true;
-                            }
-                            $scope.job = response.data[0];
-                            return response;
-                        })
-                        .then (function (response) {
-                            chrome.storage.sync.set({
-                                'jobsList' : response,
-                            }, function () {
-                                console.log("Set jobs list to local storage");
-                            })
-                        })
-                    }
-                })
-
-                // Fetch the tasks
-                // First check local storage. 
-                chrome.storage.sync.get('tasksList', function (items) {
-                    if ('tasksList' in items) {
-                        // Tasks were stored locally, great!
-                        var tasksList = items.tasksList.data;
-                        if (tasksList != null) {
-                            console.log("Fetched tasks list from local storage");
-                            $scope.tasks = tasksList;
-                            if (tasksList.length == 0) {
-                                $scope.HasEmptyEntities = true;
-                            }
-                            $scope.task = tasksList[0];
-                            $scope.$apply();
-                            return;
-                        } 
-                    } else {
-                        // Tasks don't exist in local storage. Need to call API
-                        $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
-                        .then( function (response) {
-                            $scope.tasks = response.data;
-                            if (response.data.length == 0) {
-                               $scope.HasEmptyEntities = true;
-                            }
-                            $scope.task = response.data[0];
-                            return response;
-                        })
-                        .then (function (response) {
-                            chrome.storage.sync.set({
-                                'tasksList' : response,
-                            }, function () {
-                                console.log("Set tasks list to local storage");
-                            })
-                        })
-                    }
-                })
-                return;
-            }
+    var afterGetSession = function (session) {
+       
+        var afterGetClients = function (clientsList) {
+            console.log(clientsList);
         }
-        // Session couldn't be found
-        alert('Session could not be found');
-        return;
-    })
+
+        var afterGetJobs = function (jobsList) {
+            console.log(jobsList);
+        }
+
+        EntityService.getClients(session, afterGetClients);
+        EntityService.getJobs(session, afterGetJobs);
+
+
+    }
+    EntityService.getSession(afterGetSession);
+
+    // chrome.storage.sync.get('session', function (items) {
+    //     if ('session' in items) {
+    //         var session = items.session.data;
+    //         if (session != null) {
+    //             // Everything's good to go here
+
+               
+
+    //             // Session values
+    //             $scope.UserName = session.UserName;
+    //             $scope.UserID = session.UserID;
+    //             $scope.CompanyID = session.CompanyID;
+    //             $scope.UserEmail = session.UserEmail;
+    //             $scope.Token = session.Token;
+    //             $scope.SecurityLevel = session.SecurityLevel;
+
+    //             $scope.IsManagerOrAdmin = session.SecurityLevel == 'manager'
+    //                 || session.SecurityLevel == "admin";
+
+    //             // If there are any empty entity drop downs (job, task, client), this is true
+    //             $scope.HasEmptyEntities = false;
+
+
+    //             // Mapping from clientIDs to jobs
+    //             $scope.JobMap = {};
+
+    //             // Matched jobs for clientIDs
+    //             $scope.JobClients = [];
+
+
+    //             // Base URL for making API calls to the three main GET methods
+    //             baseURL = API_BASE + "Companies/" + $scope.CompanyID + "/Users/" + $scope.UserID;
+
+    //             // Watch the client for changes to adjust available jobs list
+    //             $scope.$watch('client.ClientID', function (clientID) {
+    //                 console.log('client was changed');
+    //                 if ($scope.jobs) {
+    //                     $scope.JobClients = $scope.jobs.filter(function (job) {return job.ClientID == clientID});
+    //                     $scope.job = $scope.JobClients[0];
+    //                 }
+    //             })
+
+
+    //             // Refresh function
+    //             // This forces an API call for the jobs, clients, and tasks dropdown menus
+    //             $scope.refresh = function() {
+    //                 console.log("Fetching most recent data from Clicktime");
+    //                 $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
+    //                 .then(function (response) {
+    //                     $scope.clients = response.data;
+    //                     if (response.data.length == 0) {
+    //                         $scope.HasEmptyEntities = true;
+    //                     }
+    //                     $scope.client = response.data[0];
+    //                     return response;
+    //                 })
+    //                 .then (function (response) {
+    //                     chrome.storage.sync.set({
+    //                         'clientsList' : response,
+    //                     }, function () {
+    //                         console.log("Set clients list to local storage");
+    //                     })
+    //                 })
+
+    //                 $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
+    //                 .then( function (response) {
+    //                     $scope.jobs = response.data;
+    //                     console.log($scope.jobs);
+    //                     if (response.data.length == 0) {
+    //                         $scope.HasEmptyEntities = true;
+    //                     }
+
+    //                     if ($scope.client) {
+    //                         $scope.JobClients = $scope.jobs.filter(function (job) {return job.ClientID == $scope.client.ClientID});
+    //                         $scope.job = $scope.JobClients[0];
+    //                     } else {
+    //                         $scope.job = response.data[0];
+    //                     }
+
+    //                     return response;
+    //                 })
+    //                 .then (function (response) {
+    //                     chrome.storage.sync.set({
+    //                         'jobsList' : response,
+    //                     }, function () {
+    //                         console.log("Set jobs list to local storage");
+    //                     })
+    //                 })
+
+    //                 $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
+    //                 .then( function (response) {
+    //                     $scope.tasks = response.data;
+    //                     if (response.data.length == 0) {
+    //                         $scope.HasEmptyEntities = true;
+    //                     }
+    //                     $scope.task = response.data[0];
+    //                     return response;
+    //                 })
+    //                 .then (function (response) {
+    //                     chrome.storage.sync.set({
+    //                         'tasksList' : response,
+    //                     }, function () {
+    //                         console.log("Set tasks list to local storage");
+    //                     })
+    //                 })
+    //             }
+
+
+    //             //////////////// Initialization calls ///////////////////////////////////
+
+    //             // Fetch the clients
+    //             // First check local storage. 
+    //             chrome.storage.sync.get('clientsList', function (items) {
+    //                 if ('clientsList' in items) {
+    //                     // Clients were stored locally, great!
+    //                     var clientsList = items.clientsList.data;
+    //                     if (clientsList != null) {
+    //                         console.log("Fetched clients list from local storage");
+    //                         $scope.clients = clientsList;
+    //                         if (clientsList.length == 0) {
+    //                             $scope.HasEmptyEntities = true;
+    //                         }
+    //                         $scope.client = clientsList[0];
+    //                         $scope.$apply();
+    //                         return;
+    //                     } 
+    //                 } else {
+    //                     // Clients don't exist in local storage. Need to call API
+    //                     $scope.api('Clients', $scope.UserEmail, $scope.Token, 'GET')
+    //                     .then( function (response) {
+    //                         $scope.clients = response.data;
+    //                         if (response.data.length == 0) {
+    //                            $scope.HasEmptyEntities = true;
+    //                         }
+    //                         $scope.client = response.data[0];
+    //                         return response;
+    //                     })
+    //                     .then (function (response) {
+    //                         chrome.storage.sync.set({
+    //                             'clientsList' : response,
+    //                         }, function () {
+    //                             console.log("Set clients list to local storage");
+    //                         })
+    //                     })
+    //                 }
+    //             })
+
+    //             // Fetch the jobs
+    //             // First check local storage. 
+    //             chrome.storage.sync.get('jobsList', function (items) {
+    //                 if ('jobsList' in items) {
+    //                     // Jobs were stored locally, great!
+    //                     var jobsList = items.jobsList.data;
+    //                     if (jobsList != null) {
+    //                         console.log("Fetched jobs list from local storage");
+    //                         $scope.jobs = jobsList;
+    //                         if (jobsList.length == 0) {
+    //                             $scope.HasEmptyEntities = true;
+    //                         }
+    //                         $scope.job = jobsList[0];
+
+    //                         $scope.$apply();
+    //                         return;
+    //                     } 
+    //                 } else {
+    //                     // Jobs don't exist in local storage. Need to call API
+    //                     $scope.api('Jobs', $scope.UserEmail, $scope.Token, 'GET')
+    //                     .then( function (response) {
+    //                         $scope.jobs = response.data;
+    //                         if (response.data.length == 0) {
+    //                            $scope.HasEmptyEntities = true;
+    //                         }
+
+    //                         $scope.job = response.data[0];
+    //                         return response;
+    //                     })
+    //                     .then (function (response) {
+    //                         chrome.storage.sync.set({
+    //                             'jobsList' : response,
+    //                         }, function () {
+    //                             console.log("Set jobs list to local storage");
+    //                         })
+    //                     })
+    //                 }
+    //             })
+
+    //             // Fetch the tasks
+    //             // First check local storage. 
+    //             chrome.storage.sync.get('tasksList', function (items) {
+    //                 if ('tasksList' in items) {
+    //                     // Tasks were stored locally, great!
+    //                     var tasksList = items.tasksList.data;
+    //                     if (tasksList != null) {
+    //                         console.log("Fetched tasks list from local storage");
+    //                         $scope.tasks = tasksList;
+    //                         if (tasksList.length == 0) {
+    //                             $scope.HasEmptyEntities = true;
+    //                         }
+    //                         $scope.task = tasksList[0];
+    //                         $scope.$apply();
+    //                         return;
+    //                     } 
+    //                 } else {
+    //                     // Tasks don't exist in local storage. Need to call API
+    //                     $scope.api('Tasks', $scope.UserEmail, $scope.Token, 'GET')
+    //                     .then( function (response) {
+    //                         $scope.tasks = response.data;
+    //                         if (response.data.length == 0) {
+    //                            $scope.HasEmptyEntities = true;
+    //                         }
+    //                         $scope.task = response.data[0];
+    //                         return response;
+    //                     })
+    //                     .then (function (response) {
+    //                         chrome.storage.sync.set({
+    //                             'tasksList' : response,
+    //                         }, function () {
+    //                             console.log("Set tasks list to local storage");
+    //                         })
+    //                     })
+    //                 }
+    //             })
+    //             return;
+    //         }
+    //     }
+    //     // Session couldn't be found
+    //     alert('Session could not be found');
+    //     return;
+    // })
 
 }]);
 

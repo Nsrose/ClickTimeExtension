@@ -9,6 +9,7 @@
 
         <!-- Services -->
         <script src="../js/services/APIService.js"></script>
+        <script src="../js/services/EntityService.js"></script>
         <script src="../js/app/PageController.js"></script>
 
         <!-- Objects -->
@@ -31,10 +32,10 @@
             </div>
             
             <h1>Client: </h1>
-            <select ng-model="client" ng-options="client as client.DisplayName for client in clients">
+            <select ng-model="client" ng-options="client as client.DisplayName for client in clients | orderBy: '-Recent'">
             </select>
             <h1>Job: </h1>
-            <select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
+            <select ng-model="job" ng-options="job as job.DisplayName for job in JobClients">
             </select>
             <h1>Task: </h1>
             <select ng-model="task" ng-options="task as task.DisplayName for task in tasks">

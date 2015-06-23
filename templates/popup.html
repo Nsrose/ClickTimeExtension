@@ -24,6 +24,8 @@
         <script src="../js/services/StopWatch.js"></script>
     </head>
     <body id="popup">
+        <div id="overlay"></div>
+
         <header>
             <h1>Time Tracking!</h1>
         </header>
@@ -31,8 +33,15 @@
             <button ng-click="startStopWatch()">Start time</button>
             <button ng-click="stopStopWatch()">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
-            <button ng-click="refresh()">Refresh</button>
+            
             <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
+
+            <div class="refresh-container">
+                <div class="refresh-message">
+                    Can't find a recently created client, job, or task?
+                </div>
+                <button ng-click="refresh()">Refresh</button>
+            </div>
 
             <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
 

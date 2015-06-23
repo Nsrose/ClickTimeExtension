@@ -48,16 +48,16 @@
             <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
             </div>
             
-            <h1>Client: </h1>
+            <h3>Client: </h3>
             <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients">
             </div>
             
 
-            <h1>Job: </h1>
+            <h3>Job: </h3>
             <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
             </div>
 
-            <h1>Task: </h1>
+            <h3>Task: </h3>
             <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
             </div>
         </div>

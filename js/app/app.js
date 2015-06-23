@@ -5,6 +5,7 @@
 // API base url for development.
 var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
 var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your request.";
+
 var myApp = angular.module('ClickTimeExtension', []);
 
 String.prototype.capitalize = function() {

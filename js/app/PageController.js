@@ -1,7 +1,6 @@
 // Main controller for the extension. By this point, user must be logged in. 
 myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$http', function ($scope, APIService, EntityService, $http) {
 
-
     var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
@@ -30,19 +29,21 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
         }, 1000
     );
 
+    $scope.put = function (entity, type) {
+        EntityService.put(entity, type);
+    }
+    $scope.showRecent = function (entity) {
+        EntityService.showRecent(entity);
+    }
+
+    $scope.saveTimeEntry = function (client, job, task) {
+       EntityService.saveTimeEntry(client, job, task);
+    }
+
 
     // Logout function
     $scope.logout = function() {
-        chrome.storage.sync.remove('session', function () {
-            chrome.storage.sync.remove('clientsList', function () {
-                console.log("removed clients list.");
-            })
-            chrome.storage.sync.remove('jobsList', function () {
-                console.log("removed jobs list.");
-            })
-            chrome.storage.sync.remove('tasksList', function() {
-                console.log("removed tasks list.");
-            })
+        chrome.storage.sync.remove(CHROME_STORAGE_VARS, function () {
             alert("Logged out.");
             window.location.href = "../../templates/login.html";
         })

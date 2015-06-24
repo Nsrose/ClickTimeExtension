@@ -75,13 +75,34 @@ myApp.service('EntityService', function ($http, APIService) {
     this.getClients = function (session, checkLocal, callback) {
         if (checkLocal) {
             // Call to just get the entity. Check local storage first.
-            chrome.storage.sync.get('clientsList', function (items) {
+            chrome.storage.sync.get(['clientsList', 'clientsByRecent'], function (items) {
                 if ('clientsList' in items) {
                     // Clients were stored locally, great!
                     var clientsList = items.clientsList.data;
                     if (clientsList != null) {
+                        var clientsByRecent = [];
+                        // See if the recently used were available to reorder list
+                        if ('clientsByRecent' in items) {
+                            clientsByRecent = items.clientsByRecent;
+                        }
+
+                        var entityList = [];
+                        // First add any client not in the recent list
+                        for (i in clientsList) {
+                            c = clientsList[i];
+                            if (clientsByRecent && !containsClient(clientsByRecent, c)) {
+                                entityList.push(c);  
+                            }
+                        }
+
+                        // Then add the recent clients
+                        for (i in clientsByRecent) {
+                            r = clientsByRecent[i];
+                            entityList.unshift(r);
+                        }
+
                         console.log("Fetched clients list from local storage");
-                        callback(clientsList);
+                        callback(entityList);
                     } 
                 } else {
                     CompanyID = session.CompanyID;
@@ -92,8 +113,29 @@ myApp.service('EntityService', function ($http, APIService) {
                         chrome.storage.sync.set({
                             'clientsList' : response,
                         }, function () {
-                            console.log("Set clients list to local storage");
-                            callback(response.data);
+                            var clientsList = response.data;
+                            var clientsByRecent = [];
+                             // See if the recently used were available to reorder list
+                            if ('clientsByRecent' in items) {
+                                clientsByRecent = items.clientsByRecent;
+                            }
+
+                            var entityList = [];
+                            // First add any client not in the recent list
+                            for (i in clientsList) {
+                                c = clientsList[i];
+                                if (clientsByRecent && !containsClient(clientsByRecent, c)) {
+                                    entityList.push(c);    
+                                }
+                            }
+
+                            // Then add the recent clients
+                            for (i in clientsByRecent) {
+                                r = clientsByRecent[i];
+                                entityList.unshift(r);
+                            }
+
+                            callback(entityList);
                         })
                     })
                 }
@@ -165,13 +207,36 @@ myApp.service('EntityService', function ($http, APIService) {
     // Calls the callback on the tasksList
     this.getTasks = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.sync.get('tasksList', function (items) {
+            chrome.storage.sync.get(['tasksList', 'tasksByRecent'], function (items) {
                 if ('tasksList' in items) {
                     // tasks were stored locally, great!
                     var tasksList = items.tasksList.data;
                     if (tasksList != null) {
+
+                        var tasksByRecent = [];
+                        // See if the recently used were available to reorder list
+                        if ('tasksByRecent' in items) {
+                            tasksByRecent = items.tasksByRecent;
+                        }
+
+                        var entityList = [];
+                        // First add any task not in the recent list
+                        for (i in tasksList) {
+                            t = tasksList[i];
+                            if (tasksByRecent && !containsTask(tasksByRecent, t)) {
+                                entityList.push(t);  
+                            }
+                        }
+
+                        // Then add the recent tasks
+                        for (i in tasksByRecent) {
+                            r = tasksByRecent[i];
+                            entityList.unshift(r);
+                        }
                         console.log("Fetched tasks list from local storage");
-                        callback(tasksList);
+                        console.log(tasksByRecent);
+                        console.log(entityList);
+                        callback(entityList);
                     } 
                 } else {
                     // Tasks don't exist in local storage. Need to call API
@@ -180,8 +245,29 @@ myApp.service('EntityService', function ($http, APIService) {
                         chrome.storage.sync.set({
                             'tasksList' : response,
                         }, function () {
+                            var tasksByRecent = [];
+                            var tasksList = response.data;
+                            // See if the recently used were available to reorder list
+                            if ('tasksByRecent' in items) {
+                                tasksByRecent = items.tasksByRecent;
+                            }
+
+                            var entityList = [];
+                            // First add any task not in the recent list
+                            for (i in tasksList) {
+                                t = tasksList[i];
+                                if (tasksByRecent && !containsTask(tasksByRecent, t)) {
+                                    entityList.push(t);  
+                                }
+                            }
+
+                            // Then add the recent tasks
+                            for (i in tasksByRecent) {
+                                r = tasksByRecent[i];
+                                entityList.unshift(r);
+                            }
                             console.log("Set tasks list to local storage");
-                            callback(response.data);
+                            callback(entityList);
                         })
                     })
                 }
@@ -199,6 +285,100 @@ myApp.service('EntityService', function ($http, APIService) {
                     })
                 })
         }
+       
+    }
+
+   
+
+    // Returns true iff list contains the client object.
+    var containsClient = function (list, client) {
+        for (i in list) {
+            var c = list[i];
+            if (c.ClientID == client.ClientID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns true iff list contains the task object.
+    var containsTask = function (list, task) {
+        for (i in list) {
+            var t = list[i];
+            if (t.TaskID == task.TaskID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns the index of the client object, or -1 if it doesn't exist.
+    var indexOfClient = function (list, client) {
+        for (i in list) {
+            var c = list[i];
+            if (c.ClientID == client.ClientID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Returns the index of the task object, or -1 if it doesn't exist.
+    var indexOfTask = function (list, task) {
+        for (i in list) {
+            var t = list[i];
+            if (t.TaskID == task.TaskID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    this.saveTimeEntry = function (client, job, task) {
+        // Do time entry stuff
+
+        //// Caching the most recent ////
+        console.log(task);
+        console.log(client);
+        // Get caches from local storage and update them
+        chrome.storage.sync.get(['clientsByRecent', 'tasksByRecent'], function (items) {
+            
+            var clientsByRecent = [];
+            var tasksByRecent = [];
+
+            if ('clientsByRecent' in items) {
+                clientsByRecent = items.clientsByRecent;
+            }
+
+            cindex = indexOfClient(clientsByRecent, client);
+            if (cindex != -1) {
+                clientsByRecent.splice(cindex, 1);
+            }
+
+            clientsByRecent.push(client);
+
+
+
+            if ('tasksByRecent' in items) {
+                tasksByRecent = items.tasksByRecent;
+            }
+
+            tindex = indexOfTask(tasksByRecent, task);
+            if (tindex != -1) {
+                tasksByRecent.splice(tindex, 1);
+            }
+
+            tasksByRecent.push(task);
+
+
+            chrome.storage.sync.set({
+                'clientsByRecent' : clientsByRecent,
+                'tasksByRecent' : tasksByRecent
+            }, function () {
+                console.log("Saved most recent lists to local storage");
+            })
+        })
+
        
     }
 

@@ -10,7 +10,6 @@
         <script src="../js/lib/angular.min.js"></script>
         <script src="../js/app/app.js"></script>
         <script src="../js/lib/bootstrap.min.js"></script>
-        <!-- FIX! -->
         <script src="../js/lib/format.js"></script>
         <script src="../js/lib/customSelect.js"></script>
 
@@ -33,6 +32,8 @@
             <button ng-click="startStopWatch()">Start time</button>
             <button ng-click="stopStopWatch()">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
+
+            <button ng-click="saveTimeEntry(client, job, task)">Save</button>
             
             <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
 

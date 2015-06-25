@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="../css/font-awesome.min.css">
         <link rel="stylesheet" href="../css/style.css">
         <link rel="stylesheet" href="../css/popup.css">
+        <link rel="stylesheet" href="../css/angular-csp.css">
         <!-- libraries -->
         <script src="../js/lib/jquery-1.11.3.min.js"></script>
         <script src="../js/lib/angular.min.js"></script>
@@ -33,7 +34,7 @@
             <button ng-click="stopStopWatch()">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
 
-            <button ng-click="saveTimeEntry(client, job, task)">Save</button>
+            <button ng-click="saveTimeEntry(user, client, job, task)">Save Time</button>
             
             <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
 
@@ -42,6 +43,15 @@
                     Can't find a recently created client, job, or task?
                 </div>
                 <button ng-click="refresh()">Refresh</button>
+            </div>
+
+            <div class="time-entry-container">
+                <form name="time-entry-form">
+                    <label>
+                        Hours:
+                        <input type="text" ng-model="user.timeEntry" size="20" ng-blur="roundHour(user.timeEntry, 0.25)">
+                    </label>
+                </form>
             </div>
 
             <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>

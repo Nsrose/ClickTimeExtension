@@ -8,6 +8,7 @@ var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your req
 var CACHE_LIMIT = 5;
 var CHROME_STORAGE_VARS = [
 	'session',
+	'user',
 	'clientsList',
 	'jobsList',
 	'tasksList',

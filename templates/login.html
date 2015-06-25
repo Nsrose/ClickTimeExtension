@@ -2,6 +2,7 @@
 <html ng-app="ClickTimeExtension" ng-csp>
     <head>
         <link rel="stylesheet" href="../css/popup.css">
+        <link rel="stylesheet" href="../css/angular-csp.css">
 
         <!--<script src="js/lib/jquery-1.8.2.min.js"></script>-->
         <script src="../js/lib/angular.min.js"></script>
@@ -24,7 +25,7 @@
                 <p>Email:<br>
                     <input type="email" name="email" ng-model="user.email" required><br>
                     <span style="color:red" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
-                        <span ng-show="loginForm.email.$error.required">Email is rmequired.</span>
+                        <span ng-show="loginForm.email.$error.required">Email is required.</span>
                         <span ng-show="loginForm.email.$error.email">bad emails make cats sad.</span>
                     </span>
                 </p>

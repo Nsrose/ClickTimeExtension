@@ -49,14 +49,18 @@ myApp.service('EntityService', function ($http, APIService) {
     }
 
 	// Function for making async API calls.
-    // Entity must be plural 
+    // Entity must be plural, except in case of user
     var api = function (entity, email, token, method) {
         if (baseURL == "") {
             alert("Need to get user session before making API calls");
             return;
         }
 
-        var url = baseURL + "/" + entity;
+        var url = baseURL;
+        if (entity != 'User') {
+            url += "/" + entity;
+        }
+
 
         return APIService.apiCall(url, email, token, method)
             .then(function (response) {
@@ -234,8 +238,6 @@ myApp.service('EntityService', function ($http, APIService) {
                             entityList.unshift(r);
                         }
                         console.log("Fetched tasks list from local storage");
-                        console.log(tasksByRecent);
-                        console.log(entityList);
                         callback(entityList);
                     } 
                 } else {
@@ -288,6 +290,47 @@ myApp.service('EntityService', function ($http, APIService) {
        
     }
 
+    // Returns the User
+    this.getUser = function (session, checkLocal, callback) {
+        if (checkLocal) {
+            chrome.storage.sync.get('user', function (items) {
+                if ('user' in items) {
+                    var user = items.user.data;
+
+                    if (user != null) {
+                        console.log("Fetched user object from local storage");
+                        callback(user);
+                    }
+                } else {
+                    // User doesn't exist in local storage. Need to call API.
+                    api('User', session.UserEmail, session.Token, 'GET')
+                    .then(function (response) {
+                        chrome.storage.sync.set({
+                            'user' : response,
+                        }, function () {
+                            var user = response.data;
+                            console.log("Set user object to local storage");
+                            callback(user);
+                        })
+                    })
+                }
+            })
+        } else {
+            CompanyID = session.CompanyID;
+            UserID = session.UserID;
+            api('User', session.UserEmail, session.Token, 'GET')
+            .then(function (response) {
+                chrome.storage.sync.set({
+                    'user' : response,
+                }, function () {
+                    var user = response.data;
+                    console.log("Set user object to local storage");
+                    callback(user);
+                })
+            })
+        }
+    }
+
    
 
     // Returns true iff list contains the client object.
@@ -334,7 +377,7 @@ myApp.service('EntityService', function ($http, APIService) {
         return -1;
     }
 
-    this.saveTimeEntry = function (client, job, task) {
+    this.saveTimeEntry = function (user, client, job, task) {
         // Do time entry stuff
 
         //// Caching the most recent ////
@@ -380,6 +423,36 @@ myApp.service('EntityService', function ($http, APIService) {
         })
 
        
+    }
+
+    /**
+     * Converts a true time value to a rounded time value according to the rounding scheme
+     * @param  time             Precise time
+     * @param  timeIncrement    Timestep (ONLY LESS THAN OR EQUAL TO 1) (e.x. 1, 0.5, 0.25, 0.1)
+     * @return The rounded time according to the timeIncrement parameter
+     * Shamelessly stolen from Clicktime's js library.
+     */
+    this.roundToNearest = function (time, timeIncrement) {
+        var precision;
+        switch (timeIncrement) {
+            case "1":
+            case 1:
+                precision = 0;
+                break;
+            case "0.25":
+            case 0.25:
+                precision = 2;
+                break;
+            default:
+                precision = 1;
+                break;
+        }
+
+        var intpart = parseInt(time);
+        var decpart = parseFloat(time - intpart);
+        var howManyIncrements = Math.round(parseFloat(decpart / timeIncrement).toFixed(10));
+        if (intpart == 0 && howManyIncrements == 0 && time > 0) howManyIncrements = 1;
+        return (intpart + howManyIncrements * timeIncrement).toFixed(precision);
     }
 
 })

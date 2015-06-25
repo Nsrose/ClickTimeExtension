@@ -44,11 +44,12 @@
                 </div>
                 <button ng-click="refresh()">Refresh</button>
             </div>
+            <br>
 
             <div class="time-entry-container">
                 <form name="time-entry-form">
                     <label>
-                        Hours:
+                        Hours:<br>
                         <input type="text" ng-model="user.timeEntry" size="20" ng-blur="roundHour(user.timeEntry, 0.25)">
                     </label>
                 </form>
@@ -71,6 +72,9 @@
             <h3>Task: </h3>
             <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
             </div>
+
+            <h3>Notes:</h3>
+            <textarea placeholder="Notes (optional):" rows="4" cols="50" maxlength="4000"></textarea> 
         </div>
     </body>
 </html>

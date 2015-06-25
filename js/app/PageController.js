@@ -125,11 +125,17 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
             $scope.$apply();
         }
 
+        var afterGetCompany = function (company) {
+            $scope.company = company;
+            $scope.$apply();
+        }
+
 
         EntityService.getClients($scope.Session, false, afterGetClients);
         EntityService.getJobs($scope.Session, false, afterGetJobs);
         EntityService.getTasks($scope.Session, false, afterGetTasks);
         EntityService.getUser($scope.Session, false, afterGetUser);
+        EntityService.getCompany($scope.Session, false, afterGetCompany);
     }
 
 
@@ -197,11 +203,17 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
             $scope.$apply();
         }
 
+        var afterGetCompany = function (company) {
+            $scope.company = company;
+            $scope.$apply();
+        }
+
 
         EntityService.getClients(session, true, afterGetClients);
         EntityService.getJobs(session, true, afterGetJobs);
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
+        EntityService.getCompany(session, true, afterGetCompany);
 
     }
 

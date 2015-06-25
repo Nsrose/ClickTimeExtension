@@ -61,6 +61,10 @@ myApp.service('EntityService', function ($http, APIService) {
             url += "/" + entity;
         }
 
+        if (entity == 'Company') {
+            url = API_BASE + "Companies/" + CompanyID;
+        }
+
 
         return APIService.apiCall(url, email, token, method)
             .then(function (response) {
@@ -326,6 +330,47 @@ myApp.service('EntityService', function ($http, APIService) {
                     var user = response.data;
                     console.log("Set user object to local storage");
                     callback(user);
+                })
+            })
+        }
+    }
+
+    // Returns the Company
+    this.getCompany = function (session, checkLocal, callback) {
+        if (checkLocal) {
+            chrome.storage.sync.get('company', function (items) {
+                if ('company' in items) {
+                    var company = items.company.data;
+
+                    if (company != null) {
+                        console.log("Fetched company object from local storage");
+                        callback(company);
+                    }
+                } else {
+                    // Compnay doesn't exist in local storage. Need to call API.
+                    api('Company', session.UserEmail, session.Token, 'GET')
+                    .then(function (response) {
+                        chrome.storage.sync.set({
+                            'company' : response,
+                        }, function () {
+                            var company = response.data;
+                            console.log("Set company object to local storage");
+                            callback(company);
+                        })
+                    })
+                }
+            })
+        } else {
+            CompanyID = session.CompanyID;
+            UserID = session.UserID;
+            api('Company', session.UserEmail, session.Token, 'GET')
+            .then(function (response) {
+                chrome.storage.sync.set({
+                    'company' : response,
+                }, function () {
+                    var company = response.data;
+                    console.log("Set company object to local storage");
+                    callback(company);
                 })
             })
         }

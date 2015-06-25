@@ -36,7 +36,7 @@
 
             <button ng-click="saveTimeEntry(user, client, job, task)">Save Time</button>
             
-            <h1>Time elapsed: <span ng-model="DisplayTime">{{DisplayTime}}</span></h1>
+           
 
             <div class="refresh-container">
                 <div class="refresh-message">
@@ -49,8 +49,20 @@
             <div class="time-entry-container">
                 <form name="time-entry-form">
                     <label>
-                        Hours:<br>
-                        <input type="text" ng-model="user.timeEntry" size="20" ng-blur="roundHour(user.timeEntry, 0.25)">
+                       Hours:
+                        <input type="text" ng-model="user.timeEntry" ng-blur="roundHour(user.timeEntry, 0.25)">
+                    </label>
+
+                    <label>
+                        Start time:
+                        <input type="time" ng-model="user.timeStart">
+                        End time:
+                        <input type="time" ng-model="user.timeEnd">
+                    </label>
+
+                    <label>
+                        Timer:
+                        <span ng-model="DisplayTime">{{DisplayTime}}</span>
                     </label>
                 </form>
             </div>

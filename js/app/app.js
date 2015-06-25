@@ -9,6 +9,7 @@ var CACHE_LIMIT = 5;
 var CHROME_STORAGE_VARS = [
 	'session',
 	'user',
+	'company',
 	'clientsList',
 	'jobsList',
 	'tasksList',

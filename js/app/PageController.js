@@ -1,10 +1,10 @@
 // Main controller for the extension. By this point, user must be logged in. 
-myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$http', function ($scope, APIService, EntityService, $http) {
+myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, APIService, CTService, EntityService, TimeEntryService, $http) {
 
     var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
-    $scope.DisplayTime = _StopWatch.formatTime(0);
+   
     $scope.Session = null;
 
     $scope.jobsList = null;
@@ -17,27 +17,61 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
         
     $scope.stopStopWatch = function() {
         _StopWatch.stop();
-        $scope.DisplayTime = _StopWatch.duration();
+        $scope.timeEntry.hours = _StopWatch.duration();
         setTimeout(function() {
             _StopWatch.reset();
             }, 1000
         );
     }
 
-    setInterval(function() {
-        $scope.DisplayTime = _StopWatch.formatTime(_StopWatch.time());
-        $scope.$apply();
-        }, 1000
-    );
+    // Clears stop watch to 0:00:00
+    $scope.clearStopwatch = function () {
+        setInterval(function() {
+            $scope.timeEntry.hours = _StopWatch.formatTime(_StopWatch.time());
+            $scope.$apply();
+        }, 1000);
+    }
+
+    // Updates screen every second
+    if ($scope.showStopwatch) {
+        // setInterval(function() {
+        //     $scope.user.timeEntry = _StopWatch.formatTime(_StopWatch.time());
+        //     $scope.$apply();
+        //     }, 1000
+        // );
+        $scope.clearStopwatch();
+    }
+    
 
 
     ////// Time entry ////// 
-    $scope.saveTimeEntry = function (user, client, job, task) {
-       EntityService.saveTimeEntry(user, client, job, task);
+    $scope.saveTimeEntry = function (session, timeEntry) {
+       TimeEntryService.saveTimeEntry(session, timeEntry);
+       EntityService.updateRecentEntities(timeEntry);
+    }
+
+    // Add an entity to the scope's time entry. Called with every selection of a dropdown.
+    $scope.addEntityTimeEntry = function (entityType, entity) {
+        switch (entityType) {
+            case "client":
+                $scope.timeEntry.client = entity;
+                break;
+            case "job":
+                $scope.timeEntry.job = entity;
+                $scope.timeEntry.JobID = entity.JobID;
+                break;
+            case "task":
+                $scope.timeEntry.task = entity;
+                $scope.timeEntry.TaskID = entity.TaskID;
+                break;
+            default:
+                alert("Improper entity of type: " + entityType);
+                break;
+        }
     }
 
     // Returns true iff the stopwatch should be shown for this user.
-    $scope.showStopwatch = function () {
+    var showStopwatch = function () {
         if ($scope.user != null) {
             return $scope.user.RequireStopwatch;    
         }
@@ -46,17 +80,17 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
 
     // Returns true iff start and end time fields should be shown for this user.
     // True iff start and end times are required AND the stopwatch shouldn't be shown.
-    $scope.showStartEndTimes = function() {
+    var showStartEndTimes = function() {
         if ($scope.user != null) {
-            return !$scope.showStopwatch() && $scope.user.RequireStartEndTime;
+            return !$scope.showStopwatch && $scope.user.RequireStartEndTime;
         }
         alert("Need to get user before calling showStartEndTimes");
     }
 
     // Returns true iff the regular time entry field should be shown for this user.
-    $scope.showTimeEntryField = function() {
+    var showTimeEntryField = function() {
         if ($scope.user != null) {
-            return !$scope.showStopwatch() && !$scope.showStartEndTimes();
+            return !$scope.showStopwatch && !$scope.showStartEndTimes;
         }
         alert("Need to get user before calling showTimeEntryField");
     }
@@ -64,12 +98,15 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
     // Round hour inputs
     $scope.roundHour = function (time, timeToIncrement) {
         if (time) {
-            $scope.user.timeEntry = EntityService.roundToNearest(time, timeToIncrement);
+            $scope.timeEntry.hours = CTService.roundToNearest(time, timeToIncrement);
         }
         
     }
 
     ////////////////////////////
+
+
+
 
     // Logout function
     $scope.logout = function() {
@@ -90,6 +127,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
                 $scope.HasEmptyEntities = true;
             }
             $scope.client = clientsList[0];
+            $scope.timeEntry.client = $scope.client;
             $scope.$apply();
         }
 
@@ -108,6 +146,8 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
                 $scope.HasEmptyEntities = true;
             }
             $scope.job = $scope.jobs[0];
+            $scope.timeEntry.job = $scope.job;
+            $scope.timeEntry.JobID = $scope.job.JobID;
             $scope.$apply();
         }
 
@@ -117,11 +157,25 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
                 $scope.HasEmptyEntities = true;
             }
             $scope.task = tasksList[0];
+            $scope.timeEntry.task = $scope.task;
+            $scope.timeEntry.TaskID = $scope.task.TaskID;
             $scope.$apply();
         }
 
         var afterGetUser = function (user) {
             $scope.user = user;
+
+            $scope.showStopwatch = showStopwatch();
+            $scope.showStartEndTimes = showStartEndTimes();
+            $scope.showTimeEntryField = showTimeEntryField();
+           
+            $scope.isDev = user.UserID == '27fbqzVh1Tok';
+
+
+
+            if ($scope.showStopwatch) {
+                $scope.timeEntry.hours = _StopWatch.formatTime(0);
+            }
             $scope.$apply();
         }
 
@@ -153,6 +207,20 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
     // Get the session of the user from storage.
     var afterGetSession = function (session) {
         $scope.Session = session;
+         // default empty time entry
+        var dateString = CTService.getDateString();
+        $scope.timeEntry = {
+            "BreakTime":0.00,
+            "Comment":"",
+            "Date":dateString,
+            "Hours":0.00,
+            "ISOEndTime":new Date(),
+            "ISOStartTime":new Date(),
+            "JobID":"",
+            "PhaseID":"",
+            "SubPhaseID":null,
+            "TaskID":""
+        }
        
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
             || EntityService.SecurityLevel == 'admin';
@@ -164,8 +232,12 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
             if (clientsList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            console.log($scope.clients);
             $scope.client = clientsList[0];
+            if ($scope.timeEntry.client == null) {
+                $scope.timeEntry.client = $scope.client;
+            }
+
+            console.log($scope.clients);
             $scope.$apply();
         }
 
@@ -183,8 +255,9 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
             if ($scope.jobs.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            console.log($scope.jobs);
             $scope.job = $scope.jobs[0];
+            $scope.timeEntry.job = $scope.job;
+            $scope.timeEntry.JobID = $scope.job.JobID;
             $scope.$apply();
         }
 
@@ -193,13 +266,24 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            console.log($scope.tasks);
             $scope.task = tasksList[0];
+            $scope.timeEntry.task = $scope.task;
+            $scope.timeEntry.TaskID = $scope.task.TaskID;
             $scope.$apply();
         }
 
         var afterGetUser = function (user) {
             $scope.user = user;
+            $scope.showStopwatch = showStopwatch();
+            $scope.showStartEndTimes = showStartEndTimes();
+            $scope.showTimeEntryField = showTimeEntryField();
+           
+
+            $scope.isDev = user.UserID == '27fbqzVh1Tok';
+
+            if ($scope.showStopwatch) {
+                $scope.timeEntry.hours = _StopWatch.formatTime(0);
+            }
             $scope.$apply();
         }
 
@@ -214,11 +298,35 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
-
     }
 
 
     EntityService.getSession(afterGetSession);
+
+
+    //// Dev tools ////
+
+    // Show stopwatch
+    $scope.devShowStopwatch = function () {
+        $scope.showStartEndTimes = false;
+        $scope.showTimeEntryField = false;
+        $scope.showStopwatch = true;
+        $scope.clearStopwatch();
+    }
+
+    // Show startendtimes
+    $scope.devShowStartEndTimes = function () {
+        $scope.showStopwatch = false;
+        $scope.showTimeEntryField = false;
+        $scope.showStartEndTimes = true;
+    }
+
+    // Show time entry field
+    $scope.devShowTimeEntryField = function () {
+        $scope.showStartEndTimes = false;
+        $scope.showStopwatch = false;
+        $scope.showTimeEntryField = true;
+    }
 
 }]);
 

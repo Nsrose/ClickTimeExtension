@@ -1,6 +1,6 @@
 // Services for accessing entities
 // These will only work once the session is open
-myApp.service('EntityService', function ($http, APIService) {
+myApp.service('EntityService', function ($http, APIService, CTService) {
 	// The users session
 	var Session = null;
 	var UserName = null;
@@ -155,7 +155,6 @@ myApp.service('EntityService', function ($http, APIService) {
             // Clients don't exist in local storage. Need to call API
             api('Clients', session.UserEmail, session.Token, 'GET')
             .then (function (response) {
-                console.log(response);
                 chrome.storage.sync.set({
                     'clientsList' : response,
                 }, function () {
@@ -422,12 +421,13 @@ myApp.service('EntityService', function ($http, APIService) {
         return -1;
     }
 
-    this.saveTimeEntry = function (user, client, job, task) {
-        // Do time entry stuff
+    // Update recently used list in local storage when saving a time entry
+    this.updateRecentEntities = function (timeEntry) {
+        var task = timeEntry.task;
+        var client = timeEntry.client;
+
 
         //// Caching the most recent ////
-        console.log(task);
-        console.log(client);
         // Get caches from local storage and update them
         chrome.storage.sync.get(['clientsByRecent', 'tasksByRecent'], function (items) {
             
@@ -443,7 +443,7 @@ myApp.service('EntityService', function ($http, APIService) {
                 clientsByRecent.splice(cindex, 1);
             }
 
-            clientsByRecent.push(client);
+            clientsByRecent.push(angular.copy(client));
 
 
 
@@ -456,7 +456,7 @@ myApp.service('EntityService', function ($http, APIService) {
                 tasksByRecent.splice(tindex, 1);
             }
 
-            tasksByRecent.push(task);
+            tasksByRecent.push(angular.copy(task));
 
 
             chrome.storage.sync.set({
@@ -468,36 +468,6 @@ myApp.service('EntityService', function ($http, APIService) {
         })
 
        
-    }
-
-    /**
-     * Converts a true time value to a rounded time value according to the rounding scheme
-     * @param  time             Precise time
-     * @param  timeIncrement    Timestep (ONLY LESS THAN OR EQUAL TO 1) (e.x. 1, 0.5, 0.25, 0.1)
-     * @return The rounded time according to the timeIncrement parameter
-     * Shamelessly stolen from Clicktime's js library.
-     */
-    this.roundToNearest = function (time, timeIncrement) {
-        var precision;
-        switch (timeIncrement) {
-            case "1":
-            case 1:
-                precision = 0;
-                break;
-            case "0.25":
-            case 0.25:
-                precision = 2;
-                break;
-            default:
-                precision = 1;
-                break;
-        }
-
-        var intpart = parseInt(time);
-        var decpart = parseFloat(time - intpart);
-        var howManyIncrements = Math.round(parseFloat(decpart / timeIncrement).toFixed(10));
-        if (intpart == 0 && howManyIncrements == 0 && time > 0) howManyIncrements = 1;
-        return (intpart + howManyIncrements * timeIncrement).toFixed(precision);
     }
 
 })

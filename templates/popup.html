@@ -17,7 +17,11 @@
 
         <!-- Services -->
         <script src="../js/services/APIService.js"></script>
+        <script src="../js/services/CTService.js"></script>
         <script src="../js/services/EntityService.js"></script>
+        <script src="../js/services/TimeEntryService.js"></script>
+
+        <!-- Controllers -->
         <script src="../js/app/PageController.js"></script>
 
         <!-- Objects -->
@@ -30,11 +34,17 @@
             <h1>Time Tracking!</h1>
         </header>
         <div ng-controller="PageController">
-            <button ng-click="startStopWatch()">Start time</button>
-            <button ng-click="stopStopWatch()">Stop time</button>
+            <div id="devtools" ng-show="isDev">
+                <button ng-click="devShowStopwatch()">Stopwatch</button>
+                <button ng-click="devShowStartEndTimes()">Start/End Times</button>
+                <button ng-click="devShowTimeEntryField()">Time Entry</button>
+            </div>
+
+            <button ng-click="startStopWatch()" ng-show="showStopwatch">Start time</button>
+            <button ng-click="stopStopWatch()" ng-show="showStopwatch">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
 
-            <button ng-click="saveTimeEntry(user, client, job, task)">Save Time</button>
+            <button ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
             
            
 
@@ -47,21 +57,21 @@
 
             <div class="time-entry-container">
                 <form name="time-entry-form">
-                    <label>
+                    <label ng-show="showTimeEntryField">
                         Hours:
-                        <input type="text" ng-model="user.timeEntry" ng-blur="roundHour(user.timeEntry, 0.25)">
+                        <input type="text" ng-model="timeEntry.Hours" ng-blur="roundHour(user.timeEntry, 0.25)">
                     </label>
 
-                    <label>
+                    <label ng-show="true">
                         Start time:
-                        <input type="time" ng-model="user.timeStart">
+                        <input type="time" ng-model="timeEntry.ISOStartTime">
                         End time:
-                        <input type="time" ng-model="user.timeEnd">
+                        <input type="time" ng-model="timeEntry.ISOEndTIme">
                     </label>
 
-                    <label>
+                    <label ng-show="showStopwatch">
                         Timer:
-                        <span ng-model="DisplayTime">{{DisplayTime}}</span>
+                        <span>{{DisplayTime}}</span>
                     </label>
                 </form>
             </div>
@@ -72,16 +82,16 @@
             </div>
             
             <h3>Client: </h3>
-            <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients">
+            <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)">
             </div>
             
 
             <h3>Job: </h3>
-            <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
+            <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
             </div>
 
             <h3>Task: </h3>
-            <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
+            <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
             </div>
         </div>
     </body>

@@ -14,7 +14,8 @@ var CHROME_STORAGE_VARS = [
 	'jobsList',
 	'tasksList',
 	'clientsByRecent',
-	'tasksByRecent'
+	'tasksByRecent',
+	'timeEntries'
 ]
 
 var myApp = angular.module('ClickTimeExtension', []);

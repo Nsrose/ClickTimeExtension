@@ -7,14 +7,16 @@ myApp.service('APIService', function ($http) {
     // email - user email
     // password - user password
     // requestMethod - GET or POST
-    this.apiCall = function (requestURL, email, password, requestMethod) {
+    // data - data for POST requests
+    this.apiCall = function (requestURL, email, password, requestMethod, data) {
         var credentials = btoa(email + ":" + password);
         var request = {
             method: requestMethod,
             url: requestURL,
             headers: {
                 'Authorization' : 'Basic ' + credentials
-            }
+            },
+            data: data
         };
         return $http(request)
                 .success(function(data, status, headers, config) {

@@ -21,7 +21,7 @@ var CHROME_STORAGE_VARS = [
 // The number of scope variables that need to be rendered before removing the loading mask
 var NUM_SCOPE_VARS = 6;
 
-var myApp = angular.module('ClickTimeExtension', []);
+var myApp = angular.module('ClickTimeExtension', ['ngRoute']);
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);

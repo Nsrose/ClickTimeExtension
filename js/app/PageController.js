@@ -1,6 +1,8 @@
 // Main controller for the extension. By this point, user must be logged in. 
 myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, APIService, CTService, EntityService, TimeEntryService, $http) {
 
+    $scope.variables = [];
+
     var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
@@ -9,6 +11,26 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
 
     $scope.jobsList = null;
     $scope.HasEmptyEntities = false;
+
+    $scope.pageReady = false;
+
+
+    //// Interface logic ////
+    // Returns true iff the extension is ready.
+    // All fields need to be ready, including client, job, task, user, company
+    $scope.pageReadyFunc = function () {
+        if ($scope.jobs && $scope.clients && $scope.tasks && $scope.user && $scope.company) {
+            return true;
+        }
+        return false;
+    }
+
+    $scope.$watch('variables', function(newVal, oldVal) {
+        if ($scope.variables.length == NUM_SCOPE_VARS) {
+            $scope.pageReady = true;
+            console.log($scope.variables);
+        }
+    }, true)
 
     // stopwatch
     $scope.startStopWatch = function() {
@@ -42,12 +64,35 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
         $scope.clearStopwatch();
     }
     
-
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
     ////// Time entry ////// 
     $scope.saveTimeEntry = function (session, timeEntry) {
-       TimeEntryService.saveTimeEntry(session, timeEntry);
-       EntityService.updateRecentEntities(timeEntry);
+        var clickTimeEntry = {
+            "BreakTime" : timeEntry.BreakTime,
+            "Comment" : timeEntry.Comment,
+            "Date" : timeEntry.Date,
+            "Hours" : timeEntry.Hours,
+            "JobID" : timeEntry.JobID,
+            "PhaseID" : timeEntry.PhaseID,
+            "SubPhaseID" : timeEntry.SubPhaseID,
+            "TaskID" : timeEntry.TaskID,
+        }
+        if ($scope.showStartEndTimes) {
+            var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+            var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+            clickTimeEntry.ISOStartTime = ISOStartTime;
+            clickTimeEntry.ISOEndTime = ISOEndTime;
+        }
+
+        TimeEntryService.saveTimeEntry(session, clickTimeEntry, function (response) {
+            if (response.status == 200) {
+                alert("Saved time entry of " + clickTimeEntry.Hours +" hours.");
+            } else {
+                alert("An error occured.");
+            }
+        });
+        EntityService.updateRecentEntities(timeEntry);
     }
 
     // Add an entity to the scope's time entry. Called with every selection of a dropdown.
@@ -207,6 +252,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
     // Get the session of the user from storage.
     var afterGetSession = function (session) {
         $scope.Session = session;
+        $scope.variables.push('session');
          // default empty time entry
         var dateString = CTService.getDateString();
         $scope.timeEntry = {
@@ -237,7 +283,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
                 $scope.timeEntry.client = $scope.client;
             }
 
-            console.log($scope.clients);
+            $scope.variables.push('clients');
             $scope.$apply();
         }
 
@@ -258,6 +304,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
             $scope.job = $scope.jobs[0];
             $scope.timeEntry.job = $scope.job;
             $scope.timeEntry.JobID = $scope.job.JobID;
+            $scope.variables.push('jobs');
             $scope.$apply();
         }
 
@@ -269,6 +316,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
             $scope.task = tasksList[0];
             $scope.timeEntry.task = $scope.task;
             $scope.timeEntry.TaskID = $scope.task.TaskID;
+            $scope.variables.push('tasks');
             $scope.$apply();
         }
 
@@ -284,11 +332,14 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
             if ($scope.showStopwatch) {
                 $scope.timeEntry.hours = _StopWatch.formatTime(0);
             }
+
+            $scope.variables.push('user');
             $scope.$apply();
         }
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            $scope.variables.push('company');
             $scope.$apply();
         }
 
@@ -298,6 +349,7 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
+
     }
 
 

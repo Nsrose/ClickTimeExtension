@@ -40,6 +40,10 @@
                 <button ng-click="devShowTimeEntryField()">Time Entry</button>
             </div>
 
+            <div id="loading-mask" ng-hide="pageReady">
+                <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
+            </div>
+
             <button ng-click="startStopWatch()" ng-show="showStopwatch">Start time</button>
             <button ng-click="stopStopWatch()" ng-show="showStopwatch">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
@@ -62,7 +66,7 @@
                         <input type="text" ng-model="timeEntry.Hours" ng-blur="roundHour(user.timeEntry, 0.25)">
                     </label>
 
-                    <label ng-show="true">
+                    <label ng-show="showStartEndTimes">
                         Start time:
                         <input type="time" ng-model="timeEntry.ISOStartTime">
                         End time:

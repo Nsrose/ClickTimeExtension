@@ -23,6 +23,7 @@ myApp.service('APIService', function ($http) {
                     return data;
                 }).
                 error(function(data, status, headers, config) {
+                    alert(data.Detail);
                     return null;
                 });
     }

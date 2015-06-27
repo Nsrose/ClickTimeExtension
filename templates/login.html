@@ -21,6 +21,11 @@
         <!-- TODO: Add required fields and anuglar directives  -->
 
         <div ng-controller="LoginController">
+
+            <div id="loading-mask" ng-show="rerouting">
+                <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
+            </div>
+
             <form name="loginForm">
                 <p>Email:<br>
                     <input type="email" name="email" ng-model="user.email" required><br>

@@ -13,3 +13,26 @@ body {
   -ms-user-select: none;
   user-select: none;
 }
+
+.img-scaled {
+  width: 100%;
+}
+
+#spinner {
+    width: 40px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 999;
+    margin-top: 40%;
+}
+
+#loading-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 999;
+}

@@ -1,6 +1,5 @@
-// Login controller
-myApp.controller("LoginController", ['$scope', 'APIService', '$http', function ($scope, APIService, $http) {
-   
+myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', function ($scope, APIService, $http, $location) {
+    console.log("Back to login")
     $scope.rerouting = false;
     // Get the session, if it exists, go to popup. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {
@@ -8,8 +7,11 @@ myApp.controller("LoginController", ['$scope', 'APIService', '$http', function (
             // Session variable exists
             var session = items.session.data;
             if (session != null) {
+                console.log("Logging in user from previous session");
                 // User does not need to login.
-                window.location.href = "../../templates/popup.html";
+                // window.location.href = "../../templates/popup.html";
+                $location.path("/time_entry");
+                $scope.$apply();
             }
         }
     })
@@ -26,14 +28,16 @@ myApp.controller("LoginController", ['$scope', 'APIService', '$http', function (
                 {'session' : session},
                 function() {
                     console.log("Set session in local storage.");
-                    window.location.href = "../../templates/popup.html";
+                    $location.path("/time_entry");
+                    $scope.$apply();
                 }
             )
         })
         .catch(function (error) {
             $scope.loginError = true;
-            window.location.href = "../../templates/login.html";
+            $scope.rerouting = false;
+            $location.path("/login");
         })
     }
+   
 }])
-

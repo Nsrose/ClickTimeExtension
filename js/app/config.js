@@ -2,16 +2,16 @@
 
 myApp.config(['$routeProvider',
   function($routeProvider) {
-    $routeProvider.
-      when('/popup', {
-        templateUrl: '../../templates/popup.html',
-        controller: 'PageController'
-      }).
-      when('/login', {
+    $routeProvider
+      .when('/time_entry', {
+        templateUrl: '../../templates/time_entry.html',
+        controller: 'TimeEntryController'
+      })
+      .when('/login', {
         templateUrl: '../../templates/login.html',
-        controller: 'LoginController'
-      }).
-      otherwise({
+        controller: 'LoginEntryController'
+      })
+      .otherwise({
         redirectTo: '/login'
       });
   }]);

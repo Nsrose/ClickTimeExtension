@@ -1,6 +1,4 @@
-// Main controller for the extension. By this point, user must be logged in. 
-myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, APIService, CTService, EntityService, TimeEntryService, $http) {
-
+myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
     $scope.variables = [];
 
     var _StopWatch = new StopWatch();
@@ -67,6 +65,34 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
     ////////////////////////////////////////////////////////////////////////////////////////////
 
     ////// Time entry ////// 
+
+    // Time entry methods
+    $scope.timeEntryMethods = ['Hours', 'Start/End Times', 'Stopwatch'];
+    $scope.timeEntryMethod = $scope.timeEntryMethods[0];
+    $scope.changeTimeEntryMethod = function (timeEntryMethod) {
+    	switch (timeEntryMethod) {
+    		case "Hours":
+    			$scope.showTimeEntryField = true;
+    			$scope.showStopwatch = false;
+    			$scope.showStartEndTimes = false;
+    			break;
+    		case "Start/End Times":
+    			$scope.showTimeEntryField = false;
+    			$scope.showStartEndTimes = true;
+    			$scope.showStopwatch = false;
+    			break;
+    		case "Stopwatch":
+    			$scope.showTimeEntryField = false;
+    			$scope.showStartEndTimes = false;
+    			$scope.showStopwatch = true;
+    			break;
+    		default:
+    			alert("Invalid time entry method");
+    			break;
+    	}
+    }
+
+
     $scope.saveTimeEntry = function (session, timeEntry) {
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
@@ -157,7 +183,8 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
     $scope.logout = function() {
         chrome.storage.sync.remove(CHROME_STORAGE_VARS, function () {
             alert("Logged out.");
-            window.location.href = "../../templates/login.html";
+            $location.path("/login");
+            $scope.$apply();
         })
     }
 
@@ -379,6 +406,5 @@ myApp.controller("PageController", ['$scope', 'APIService', 'CTService', 'Entity
         $scope.showStopwatch = false;
         $scope.showTimeEntryField = true;
     }
-
-}]);
-
+   
+}])

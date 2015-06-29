@@ -1,0 +1,63 @@
+<h1>Time Entry</h1>
+
+
+<div id="loading-mask" ng-hide="pageReady">
+    <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
+</div>
+
+<button ng-click="startStopWatch()" ng-show="showStopwatch">Start time</button>
+<button ng-click="stopStopWatch()" ng-show="showStopwatch">Stop time</button>
+<button ng-click="logout()">Sign Out</button>
+
+<button ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
+
+
+
+<div class="refresh-container">
+    <div class="refresh-message">
+        Can't find a recently created client, job, or task?
+    </div>
+    <button ng-click="refresh()">Refresh</button>
+</div>
+
+<div class="time-entry-container">
+	<div class="time-entry-select">Time entry method:</div>
+	<div custom-select ng-model="timeEntryMethod" ng-options="method for method in timeEntryMethods" ng-click="changeTimeEntryMethod(timeEntryMethod)"></div> 
+
+    <form name="time-entry-form">
+        <label ng-show="showTimeEntryField">
+            Hours:
+            <input type="text" ng-model="timeEntry.Hours" ng-blur="roundHour(user.timeEntry, 0.25)">
+        </label>
+
+        <label ng-show="showStartEndTimes">
+            Start time:
+            <input type="time" ng-model="timeEntry.ISOStartTime">
+            End time:
+            <input type="time" ng-model="timeEntry.ISOEndTIme">
+        </label>
+
+        <label ng-show="showStopwatch">
+            Timer:
+            <span>{{DisplayTime}}</span>
+        </label>
+    </form>
+</div>
+
+<div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
+
+<div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
+</div>
+
+<h3>Client: </h3>
+<div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)">
+</div>
+
+
+<h3>Job: </h3>
+<div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
+</div>
+
+<h3>Task: </h3>
+<div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
+</div>

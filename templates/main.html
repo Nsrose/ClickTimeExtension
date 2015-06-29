@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="ClickTimeExtension" ng-csp>
+<head>
+	<title>ClickTime</title>
+
+	<!-- Style -->
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/angular-csp.css">
+
+	<!-- Angular Libraries -->
+	<script src="../js/lib/jquery-1.11.3.min.js"></script>
+    <script src="../js/lib/angular.min.js"></script>
+    <script src="../js/lib/angular-route.js"></script>
+    
+
+    <!-- App and config -->
+    <script src="../js/app/app.js"></script>
+    <script src="../js/app/config.js"></script>
+
+    <!-- Helpful libraries -->
+    <script src="../js/lib/bootstrap.min.js"></script>
+    <script src="../js/lib/format.js"></script>
+    <script src="../js/lib/customSelect.js"></script>
+
+    <!-- Controllers -->
+    <script src="../js/app/LoginEntryController.js"></script>
+    <script src="../js/app/TimeEntryController.js"></script>
+
+    <!-- Services -->
+  	<script src="../js/services/APIService.js"></script>
+  	<script src="../js/services/CTService.js"></script>
+  	<script src="../js/services/EntityService.js"></script>
+  	<script src="../js/services/TimeEntryService.js"></script>
+  	<script src="../js/services/StopWatch.js"></script>
+   
+</head>
+<body id="main">
+	<div ng-view></div>
+</body>
+</html>

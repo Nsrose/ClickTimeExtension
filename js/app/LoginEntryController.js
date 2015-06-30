@@ -1,5 +1,5 @@
 myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', function ($scope, APIService, $http, $location) {
-    console.log("Back to login")
+
     $scope.rerouting = false;
     // Get the session, if it exists, go to popup. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {

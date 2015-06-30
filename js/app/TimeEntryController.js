@@ -14,14 +14,19 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
 
 
     //// Interface logic ////
-    // Returns true iff the extension is ready.
-    // All fields need to be ready, including client, job, task, user, company
-    $scope.pageReadyFunc = function () {
-        if ($scope.jobs && $scope.clients && $scope.tasks && $scope.user && $scope.company) {
-            return true;
+    $scope.clearError = function (error) {
+        switch (error) {
+            case "hours":
+                $scope.timeEntryErrorHours = false;
+                break;
+            case "startEndTimes":
+                $scope.timeEntryErrorStartEndTimes = false;
+                break;
+            default:
+                break;
         }
-        return false;
     }
+
 
     $scope.$watch('variables', function(newVal, oldVal) {
         if ($scope.variables.length == NUM_SCOPE_VARS) {
@@ -72,17 +77,17 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
     $scope.changeTimeEntryMethod = function (timeEntryMethod) {
     	switch (timeEntryMethod) {
     		case "Hours":
-    			$scope.showTimeEntryField = true;
+    			$scope.showHourEntryField = true;
     			$scope.showStopwatch = false;
     			$scope.showStartEndTimes = false;
     			break;
     		case "Start/End Times":
-    			$scope.showTimeEntryField = false;
+    			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = true;
     			$scope.showStopwatch = false;
     			break;
     		case "Stopwatch":
-    			$scope.showTimeEntryField = false;
+    			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = false;
     			$scope.showStopwatch = true;
     			break;
@@ -94,31 +99,75 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
 
 
     $scope.saveTimeEntry = function (session, timeEntry) {
+        if (!validateTimeEntry(timeEntry)) {
+            return;
+        }
+
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
             "Comment" : timeEntry.Comment,
             "Date" : timeEntry.Date,
-            "Hours" : timeEntry.Hours,
             "JobID" : timeEntry.JobID,
             "PhaseID" : timeEntry.PhaseID,
             "SubPhaseID" : timeEntry.SubPhaseID,
             "TaskID" : timeEntry.TaskID,
         }
+        console.log(clickTimeEntry);
+        return;
+        if ($scope.showHourEntryField) {
+            clickTimeEntry.Hours = timeEntry.Hours;
+        }
+
         if ($scope.showStartEndTimes) {
+            var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
+            clickTimeEntry.Hours = hourDiff;
             var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
             var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
             clickTimeEntry.ISOStartTime = ISOStartTime;
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
 
+
+        $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry, function (response) {
             if (response.status == 200) {
-                alert("Saved time entry of " + clickTimeEntry.Hours +" hours.");
+                var d = new Date();
+                alert("Entry successfully uploaded at " + d.toTimeString() + ".");
             } else {
                 alert("An error occured.");
             }
+            $scope.pageReady = true;
+            $scope.$apply();
         });
         EntityService.updateRecentEntities(timeEntry);
+    }
+
+    // True iff time entry is valid. Will also throw red error messages.
+    var validateTimeEntry = function (timeEntry) {
+        if (timeEntry.JobID == "" || timeEntry.TaskID == "") {
+            alert("Job or task cannot be empty.");
+            return false;
+        }
+        
+        if ($scope.showStartEndTimes) {
+            if (timeEntry.ISOStartTime == null || timeEntry.ISOEndTime == null) {
+                $scope.timeEntryErrorStartEndTimes = true;
+                return false;
+            }
+            var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
+            if (hourDiff <=0 ) {
+                $scope.timeEntryErrorStartEndTimes
+            }
+        }
+
+        if ($scope.showHourEntryField) {
+            if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
+                $scope.timeEntryErrorHours = true;
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     // Add an entity to the scope's time entry. Called with every selection of a dropdown.
@@ -158,18 +207,18 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
         alert("Need to get user before calling showStartEndTimes");
     }
 
-    // Returns true iff the regular time entry field should be shown for this user.
-    var showTimeEntryField = function() {
+    // Returns true iff the regular hour entry field should be shown for this user.
+    var showHourEntryField = function() {
         if ($scope.user != null) {
             return !$scope.showStopwatch && !$scope.showStartEndTimes;
         }
-        alert("Need to get user before calling showTimeEntryField");
+        alert("Need to get user before calling showHourEntryField");
     }
 
     // Round hour inputs
     $scope.roundHour = function (time, timeToIncrement) {
         if (time) {
-            $scope.timeEntry.hours = CTService.roundToNearest(time, timeToIncrement);
+            $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
         }
         
     }
@@ -239,7 +288,7 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
 
             $scope.showStopwatch = showStopwatch();
             $scope.showStartEndTimes = showStartEndTimes();
-            $scope.showTimeEntryField = showTimeEntryField();
+            $scope.showHourEntryField = showHourEntryField();
            
             $scope.isDev = user.UserID == '27fbqzVh1Tok';
 
@@ -282,13 +331,15 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
         $scope.variables.push('session');
          // default empty time entry
         var dateString = CTService.getDateString();
+        var now = new Date();
+
         $scope.timeEntry = {
             "BreakTime":0.00,
             "Comment":"",
             "Date":dateString,
             "Hours":0.00,
-            "ISOEndTime":new Date(),
-            "ISOStartTime":new Date(),
+            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
             "JobID":"",
             "PhaseID":"",
             "SubPhaseID":null,
@@ -351,10 +402,7 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
             $scope.user = user;
             $scope.showStopwatch = showStopwatch();
             $scope.showStartEndTimes = showStartEndTimes();
-            $scope.showTimeEntryField = showTimeEntryField();
-           
-
-            $scope.isDev = user.UserID == '27fbqzVh1Tok';
+            $scope.showHourEntryField = showHourEntryField();
 
             if ($scope.showStopwatch) {
                 $scope.timeEntry.hours = _StopWatch.formatTime(0);
@@ -383,28 +431,6 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
     EntityService.getSession(afterGetSession);
 
 
-    //// Dev tools ////
 
-    // Show stopwatch
-    $scope.devShowStopwatch = function () {
-        $scope.showStartEndTimes = false;
-        $scope.showTimeEntryField = false;
-        $scope.showStopwatch = true;
-        $scope.clearStopwatch();
-    }
-
-    // Show startendtimes
-    $scope.devShowStartEndTimes = function () {
-        $scope.showStopwatch = false;
-        $scope.showTimeEntryField = false;
-        $scope.showStartEndTimes = true;
-    }
-
-    // Show time entry field
-    $scope.devShowTimeEntryField = function () {
-        $scope.showStartEndTimes = false;
-        $scope.showStopwatch = false;
-        $scope.showTimeEntryField = true;
-    }
    
 }])

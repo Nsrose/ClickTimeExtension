@@ -22,6 +22,8 @@
 	<div custom-select ng-model="timeEntryMethod" ng-options="method for method in timeEntryMethods" ng-click="changeTimeEntryMethod(timeEntryMethod)"></div> 
 
     <form name="time-entry-form">
+        <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
+
         <label ng-show="showHourEntryField">
             Hours:
             <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, 0.25)" ng-focus="clearError('hours')">

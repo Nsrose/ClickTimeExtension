@@ -5,8 +5,6 @@
     <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
 </div>
 
-<button ng-click="startStopWatch()" ng-show="showStopwatch">Start time</button>
-<button ng-click="stopStopWatch()" ng-show="showStopwatch">Stop time</button>
 <button ng-click="logout()">Sign Out</button>
 
 <button ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
@@ -28,7 +26,7 @@
             Hours:
             <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, 0.25)" ng-focus="clearError('hours')">
             <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
-            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Hours must be positive and less than 24.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
         </label>
 
         <label ng-show="showStartEndTimes">
@@ -36,9 +34,12 @@
             <input type="time" placeholder="HH:mm:ss" ng-model="timeEntry.ISOStartTime" ng-focus="clearError('startEndTimes')" required>
             End time:
             <input type="time" placeholder="HH:mm:ss" ng-model="timeEntry.ISOEndTime" ng-focus="clearError('startEndTimes')" required>
-            <span style="color:red" ng-show="timeEntryErrorStartEndTimes">    
-			    <p>Oops! Please enter start and end times in order to save this entry.</p>
+            <span style="color:red" ng-show="timeEntryErrorStartEndTimesInvalid">    
+			    <p>Please make sure your daily hourly total is less than 24 hours.</p>
 			</span>
+            <span style="color:red" ng-show="timeEntryErrorStartEndTimesNegative">    
+                <p>Please enter an end time later than your start time.</p>
+            </span>
 
         </label>
 

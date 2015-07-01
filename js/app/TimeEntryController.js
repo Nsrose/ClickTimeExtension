@@ -12,6 +12,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     $scope.pageReady = false;
 
+    // if true, indicate to user that they can set default time entry method in extension options
+    $scope.showOptionsMessage = false;
+
 
     //// Interface logic ////
     $scope.clearError = function (error) {
@@ -136,7 +139,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             }
             var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
             if (hourDiff <=0 ) {
-                $scope.timeEntryErrorStartEndTimes
+                $scope.timeEntryErrorStartEndTimesNegative = true;
+                return false;
+            } else if (hourDiff > 24) {
+                $scope.timeEntryErrorStartEndTimesInvalid = true;
+                return false;
             }
         }
 
@@ -334,6 +341,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             || EntityService.SecurityLevel == 'admin';
 
         $scope.HasEmptyEntities = false;
+
+        // Set the default time entry method
+        chrome.storage.sync.get('defaultTimeEntryMethod', function (items) {
+            if ('defaultTimeEntryMethod' in items) {
+                $scope.changeTimeEntryMethod(items.defaultTimeEntryMethod);
+                $scope.$apply();
+            } else {
+                $scope.showOptionsMessage = true;
+                $scope.$apply();  
+            }
+        })
 
         var afterGetClients = function (clientsList) {
             $scope.clients = clientsList;

@@ -24,7 +24,8 @@
     }
   ],
 
-
+  "options_page": "templates/options.html",
+  
   "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications" ]
 
 }

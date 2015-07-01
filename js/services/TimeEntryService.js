@@ -64,9 +64,6 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 	this.saveTimeEntry = function (session, clickTimeEntry) {
 		var url = API_BASE + "Companies/" + session.CompanyID + "/Users/" + session.UserID + "/TimeEntries";
 		return api(url, session.UserEmail, session.Token, "POST", clickTimeEntry)
-		// .then(function (response) {
-		// 	callback(response);
-		// })
 	}
 
 

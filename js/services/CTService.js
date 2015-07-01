@@ -57,4 +57,10 @@ myApp.service('CTService', function() {
     	// T splits date/time, . splits ms and the rest
     	return date.toISOString().split('T')[1].split('.')[0];
     }
+
+    /** Compile hrs, min, and sec to a Clicktime Hour stamp */
+    this.compileHours = function (hrs, min, sec) {
+        var time = (hrs + min/60 + sec/3600) + '';
+        return this.roundToNearest(time, 0.25);
+    }
 })

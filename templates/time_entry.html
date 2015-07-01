@@ -27,9 +27,8 @@
         <label ng-show="showHourEntryField">
             Hours:
             <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, 0.25)" ng-focus="clearError('hours')">
-            <span style="color:red" ng-show="timeEntryErrorHours">    
-			    <p>Cannot enter 0 hours.</p>
-			</span>
+            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Hours must be positive and less than 24.</p></span>
         </label>
 
         <label ng-show="showStartEndTimes">
@@ -45,7 +44,8 @@
 
         <label ng-show="showStopwatch">
             Timer:
-            <span>{{DisplayTime}}</span>
+            <stopwatch title="Stopwatch #1" time="sharedTime">
+            </stopwatch>
         </label>
     </form>
 </div>
@@ -67,3 +67,5 @@
 <h3>Task: </h3>
 <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
 </div>
+
+

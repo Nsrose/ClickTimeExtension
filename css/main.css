@@ -36,3 +36,7 @@ body {
     background-color: white;
     z-index: 999;
 }
+
+.elapsed-time-unit {
+    display: inline-block;
+}

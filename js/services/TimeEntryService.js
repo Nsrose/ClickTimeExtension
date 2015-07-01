@@ -61,15 +61,14 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 	// Save a time entry
 	// This does NO checks on the validity of a time entry! By this point, the time entry object is assumed
 	// to be 100% valid for which user and company it is being saved for.
-	this.saveTimeEntry = function (session, clickTimeEntry, callback) {
+	this.saveTimeEntry = function (session, clickTimeEntry) {
 		var url = API_BASE + "Companies/" + session.CompanyID + "/Users/" + session.UserID + "/TimeEntries";
-		api(url, session.UserEmail, session.Token, "POST", clickTimeEntry)
-		.then(function (response) {
-			callback(response);
-		})
+		return api(url, session.UserEmail, session.Token, "POST", clickTimeEntry)
+		// .then(function (response) {
+		// 	callback(response);
+		// })
 	}
 
-	
 
 
 })

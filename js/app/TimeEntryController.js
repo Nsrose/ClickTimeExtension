@@ -1,7 +1,7 @@
-myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
+myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
     $scope.variables = [];
 
-    var _StopWatch = new StopWatch();
+    // var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
    
@@ -17,7 +17,8 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
     $scope.clearError = function (error) {
         switch (error) {
             case "hours":
-                $scope.timeEntryErrorHours = false;
+                $scope.timeEntryErrorHoursZero = false;
+                $scope.timeEntryErrorHoursInvalid = false;
                 break;
             case "startEndTimes":
                 $scope.timeEntryErrorStartEndTimes = false;
@@ -31,43 +32,11 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
     $scope.$watch('variables', function(newVal, oldVal) {
         if ($scope.variables.length == NUM_SCOPE_VARS) {
             $scope.pageReady = true;
-            console.log($scope.variables);
         }
     }, true)
 
-    // stopwatch
-    $scope.startStopWatch = function() {
-        _StopWatch.start();
-    }
-        
-    $scope.stopStopWatch = function() {
-        _StopWatch.stop();
-        $scope.timeEntry.hours = _StopWatch.duration();
-        setTimeout(function() {
-            _StopWatch.reset();
-            }, 1000
-        );
-    }
-
-    // Clears stop watch to 0:00:00
-    $scope.clearStopwatch = function () {
-        setInterval(function() {
-            $scope.timeEntry.hours = _StopWatch.formatTime(_StopWatch.time());
-            $scope.$apply();
-        }, 1000);
-    }
-
-    // Updates screen every second
-    if ($scope.showStopwatch) {
-        // setInterval(function() {
-        //     $scope.user.timeEntry = _StopWatch.formatTime(_StopWatch.time());
-        //     $scope.$apply();
-        //     }, 1000
-        // );
-        $scope.clearStopwatch();
-    }
     
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
 
     ////// Time entry ////// 
 
@@ -112,8 +81,7 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
             "SubPhaseID" : timeEntry.SubPhaseID,
             "TaskID" : timeEntry.TaskID,
         }
-        console.log(clickTimeEntry);
-        return;
+      
         if ($scope.showHourEntryField) {
             clickTimeEntry.Hours = timeEntry.Hours;
         }
@@ -127,17 +95,29 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
 
+        if ($scope.showStopwatch) {
+            var hrs = parseInt($("#hrs").text());
+            var min = parseInt($("#min").text());
+            var sec = parseInt($("#sec").text());
+            clickTimeEntry.Hours = CTService.compileHours(hrs, min, sec);
+        }
+        
 
         $scope.pageReady = false;
-        TimeEntryService.saveTimeEntry(session, clickTimeEntry, function (response) {
-            if (response.status == 200) {
+        TimeEntryService.saveTimeEntry(session, clickTimeEntry)
+        .then(function (response) {
+            var d = new Date();
+            alert("Entry successfully uploaded at " + d.toTimeString() + ".");
+            $scope.pageReady = true;
+        })
+        .catch(function (response) {
+            if (response.data == null) {
                 var d = new Date();
-                alert("Entry successfully uploaded at " + d.toTimeString() + ".");
+                alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
             } else {
                 alert("An error occured.");
             }
             $scope.pageReady = true;
-            $scope.$apply();
         });
         EntityService.updateRecentEntities(timeEntry);
     }
@@ -162,7 +142,11 @@ myApp.controller("TimeEntryController", ['$scope', '$location', 'APIService', 'C
 
         if ($scope.showHourEntryField) {
             if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
-                $scope.timeEntryErrorHours = true;
+                $scope.timeEntryErrorHoursZero = true;
+                return false;
+            }
+            if (timeEntry.Hours > 24.00 || timeEntry.Hours < 0) {
+                $scope.timeEntryErrorHoursInvalid = true;
                 return false;
             }
         }

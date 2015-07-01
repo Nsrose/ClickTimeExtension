@@ -5,36 +5,42 @@
 
 	<!-- Style -->
 	<link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/font-awesome.min.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/angular-csp.css">
+  <link rel="stylesheet" href="../css/font-awesome.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/angular-csp.css">
 
-	<!-- Angular Libraries -->
-	<script src="../js/lib/jquery-1.11.3.min.js"></script>
-    <script src="../js/lib/angular.min.js"></script>
-    <script src="../js/lib/angular-route.js"></script>
-    
+  <!-- Angular Libraries -->
+  <script src="../js/lib/jquery-1.11.3.min.js"></script>
+  <script src="../js/lib/angular.min.js"></script>
+  <script src="../js/lib/angular-route.js"></script>
+  
+  <script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+  
 
-    <!-- App and config -->
-    <script src="../js/app/app.js"></script>
-    <script src="../js/app/config.js"></script>
+  <!-- App and config -->
+  <script src="../js/app/app.js"></script>
+  <script src="../js/app/config.js"></script>
 
-    <!-- Helpful libraries -->
-    <script src="../js/lib/bootstrap.min.js"></script>
-    <script src="../js/lib/format.js"></script>
-    <script src="../js/lib/customSelect.js"></script>
+  <!-- Helpful libraries -->
+  <script src="../js/lib/bootstrap.min.js"></script>
+  <script src="../js/lib/format.js"></script>
+  <script src="../js/lib/customSelect.js"></script>
 
-    <!-- Controllers -->
-    <script src="../js/app/LoginEntryController.js"></script>
-    <script src="../js/app/TimeEntryController.js"></script>
+  <!-- Controllers -->
+  <script src="../js/app/LoginEntryController.js"></script>
+  <script src="../js/app/TimeEntryController.js"></script>
 
-    <!-- Services -->
-  	<script src="../js/services/APIService.js"></script>
-  	<script src="../js/services/CTService.js"></script>
-  	<script src="../js/services/EntityService.js"></script>
-  	<script src="../js/services/TimeEntryService.js"></script>
-  	<script src="../js/services/StopWatch.js"></script>
+  <!-- Services -->
+	<script src="../js/services/APIService.js"></script>
+	<script src="../js/services/CTService.js"></script>
+	<script src="../js/services/EntityService.js"></script>
+	<script src="../js/services/TimeEntryService.js"></script>
+
+	<!--<script src="../js/services/StopWatch.js"></script>-->
+
+  <!-- directives -->
+  <script src="../js/directives/stopwatch.js"></script>
    
 </head>
 <body id="main">
@@ -42,3 +48,19 @@
 	<div class="contact"><a href="http://www.clicktime.com/company/contact" target="_blank">Contact Us</a></div>
 </body>
 </html>
+
+
+<script type="text/ng-template" id="stopwatch.html">
+  <div id='elapsed-time'>
+  <div class='elapsed-time-unit' id='hrs' ng-model="stopwatchHrs">{{swctrl.getElapsedHrsDisp()}}</div>
+  <div class='elapsed-time-unit'>:</div>
+  <div class='elapsed-time-unit' id='min' ng-model="stopwatchMin">{{swctrl.getElapsedMinDisp()}}</div>
+  <div class='elapsed-time-unit'>:</div>
+  <div class='elapsed-time-unit' id='sec' ng-model="stopwatchSec">{{swctrl.getElapsedSecDisp()}}</div>
+
+  </div>
+
+  <button id="start" class="btn btn-success" ng-click="swctrl.start()">Start</button>
+  <button id="stop" class="btn btn-danger" ng-click="swctrl.stop()">Stop</button>
+  <button id="reset" class="btn btn-default" ng-click="swctrl.reset()">Reset</button>
+</script>                                              

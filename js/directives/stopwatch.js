@@ -1,6 +1,6 @@
 //Stop watch methods for time entry
 
-myApp.directive('stopwatch', function() {
+myApp.directive('stopwatch', ['StopwatchService', function (StopwatchService) {
 	return {
 		restrict: 'AE',
 		templateUrl: 'stopwatch.html',
@@ -21,12 +21,13 @@ myApp.directive('stopwatch', function() {
 		    
 		    self.start = function() {
 		      if (!timerPromise) {
-		        startTime = new Date();
-		        timerPromise = $interval(function() {
+		      	startTime = new Date();
+	        	timerPromise = $interval(function() {
 		          var now = new Date();
 		          //$scope.time = now;
 		          elapsedMs = now.getTime() - startTime.getTime();
 		        }, 31);
+		     
 		      }
 		    };
 		    
@@ -91,4 +92,4 @@ myApp.directive('stopwatch', function() {
 
 		}
 	}
-})
+}])

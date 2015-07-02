@@ -49,6 +49,8 @@
             Timer:
             <stopwatch title="Stopwatch #1" time="sharedTime">
             </stopwatch>
+            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
         </label>
     </form>
 </div>

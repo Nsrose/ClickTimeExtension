@@ -59,7 +59,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     			$scope.showStopwatch = false;
     			break;
     		case "Stopwatch":
-                console.log('hereio')
     			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = false;
     			$scope.showStopwatch = true;
@@ -72,10 +71,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
 
     $scope.saveTimeEntry = function (session, timeEntry) {
-        if (!validateTimeEntry(timeEntry)) {
-            return;
-        }
-
+        
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
             "Comment" : timeEntry.Comment,
@@ -104,8 +100,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             var min = parseInt($("#min").text());
             var sec = parseInt($("#sec").text());
             clickTimeEntry.Hours = CTService.compileHours(hrs, min, sec);
+            timeEntry.Hours = clickTimeEntry.Hours;
         }
         
+        if (!validateTimeEntry(timeEntry)) {
+            console.log("Invalid time entry");
+            return;
+        }
 
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
@@ -148,7 +149,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             }
         }
 
-        if ($scope.showHourEntryField) {
+        if ($scope.showHourEntryField || $scope.showStopwatch) {
             if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
                 return false;
@@ -158,6 +159,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 return false;
             }
         }
+
+
         
         return true;
     }

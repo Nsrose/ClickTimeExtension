@@ -30,6 +30,7 @@
   <!-- Controllers -->
   <script src="../js/app/LoginEntryController.js"></script>
   <script src="../js/app/TimeEntryController.js"></script>
+  <script src="../js/app/StopwatchController.js"></script>
 
   <!-- Services -->
 	<script src="../js/services/APIService.js"></script>
@@ -37,8 +38,6 @@
 	<script src="../js/services/EntityService.js"></script>
 	<script src="../js/services/TimeEntryService.js"></script>
   <script src="../js/services/StopwatchService.js"></script>
-
-	<!--<script src="../js/services/StopWatch.js"></script>-->
 
   <!-- directives -->
   <script src="../js/directives/stopwatch.js"></script>
@@ -61,7 +60,7 @@
 
   </div>
 
-  <button id="start" class="btn btn-success" ng-click="swctrl.start()">Start</button>
-  <button id="stop" class="btn btn-danger" ng-click="swctrl.stop()">Stop</button>
-  <button id="reset" class="btn btn-default" ng-click="swctrl.reset()">Reset</button>
+  <button id="start" class="btn btn-success" ng-click="swctrl.start()" ng-hide="swctrl.running">Start</button>
+  <button id="stop" class="btn btn-danger" ng-click="swctrl.stop()" ng-hide="!swctrl.running">Stop</button>
+  <!--<button id="reset" class="btn btn-default" ng-click="swctrl.reset()" ng-hide="swctrl.running">Reset</button>-->
 </script>                                              

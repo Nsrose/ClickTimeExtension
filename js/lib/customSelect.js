@@ -25,7 +25,6 @@
 			restrict: 'A',
 			require: 'ngModel',
 			link: function (scope, elem, attrs, controller) {
-				console.log("Hello")
 				if (!attrs.ngOptions) {
 					throw new Error('Expected ng-options attribute.');
 				}

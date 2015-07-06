@@ -21,7 +21,7 @@
 	<div class="time-entry-select">Time entry method:</div>
 	<div custom-select ng-model="timeEntryMethod" ng-options="method for method in timeEntryMethods" ng-click="changeTimeEntryMethod(timeEntryMethod)"></div> 
 
-    <form name="time-entry-form">
+    <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
 
         <label ng-show="showHourEntryField">
@@ -47,8 +47,19 @@
 
         <label ng-show="showStopwatch">
             Timer:
-            <stopwatch title="Stopwatch #1" time="sharedTime">
-            </stopwatch>
+            <div id="stopwatch" ng-controller="StopwatchController">
+                <div id='elapsed-time'>
+                    <div class='elapsed-time-unit' id='hrs'>{{elapsedHrs}}</div>
+                    <div class='elapsed-time-unit'>:</div>
+                    <div class='elapsed-time-unit' id='min'>{{elapsedMin}}</div>
+                    <div class='elapsed-time-unit'>:</div>
+                    <div class='elapsed-time-unit' id='sec'>{{elapsedSec}}</div>
+
+                </div>
+
+                <button id="start" class="btn btn-success" ng-click="start()" ng-hide="running">Start</button>
+                <button id="stop" class="btn btn-danger" ng-click="stop()" ng-hide="!running">Stop</button>
+            </div>
             <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
         </label>

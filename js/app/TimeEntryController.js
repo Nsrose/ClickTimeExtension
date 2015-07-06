@@ -69,7 +69,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     	}
     }
 
-
     $scope.saveTimeEntry = function (session, timeEntry) {
         
         var clickTimeEntry = {

@@ -13,57 +13,84 @@ myApp.directive('stopwatch', ['StopwatchService', function (StopwatchService) {
 		controllerAs: 'swctrl',
 	  	controller: function($scope, $interval) {
 		    var self = this;
+
 		    var totalElapsedMs = 0;
 		    var elapsedMs = 0;
 		    //var time;
 		    var startTime;
 		    var timerPromise;
+
+		    self.running = false;
 		    
 		    self.start = function() {
 		      if (!timerPromise) {
 		      	startTime = new Date();
-	        	timerPromise = $interval(function() {
-		          var now = new Date();
-		          //$scope.time = now;
-		          elapsedMs = now.getTime() - startTime.getTime();
-		        }, 31);
-		     
+		      	self.running = true;
+		      	timerPromise = $interval(function() {
+		      		var now = new Date();
+		      		elapsedMs = now.getTime() - startTime.getTime();
+		      	}, 31)
 		      }
-		    };
+			 };
 		    
 		    self.stop = function() {
 		      if (timerPromise) {
-		        $interval.cancel(timerPromise);
-		        timerPromise = undefined;
-		        totalElapsedMs += elapsedMs;
-		        elapsedMs = 0;
+		      	StopwatchService.markEndTime (function () {
+		      		self.running = false;
+		      		$interval.cancel(timerPromise);
+			        timerPromise = undefined;
+			        totalElapsedMs += elapsedMs;
+			        elapsedMs = 0;
+		      	})
+			      
 		      }
 		    };
 		    
-		    self.reset = function() {
-		      startTime = new Date();
-		      totalElapsedMs = elapsedMs = 0;
-		    };
+		    // self.reset = function() {
+		    //   StopwatchService.reset(function() {
+		    //   	startTime = new Date();
+		    //   	totalElapsedMs = elapsedMs = 0;
+		    //   })
+		     
+		    // };
 		    
 		    self.getTime = function() {
 		      return time;
 		    };
 		    
 		    self.getElapsedMs = function() {
-		      return totalElapsedMs + elapsedMs;
+		      // return totalElapsedMs + elapsedMs;
+		      StopwatchService.getElapsedTime(function (elapsedObj) {
+		      	return elapsedObj.elapsedSec * 1000;
+		      })
 		    };
 
 
 		    self.getElapsedSec = function() {
 		    	return Math.floor(self.getElapsedMs() / 1000);
+		    	// console.log("Getting elapsed sec");
+		    	// StopwatchService.getElapsedTime(function (elapsedObj) {
+		    	// 	console.log(elapsedObj.elapsedSec);
+		    	// 	return elapsedObj.elapsedSec;
+		    	// })
 		    }
 
 		    self.getElapsedSecDisp = function() {
-		    	var secDisp = self.getElapsedSec() % 60 + '';
-		    	if (secDisp.length == 1) {
-		    		secDisp = "0" + secDisp;
-		    	}
-		    	return secDisp; 
+		    	// var secDisp = self.getElapsedSec() % 60 + '';
+		    	// if (secDisp.length == 1) {
+		    	// 	secDisp = "0" + secDisp;
+		    	// }
+		    	// return secDisp; 
+		    	var secDisp = "";
+		    	var ret = function () { return secDisp } ;
+		    	StopwatchService.getElapsedTime(function (elapsedObj) {
+		    		secDisp = elapsedObj.elapsedSec % 60 + '';
+		    		if (secDisp.length == 1) {
+		    			secDisp = "0" + secDisp;
+		    		}
+		    		console.log(secDisp);
+		    		return secDisp;
+		    	})
 		    }
 
 		    self.getElapsedMin = function() {

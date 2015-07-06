@@ -33,11 +33,8 @@
             <button ng-click="startStopWatch()">Start time</button>
             <button ng-click="stopStopWatch()">Stop time</button>
             <button ng-click="logout()">Sign Out</button>
-
             <button ng-click="saveTimeEntry(user, client, job, task)">Save Time</button>
-            
            
-
             <div class="refresh-container">
                 <div class="refresh-message">
                     Can't find a recently created client, job, or task?
@@ -71,23 +68,23 @@
 
             <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
             </div>
-            
-            <h3>Client: </h3>
-            <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients">
-            </div>
-            
-
-            <h3>Job: </h3>
-            <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs">
-            </div>
-
-            <h3>Task: </h3>
-            <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks">
-            </div>
-
-            <h3>Notes:</h3>
-            <textarea placeholder="Notes (optional):" rows="4" cols="50" maxlength="4000"></textarea> 
+          
+            <form name="entry">
+                <h3>Client: </h3>
+                <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" required></div>
+                
+                <h3>Job: </h3>
+                <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" required></div>
+                            
+                <h3>Task: </h3>
+                <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" required></div>
+                    
+                <h3>Notes:</h3>
+                <textarea name="text" ng-model="notes" placeholder="Notes (optional):" rows="4" cols="50" ng-maxlength="5" required></textarea><br> 
+                <span style="color: red" ng-show="entry.text.$touched && entry.text.$invalid"> 
+                    <span>Maximum is 4000 characters.</span>
+                </span>
+            </form>
         </div>
     </body>
 </html>
-

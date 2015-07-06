@@ -24,7 +24,7 @@
             <form name="loginForm">
                 <p>Email:<br>
                     <input type="email" name="email" ng-model="user.email" required><br>
-                    <span style="color:red" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
+                    <span style="color:red" ng-show="loginForm.email.$touched && loginForm.email.$invalid">
                         <span ng-show="loginForm.email.$error.required">Email is required.</span>
                         <span ng-show="loginForm.email.$error.email">bad emails make cats sad.</span>
                     </span>
@@ -32,7 +32,7 @@
 
                 <p>Password:<br>
                     <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required><br>
-                    <span style="color:red" ng-show="loginForm.password.$dirty && loginForm.password.$invalid">
+                    <span style="color:red" ng-show="loginForm.password.$touched && loginForm.password.$invalid">
                         <span ng-show="loginForm.password.$error.required">no hacking please.</span>
                         <span ng-show="loginForm.password.$error.minlength">minimum is 3 characters.</span>
                         <span ng-show="loginForm.password.$error.maxlength">maximum is 24 characters.</span>

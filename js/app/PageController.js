@@ -74,7 +74,6 @@ myApp.controller("PageController", ['$scope', 'APIService', 'EntityService', '$h
     // Logout function
     $scope.logout = function() {
         chrome.storage.sync.remove(CHROME_STORAGE_VARS, function () {
-            alert("Logged out.");
             window.location.href = "../../templates/login.html";
         })
     }

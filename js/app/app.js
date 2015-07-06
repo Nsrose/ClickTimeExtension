@@ -5,7 +5,6 @@
 // API base url for development.
 var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
 var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your request.";
-var CACHE_LIMIT = 5;
 var CHROME_STORAGE_VARS = [
 	'session',
 	'user',
@@ -14,10 +13,16 @@ var CHROME_STORAGE_VARS = [
 	'jobsList',
 	'tasksList',
 	'clientsByRecent',
-	'tasksByRecent'
+	'tasksByRecent',
+	'timeEntries'
 ]
 
-var myApp = angular.module('ClickTimeExtension', []);
+// Default timeout ms
+var TIMEOUT = 10000;
+// The number of scope variables that need to be rendered before removing the loading mask
+var NUM_SCOPE_VARS = 6;
+
+var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap']);
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);

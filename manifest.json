@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Clicktime Extension",
-  "version": "0.1",
+  "version": "0.3",
 
   "description" : "Clicktime extension",
 
@@ -10,7 +10,7 @@
   "browser_action" : {
   	"default_icon" : "img/stopwatch.png",
     "default_title" : "ClickTime",
-    "default_popup" : "templates/login.html"
+    "default_popup" : "templates/main.html"
   },
 
 
@@ -24,7 +24,13 @@
     }
   ],
 
+  "web_accessible_resources" : [
+    "js/*",
+    "templates/*"
+  ],
 
+  "options_page": "templates/options.html",
+  
   "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications" ]
 
 }

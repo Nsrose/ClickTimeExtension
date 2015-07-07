@@ -57,20 +57,22 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 
 	$scope.start = function () {
 		if (!timerPromise) {
-			StopwatchService.markStartTime(function (start) {
-				startTime = start;
-	      		$scope.running = true;
-	      		$scope.$parent.runningStopwatch = true;
-	      		timerPromise = $interval(function() {
-	      			var now = new Date();
-	      			$scope.getElapsedTime();
-	      		}, 31)
-			}) 		
-     	}
+                    chrome.browserAction.setBadgeText({text: "On"});
+                    StopwatchService.markStartTime(function (start) {
+                        startTime = start;
+                        $scope.running = true;
+                        $scope.$parent.runningStopwatch = true;
+                        timerPromise = $interval(function() {
+                        var now = new Date();
+                            $scope.getElapsedTime();
+                        }, 31)
+                    }) 		
+                }
 	}
 
 	$scope.stop = function() {
 		if (timerPromise) {
+                    chrome.browserAction.setBadgeText({text: ""});
 		    StopwatchService.markEndTime (function () {
 		      	$scope.running = false;
 		      	$scope.$parent.runningStopwatch  = false;

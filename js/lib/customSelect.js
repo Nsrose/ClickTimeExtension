@@ -8,8 +8,6 @@
 		};
 	}
 
-	// var module = angular.module('ClickTimeExtension', []);
-
 	myApp.value('customSelectDefaults', {
 		displayText: 'Select...',
 		emptyListText: 'There are no items to display',

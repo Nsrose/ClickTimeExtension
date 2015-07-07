@@ -345,7 +345,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         $scope.HasEmptyEntities = false;
 
-
         var afterGetClients = function (clientsList) {
             $scope.clients = clientsList;
             if (clientsList.length == 0) {
@@ -373,10 +372,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
             if ($scope.jobs.length == 0) {
                 $scope.HasEmptyEntities = true;
+                $scope.job = undefined;
+            } else {
+                $scope.job = $scope.jobs[0];
+                $scope.timeEntry.job = $scope.job;
+                $scope.timeEntry.JobID = $scope.job.JobID;
             }
-            $scope.job = $scope.jobs[0];
-            $scope.timeEntry.job = $scope.job;
-            $scope.timeEntry.JobID = $scope.job.JobID;
             $scope.variables.push('jobs');
             $scope.$apply();
         }

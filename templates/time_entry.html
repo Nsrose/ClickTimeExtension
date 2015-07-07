@@ -1,6 +1,4 @@
 <h1>Time Entry</h1>
-
-
 <div id="loading-mask" ng-hide="pageReady">
     <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
 </div>
@@ -75,7 +73,6 @@
 <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)">
 </div>
 
-
 <h3>Job: </h3>
 <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
 </div>
@@ -84,4 +81,10 @@
 <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
 </div>
 
-
+<form name="entry">
+	<h3>Notes:</h3>
+	<textarea name="text" ng-model="notes" placeholder="Notes (optional):" rows="4" cols="50" ng-maxlength="5" required></textarea><br> 
+	<span style="color: red" ng-show="entry.text.$touched && entry.text.$invalid"> 
+            <span>Maximum is 4000 characters.</span>
+	</span>
+</form>

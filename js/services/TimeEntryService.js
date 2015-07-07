@@ -66,6 +66,28 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 		return api(url, session.UserEmail, session.Token, "POST", clickTimeEntry)
 	}
 
+	// Store a time entry to local storage if no internet connection
+	this.storeTimeEntry = function (timeEntry, callback) {
+		chrome.storage.sync.get('storedTimeEntries', function (items) {
+			if ('storedTimeEntries' in items) {
+				storedTimeEntries = items.storedTimeEntries;
+				storedTimeEntries.push(timeEntry);
+				chrome.storage.sync.set({
+					'storedTimeEntries' : storedTimeEntries
+				}, function() {
+					callback();
+				})
+			} else {
+				storedTimeEntries = [];
+				storedTimeEntries.push(timeEntry);
+				chrome.storage.sync.set({
+					'storedTimeEntries' : storedTimeEntries
+				}, function() {
+					callback();
+				})
+			}
+		})
+	}
 
 
 })

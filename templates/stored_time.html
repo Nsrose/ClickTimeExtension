@@ -1,0 +1,14 @@
+<h1>Stored time entries</h1>
+<div id="stored-time-container">
+	<button ng-click="showTimeEntry()">Back</button>
+
+	<div ng-repeat="timeEntry in storedTimeEntries">
+		<div class="stored-time-entry-info">{{timeEntry.Date}}</div>
+		<div class="stored-time-entry-info">{{timeEntry.Hours}} hours</div>
+		<div class="stored-time-entry-info">{{timeEntry.client.DisplayName}}</div>
+		<div class="stored-time-entry-info">{{timeEntry.job.DisplayName}}</div>
+		<div class="stored-time-entry-info">{{timeEntry.task.DisplayName}}</div>
+		<div class="stored-time-entry-info">{{timeEntry.Comment}}</div>
+		<button ng-click="savedStoredEntry(timeEntry)">Save</button>
+	</div>
+</div>

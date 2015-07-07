@@ -37,6 +37,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
     }, true)
 
+    $scope.showStoredEntries = function() {
+        var session = $scope.Session;
+        $location.path("/stored_time");
+        $scope.session = session;
+    }
+
     
     //////////////////////////////////////////////////////////////////
 
@@ -81,6 +87,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             "PhaseID" : timeEntry.PhaseID,
             "SubPhaseID" : timeEntry.SubPhaseID,
             "TaskID" : timeEntry.TaskID,
+            "job" : timeEntry.job,
+            "task" : timeEntry.task,
+            "client" : timeEntry.client
         }
       
         if ($scope.showHourEntryField) {

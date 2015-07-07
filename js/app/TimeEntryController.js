@@ -1,7 +1,5 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
     $scope.variables = [];
-
-    // var _StopWatch = new StopWatch();
     $scope.UserName = null;
     $scope.UserID = null;
    
@@ -15,6 +13,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // if true, indicate to user that they can set default time entry method in extension options
     $scope.showOptionsMessage = false;
 
+    $scope.runningStopwatch = false;
 
     //// Interface logic ////
     $scope.clearError = function (error) {
@@ -70,7 +69,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     }
 
     $scope.saveTimeEntry = function (session, timeEntry) {
-        
+        if ($scope.runningStopwatch) {
+            alert("Cannot save entry with a running stopwatch.");
+            return;
+        }
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
             "Comment" : timeEntry.Comment,
@@ -112,12 +114,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         .then(function (response) {
             var d = new Date();
             alert("Entry successfully uploaded at " + d.toTimeString() + ".");
+            $scope.$broadcast("timeEntrySuccess");
             $scope.pageReady = true;
         })
         .catch(function (response) {
             if (response.data == null) {
                 var d = new Date();
-                alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                $scope.$broadcast("timeEntryError")
+                TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
+                    alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
+                }) 
             } else {
                 alert("An error occured.");
             }
@@ -279,18 +285,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         var afterGetUser = function (user) {
             $scope.user = user;
-
-            $scope.showStopwatch = showStopwatch();
-            $scope.showStartEndTimes = showStartEndTimes();
-            $scope.showHourEntryField = showHourEntryField();
-           
-            $scope.isDev = user.UserID == '27fbqzVh1Tok';
-
-
-
-            if ($scope.showStopwatch) {
-                $scope.timeEntry.hours = _StopWatch.formatTime(0);
-            }
             $scope.$apply();
         }
 
@@ -395,14 +389,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         var afterGetUser = function (user) {
             $scope.user = user;
-            $scope.showStopwatch = showStopwatch();
-            $scope.showStartEndTimes = showStartEndTimes();
-            $scope.showHourEntryField = showHourEntryField();
-
-            if ($scope.showStopwatch) {
-                $scope.timeEntry.hours = _StopWatch.formatTime(0);
-            }
-
             $scope.variables.push('user');
             $scope.$apply();
 

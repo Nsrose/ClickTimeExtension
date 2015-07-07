@@ -1,35 +1,6 @@
 // Services for managing running stopwatches, etc
 myApp.service("StopwatchService", function() {
 
-	// Return the start time of a stopwatch.
-	// First check local storage for a running stopwatch, otherwise
-	// start a new one.
-	this.getStartTime = function (callback) {
-		chrome.storage.sync.get('stopwatch', function (items) {
-			if ('stopwatch' in items) {
-				var storedTime = items.stopwatch;
-				var startTime = new Date(storedTime.startYear, storedTime.startMonth, storedTime.startDay,
-					storedTime.startHrs, storedTime.startMin, storedTime.startSec);
-				callback(startTime);
-			} else {
-				var startTime = new Date();
-				var storedTime = {
-					'startYear' : startTime.getFullYear(),
-					'startMonth' : startTime.getMonth(),
-					'startDay' : startTime.getDate(),
-					'startHrs' : startTime.getHours(),
-					'startMin' : startTime.getMinutes(),
-					'startSec' : startTime.getSeconds()
-				}
-				chrome.storage.sync.set({
-					'stopwatch' : storedTime
-				}, function() {
-					callback(startTime);
-				})
-			}
-		})
-	}
-
 	// Mark start time in local storage
 	this.markStartTime = function (callback) {
 		var startTime = new Date();
@@ -39,7 +10,8 @@ myApp.service("StopwatchService", function() {
 			'startDay' : startTime.getDate(),
 			'startHrs' : startTime.getHours(),
 			'startMin' : startTime.getMinutes(),
-			'startSec' : startTime.getSeconds()
+			'startSec' : startTime.getSeconds(),
+			'running' : true
 		}
 		chrome.storage.sync.set({
 			'stopwatch' : storedTime
@@ -56,20 +28,25 @@ myApp.service("StopwatchService", function() {
 			if ('stopwatch' in items) {
 				var now = new Date();
 				var storedWatch = items.stopwatch;
-				var elapsedHrs = now.getHours() - storedWatch.startHrs;
-				var elapsedMin = now.getMinutes() - storedWatch.startMin;
-				var elapsedSec = now.getSeconds() - storedWatch.startSec;
+				var startTime = new Date(storedWatch.startYear, storedWatch.startMonth, storedWatch.startDay,
+					storedWatch.startHrs, storedWatch.startMin, storedWatch.startSec);
+				var elapsedTimeMS = now - startTime;
+				var elapsedSec = Math.floor(elapsedTimeMS / 1000);
+				var elapsedMin = Math.floor(elapsedSec / 60);
+				var elapsedHrs = Math.floor(elapsedMin / 60);
 				var elapsedObj = {
 					'elapsedHrs' : elapsedHrs,
 					'elapsedMin' : elapsedMin,
-					'elapsedSec' : elapsedSec
+					'elapsedSec' : elapsedSec,
+					'running' : storedWatch.running
 				};
 				callback(elapsedObj);
 			} else {
 				var elapsedObj = {
 					'elapsedHrs' : 0,
 					'elapsedMin' : 0,
-					'elapsedSec' : 0
+					'elapsedSec' : 0,
+					'running' : false
 				};
 				callback(elapsedObj);
 			}
@@ -88,6 +65,7 @@ myApp.service("StopwatchService", function() {
 				stopwatch.endHrs = endTime.getHours();
 				stopwatch.endMin = endTime.getMinutes();
 				stopwatch.endSec = endTime.getSeconds();
+				stopwatch.running = false;
 				chrome.storage.sync.set({
 					'stopwatch' : stopwatch
 				}, function() {
@@ -97,8 +75,8 @@ myApp.service("StopwatchService", function() {
 		})
 	}
 
-	// Reset stopwatch to 0
-	this.reset = function (callback) {
+	// Clear stopwatch to 0
+	this.clear = function (callback) {
 		chrome.storage.sync.remove('stopwatch', function() {
 			callback();
 		})

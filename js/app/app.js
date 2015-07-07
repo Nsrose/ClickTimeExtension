@@ -14,7 +14,8 @@ var CHROME_STORAGE_VARS = [
 	'tasksList',
 	'clientsByRecent',
 	'tasksByRecent',
-	'timeEntries'
+	'timeEntries',
+	'stopwatch'
 ]
 
 // Default timeout ms

@@ -39,8 +39,6 @@
 	<script src="../js/services/TimeEntryService.js"></script>
   <script src="../js/services/StopwatchService.js"></script>
 
-  <!-- directives -->
-  <script src="../js/directives/stopwatch.js"></script>
    
 </head>
 <body id="main">
@@ -48,19 +46,3 @@
 	<div class="contact"><a href="http://www.clicktime.com/company/contact" target="_blank">Contact Us</a></div>
 </body>
 </html>
-
-
-<script type="text/ng-template" id="stopwatch.html">
-  <div id='elapsed-time'>
-  <div class='elapsed-time-unit' id='hrs' ng-model="stopwatchHrs">{{swctrl.getElapsedHrsDisp()}}</div>
-  <div class='elapsed-time-unit'>:</div>
-  <div class='elapsed-time-unit' id='min' ng-model="stopwatchMin">{{swctrl.getElapsedMinDisp()}}</div>
-  <div class='elapsed-time-unit'>:</div>
-  <div class='elapsed-time-unit' id='sec' ng-model="stopwatchSec">{{swctrl.getElapsedSecDisp()}}</div>
-
-  </div>
-
-  <button id="start" class="btn btn-success" ng-click="swctrl.start()" ng-hide="swctrl.running">Start</button>
-  <button id="stop" class="btn btn-danger" ng-click="swctrl.stop()" ng-hide="!swctrl.running">Stop</button>
-  <!--<button id="reset" class="btn btn-default" ng-click="swctrl.reset()" ng-hide="swctrl.running">Reset</button>-->
-</script>                                              

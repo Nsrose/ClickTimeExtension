@@ -7,7 +7,7 @@
 
 <button ng-click="logout()">Sign Out</button>
 
-<button ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
+<button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
 
 
 <div class="refresh-container">
@@ -58,7 +58,7 @@
                 </div>
 
                 <button id="start" class="btn btn-success" ng-click="start()" ng-hide="running">Start</button>
-                <button id="stop" class="btn btn-danger" ng-click="stop()" ng-hide="!running">Stop</button>
+                <button id="stop" class="btn btn-danger" ng-click="stop()" ng-hide="!running">Stop/Save</button>
             </div>
             <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>

@@ -17,8 +17,6 @@
     <button ng-click="refresh()">Refresh</button>
 </div>
 
-<button id="stored-time-entry-link" ng-click="showStoredEntries()">Stored Entries</button>
-
 <div class="time-entry-container">
 	<div class="time-entry-select">Time entry method:</div>
 	<div custom-select ng-model="timeEntryMethod" ng-options="method for method in timeEntryMethods" ng-click="changeTimeEntryMethod(timeEntryMethod)"></div> 

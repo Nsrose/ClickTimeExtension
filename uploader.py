@@ -74,7 +74,7 @@ def update_manifest_version(new_version):
 
 
 if __name__ == "__main__":
-    if len(sys.argv != 2):
+    if len(sys.argv) != 2:
         print("You must specificy the new version number as an argument.")
         sys.exit(1)
     create_chrome_ext(sys.argv[1])

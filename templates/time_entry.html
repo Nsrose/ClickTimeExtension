@@ -79,8 +79,9 @@
 
 <form name="entry">
 	<h3>Notes:</h3>
-	<textarea name="text" ng-model="notes" placeholder="Notes (optional):" rows="4" cols="50" maxlength="4000" ng-maxlength="3999"></textarea><br> 
-	<span style="color: red" ng-show="entry.text.$dirty && entry.text.$invalid"> 
+        <p ng-show="user.RequireComments" style="color: red">* required</p>
+	<textarea name="text" ng-model="notes" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="3999"></textarea><br> 
+	<span ng-show="entry.text.$dirty && entry.text.$invalid"> 
             <span>Oops! Please limit your note to 4000 characters.</span>
 	</span>
 </form>

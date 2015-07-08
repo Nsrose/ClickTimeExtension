@@ -8,7 +8,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
         return APIService.apiCall(url, email, token, method, data)
             .then(function (response) {
                 if (response.data == null) {
-                    alert("We're sorry, there was an error fetching the time entries.");
+                    bootbox.alert("We're sorry, there was an error fetching the time entries.");
                     console.log(url);
                 }
 

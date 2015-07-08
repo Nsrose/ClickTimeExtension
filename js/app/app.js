@@ -3,19 +3,23 @@
 // API base url
 var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
 var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your request.";
-var CHROME_STORAGE_VARS = [
-	'session',
+var CHROME_LOCAL_STORAGE_VARS = [
 	'user',
 	'company',
 	'clientsList',
 	'jobsList',
 	'tasksList',
 	'clientsByRecent',
-	'tasksByRecent',
-	'timeEntries',
-	'stopwatch',
-	'storedTimeEntries'
-]
+	'tasksByRecent'
+];
+
+var CHROME_SYNC_STORAGE_VARS = [
+    'session',
+    'timeEntries',
+    'stopwatch',
+    'storedTimeEntries',
+    'defaultTimeEntryMethod'
+];
 
 // Default timeout ms
 var TIMEOUT = 10000;

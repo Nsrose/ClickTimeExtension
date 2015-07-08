@@ -9,7 +9,6 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             if (session != null) {
                 console.log("Logging in user from previous session");
                 // User does not need to login.
-                // window.location.href = "../../templates/popup.html";
                 $location.path("/time_entry");
                 $scope.$apply();
             }

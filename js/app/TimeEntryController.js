@@ -241,11 +241,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     // Logout function
     $scope.logout = function() {
-        chrome.storage.sync.remove(CHROME_STORAGE_VARS, function () {
+        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
+        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
             bootbox.alert("Logged out.");
             $location.path("/login");
             $scope.$apply();
         })
+
     }
 
     // Refresh function

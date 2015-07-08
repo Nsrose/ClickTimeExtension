@@ -37,12 +37,12 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
 
     			} else {
     				// Session couldn't be found
-			        alert('Session could not be found');
+			        bootbox.alert('Session could not be found');
 			        return;
     			}
     		} else {
     			// Session couldn't be found
-			    alert('Session could not be found');
+			    bootbox.alert('Session could not be found');
 			    return;
     		}
     	})
@@ -52,7 +52,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Entity must be plural, except in case of user
     var api = function (entity, email, token, method) {
         if (baseURL == "") {
-            alert("Need to get user session before making API calls");
+            bootbox.alert("Need to get user session before making API calls");
             return;
         }
 
@@ -69,7 +69,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         return APIService.apiCall(url, email, token, method)
             .then(function (response) {
                 if (response.data == null) {
-                    alert("We're sorry, there was an error fetching the " + entity + " list");
+                    bootbox.alert("We're sorry, there was an error fetching the " + entity + " list");
                 }
 
                 return response;
@@ -83,7 +83,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     this.getClients = function (session, checkLocal, callback) {
         if (checkLocal) {
             // Call to just get the entity. Check local storage first.
-            chrome.storage.sync.get(['clientsList', 'clientsByRecent'], function (items) {
+            chrome.storage.local.get(['clientsList', 'clientsByRecent'], function (items) {
                 if ('clientsList' in items) {
                     // Clients were stored locally, great!
                     var clientsList = items.clientsList.data;
@@ -118,7 +118,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Clients don't exist in local storage. Need to call API
                     return api('Clients', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
-                        chrome.storage.sync.set({
+                        chrome.storage.local.set({
                             'clientsList' : response,
                         }, function () {
                             var clientsList = response.data;
@@ -155,7 +155,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             // Clients don't exist in local storage. Need to call API
             return api('Clients', session.UserEmail, session.Token, 'GET')
             .then (function (response) {
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     'clientsList' : response,
                 }, function () {
                     console.log("Set clients list to local storage");
@@ -171,7 +171,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Calls the callback on the jobsList
     this.getJobs = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.sync.get('jobsList', function (items) {
+            chrome.storage.local.get('jobsList', function (items) {
                 if ('jobsList' in items) {
                     // jobs were stored locally, great!
                     var jobsList = items.jobsList.data;
@@ -186,7 +186,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Jobs don't exist in local storage. Need to call API
                     return api('Jobs', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
-                        chrome.storage.sync.set({
+                        chrome.storage.local.set({
                             'jobsList' : response,
                         }, function () {
                             console.log("Set jobs list to local storage");
@@ -201,7 +201,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             UserID = session.UserID;
             return api('Jobs', session.UserEmail, session.Token, 'GET')
             .then (function (response) {
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     'jobsList' : response,
                 }, function () {
                     console.log("Set jobs list to local storage");
@@ -215,7 +215,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Calls the callback on the tasksList
     this.getTasks = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.sync.get(['tasksList', 'tasksByRecent'], function (items) {
+            chrome.storage.local.get(['tasksList', 'tasksByRecent'], function (items) {
                 if ('tasksList' in items) {
                     // tasks were stored locally, great!
                     var tasksList = items.tasksList.data;
@@ -248,7 +248,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Tasks don't exist in local storage. Need to call API
                     return api('Tasks', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
-                        chrome.storage.sync.set({
+                        chrome.storage.local.set({
                             'tasksList' : response,
                         }, function () {
                             var tasksByRecent = [];
@@ -283,7 +283,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             UserID = session.UserID;
             return api('Tasks', session.UserEmail, session.Token, 'GET')
                 .then (function (response) {
-                    chrome.storage.sync.set({
+                    chrome.storage.local.set({
                         'tasksList' : response,
                     }, function () {
                         console.log("Set tasks list to local storage");
@@ -297,7 +297,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Returns the User
     this.getUser = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.sync.get('user', function (items) {
+            chrome.storage.local.get('user', function (items) {
                 if ('user' in items) {
                     var user = items.user.data;
 
@@ -309,7 +309,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // User doesn't exist in local storage. Need to call API.
                     return api('User', session.UserEmail, session.Token, 'GET')
                     .then(function (response) {
-                        chrome.storage.sync.set({
+                        chrome.storage.local.set({
                             'user' : response,
                         }, function () {
                             var user = response.data;
@@ -324,7 +324,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             UserID = session.UserID;
             return api('User', session.UserEmail, session.Token, 'GET')
             .then(function (response) {
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     'user' : response,
                 }, function () {
                     var user = response.data;
@@ -338,7 +338,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Returns the Company
     this.getCompany = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.sync.get('company', function (items) {
+            chrome.storage.local.get('company', function (items) {
                 if ('company' in items) {
                     var company = items.company.data;
 
@@ -350,7 +350,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Compnay doesn't exist in local storage. Need to call API.
                     return api('Company', session.UserEmail, session.Token, 'GET')
                     .then(function (response) {
-                        chrome.storage.sync.set({
+                        chrome.storage.local.set({
                             'company' : response,
                         }, function () {
                             var company = response.data;
@@ -365,7 +365,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             UserID = session.UserID;
             return api('Company', session.UserEmail, session.Token, 'GET')
             .then(function (response) {
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     'company' : response,
                 }, function () {
                     var company = response.data;
@@ -430,7 +430,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
 
         //// Caching the most recent ////
         // Get caches from local storage and update them
-        chrome.storage.sync.get(['clientsByRecent', 'tasksByRecent'], function (items) {
+        chrome.storage.local.get(['clientsByRecent', 'tasksByRecent'], function (items) {
             
             var clientsByRecent = [];
             var tasksByRecent = [];
@@ -460,7 +460,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             tasksByRecent.push(angular.copy(task));
 
 
-            chrome.storage.sync.set({
+            chrome.local.sync.set({
                 'clientsByRecent' : clientsByRecent,
                 'tasksByRecent' : tasksByRecent
             }, function () {

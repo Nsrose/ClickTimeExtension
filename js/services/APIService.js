@@ -31,7 +31,7 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
                 console.log("timeout");
                 return null;
             }
-            alert(data.Detail);
+            bootbox.alert(data.Detail);
             return data;
         });
     }

@@ -36,7 +36,7 @@ $(document).ready(function() {
            save_options(); 
        }, 100);
     });
-    chrome.storage.sync.get('user', function(items) {
+    chrome.storage.local.get('user', function(items) {
       if ('user' in items) {
         loggedIn = true;
         user = items.user.data;

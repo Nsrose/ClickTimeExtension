@@ -8,15 +8,15 @@ chrome.storage.sync.get(['storedTimeEntries', 'session'], function (items) {
         var numSuccessfulUploads = 0;
         var storedTimeEntries = items.storedTimeEntries;
         var session = items.session.data;
+        var url = API_BASE + "/Companies/" + session.CompanyID + "/Users/" 
+            + session.UserID + "/TimeEntries";
+        var credentials = btoa(session.UserEmail + ":" + session.Token);
+
+        var beforeSend = function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Basic ' + credentials);
+        }
         for (i in storedTimeEntries) {
-            storedEntry = storedTimeEntries[i];
-            var url = API_BASE + "https://app.clicktime.com/api/1.3/" + session.CompanyID + /Users/ + session.UserID + /TimeEntries;
-            var credentials = btoa(session.UserEmail + ":" + session.Token);
-
-            var beforeSend = function (xhr) {
-                xhr.setRequestHeader('Authorization', 'Basic ' + credentials);
-            }
-
+            var storedEntry = storedTimeEntries[i];
             $.ajax({
                 method: "POST",
                 beforeSend: beforeSend, 
@@ -36,7 +36,7 @@ chrome.storage.sync.get(['storedTimeEntries', 'session'], function (items) {
             'storedTimeEntries' : unsuccessfulStoredEntries
         });
         if (numSuccessfulUploads != 0) {
-            alert("Successfully uploaded " + numSuccessfulUploads + " time entries.");
+            bootbox.alert("Successfully uploaded " + numSuccessfulUploads + " time entries.");
         }
        
     }

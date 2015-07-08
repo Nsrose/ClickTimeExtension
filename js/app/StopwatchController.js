@@ -57,17 +57,17 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 
 	$scope.start = function () {
 		if (!timerPromise) {
-                    chrome.browserAction.setBadgeText({text: "On"});
-                    StopwatchService.markStartTime(function (start) {
-                        startTime = start;
-                        $scope.running = true;
-                        $scope.$parent.runningStopwatch = true;
-                        timerPromise = $interval(function() {
-                        var now = new Date();
-                            $scope.getElapsedTime();
-                        }, 31)
-                    }) 		
-                }
+            chrome.browserAction.setBadgeText({text: "On"});
+            StopwatchService.markStartTime(function (start) {
+	            startTime = start;
+	            $scope.running = true;
+	            $scope.$parent.runningStopwatch = true;
+	            timerPromise = $interval(function() {
+	            var now = new Date();
+	                $scope.getElapsedTime();
+	            }, 31)
+            }) 		
+        }
 	}
 
 	$scope.stop = function() {
@@ -80,17 +80,19 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 			    timerPromise = undefined;
 			  	$scope.$apply();
 
-			  	var response = confirm("Save time entry of " + $scope.elapsedHrs + ":" +
-			  	 	$scope.elapsedMin + ":" + $scope.elapsedSec + "?");
-			  	if (response) {
-			  		$("#save-time-entry").click();
-			  	} else {
-			  		$scope.elapsedSec = "00";
-			  		$scope.elapsedMin = "00";
-			  		$scope.elapsedHrs = "00";
-			  		StopwatchService.clear(function () { console.log("Canceled stopwatch")});
-			  		$scope.$apply();
-			  	}
+			  	bootbox.confirm("Save time entry of " + $scope.elapsedHrs + ":" +
+			  	 	$scope.elapsedMin + ":" + $scope.elapsedSec + "?", function (response) {
+			  	 	if (response) {
+				  		$("#save-time-entry").click();
+				  	} else {
+				  		$scope.elapsedSec = "00";
+				  		$scope.elapsedMin = "00";
+				  		$scope.elapsedHrs = "00";
+				  		StopwatchService.clear(function () { console.log("Canceled stopwatch")});
+				  		$scope.$apply();
+			  		}	
+			  	})
+			  	
 		    })
 			      
 		}

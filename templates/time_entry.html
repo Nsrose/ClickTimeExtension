@@ -1,7 +1,7 @@
 <h1>Time Entry</h1>
-<div id="loading-mask" ng-hide="pageReady">
+ <div id="loading-mask" ng-hide="pageReady">
     <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
-</div>
+  </div>
 
 <button ng-click="logout()">Sign Out</button>
 
@@ -21,7 +21,7 @@
         <label ng-show="showHourEntryField">
             Hours:
             <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
-            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Oops! Please log some time in order to save this entry.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursNumeral"><p>Please enter time using only numerals and decimals.</p></span>
         </label>
@@ -55,7 +55,7 @@
                 <button id="start" class="btn btn-success" ng-click="start()" ng-hide="running">Start</button>
                 <button id="stop" class="btn btn-danger" ng-click="stop()" ng-hide="!running">Stop/Save</button>
             </div>
-            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Oops! Please log some time in order to save this entry.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
         </label>
     </form>

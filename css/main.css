@@ -34,9 +34,36 @@ body {
     width: 100%;
     height: 100%;
     background-color: white;
-    z-index: 999;
+    z-index: 700;
 }
 
 .elapsed-time-unit {
     display: inline-block;
+}
+
+#alert-container {
+    z-index: 999;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+#alert-confirm {
+    overflow: auto;
+}
+
+.alert-confirm-option {
+    display: inline-block;
+    margin-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border: 2px solid grey;
+    border-radius: 4px;
+    padding: 4px;
+    width: 100px;
+}
+
+#alert-content {
+    margin-top: 25%;
+    padding: 20px;
 }

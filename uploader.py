@@ -11,10 +11,9 @@ API_LINKED_FILES = {"js/app/app.js", "js/app/content.js"}
 LIVE_API_URL = '"https://app.clicktime.com/api/1.3/"'
 
 
-def create_chrome_ext(new_version):
+def create_chrome_ext():
     '''Makes a zipped folder of the chrome extension, ready for upload.'''
     update_api_links()
-    update_manifest_version(new_version)
     zipped = zipfile.ZipFile("../chrome_ext.zip", "w");
     for dirname, subdirs, files in os.walk("../ClickTimeExtension"):
         zipped.write(dirname)
@@ -53,28 +52,5 @@ def reset_dev_links():
         move("../" + name + "-backup", filename)
 
 
-def update_manifest_version(new_version):
-    '''Updates the manifest version of the extension in manifest.json'''
-    read_file = open('manifest.json', 'r')
-    lines = read_file.readlines()
-    read_file.close()
-    for i in range(len(lines)):
-        line = lines[i]
-        if ("version" in line) and ("manifest_version" not in line):
-            splitline = line.split(":")
-            splitline[1] = '"' + new_version + '",\n'
-            joinedline = ('').join(splitline)
-            lines[1] = joinedline
-    joinedlines = ('').join(lines)
-    write_file = open("manifest.json-new", 'w')
-    write_file.write(joinedlines)
-    write_file.close()
-
-    move("manifest.json-new", "manifest.json");
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("You must specificy the new version number as an argument.")
-        sys.exit(1)
-    create_chrome_ext(sys.argv[1])
+    create_chrome_ext()

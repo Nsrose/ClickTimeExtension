@@ -35,6 +35,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         chrome.storage.sync.remove('stopwatch');
     })
 
+    $scope.$on("timeEntrySuccess", function() {
+        $scope.clearError('hours');
+        $scope.clearError('startEndTimes');
+    })
+
     
     //////////////////////////////////////////////////////////////////
 
@@ -61,14 +66,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     			$scope.showStopwatch = true;
     			break;
     		default:
-    			alert("Invalid time entry method");
+    			bootbox.alert("Invalid time entry method");
     			break;
     	}
     }
 
     $scope.saveTimeEntry = function (session, timeEntry) {
         if ($scope.runningStopwatch) {
-            alert("Oops! Please stop the active stopwatch in order to save this entry.");
+            bootbox.alert("Oops! Please stop the active stopwatch in order to save this entry.");
             return;
         }
         var clickTimeEntry = {
@@ -109,12 +114,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             console.log("Invalid time entry");
             return;
         }
-
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
         .then(function (response) {
             var d = new Date();
-            alert("Entry successfully uploaded at " + d.toTimeString() + ".");
+            bootbox.alert("Entry successfully uploaded at " + d.toTimeString() + ".");
             $scope.$broadcast("timeEntrySuccess");
             $scope.pageReady = true;
         })
@@ -123,10 +127,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 var d = new Date();
                 $scope.$broadcast("timeEntryError");
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                    alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
+                    bootbox.alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
                 }) 
             } else {
-                alert("An error occured.");
+                bootbox.alert("An error occured.");
             }
             $scope.pageReady = true;
         });
@@ -136,7 +140,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
         if (timeEntry.JobID == "" || timeEntry.TaskID == "") {
-            alert("Job or task cannot be empty.");
+            bootbox.alert("Job or task cannot be empty.");
             return false;
         }
         
@@ -176,6 +180,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         switch (entityType) {
             case "client":
                 $scope.timeEntry.client = entity;
+                $scope.timeEntry.job = $scope.job;
+                $scope.timeEntry.JobID = $scope.job.JobID;
                 break;
             case "job":
                 $scope.timeEntry.job = entity;
@@ -186,7 +192,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.timeEntry.TaskID = entity.TaskID;
                 break;
             default:
-                alert("Improper entity of type: " + entityType);
+                bootbox.alert("Improper entity of type: " + entityType);
                 break;
         }
     }
@@ -196,7 +202,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         if ($scope.user != null) {
             return $scope.user.RequireStopwatch;    
         }
-        alert("Need to get user before calling showStopwatch");
+        bootbox.alert("Need to get user before calling showStopwatch");
     }
 
     // Returns true iff start and end time fields should be shown for this user.
@@ -205,7 +211,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         if ($scope.user != null) {
             return !$scope.showStopwatch && $scope.user.RequireStartEndTime;
         }
-        alert("Need to get user before calling showStartEndTimes");
+        bootbox.alert("Need to get user before calling showStartEndTimes");
     }
 
     // Returns true iff the regular hour entry field should be shown for this user.
@@ -213,12 +219,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         if ($scope.user != null) {
             return !$scope.showStopwatch && !$scope.showStartEndTimes;
         }
-        alert("Need to get user before calling showHourEntryField");
+        bootbox.alert("Need to get user before calling showHourEntryField");
     }
 
     // Round hour inputs
     $scope.roundHour = function (time, timeToIncrement) {
-        console.log(CTService.isNumeric(time))
         if (!CTService.isNumeric(time)) {
             $scope.timeEntryErrorHoursNumeral = true;
             return;
@@ -237,7 +242,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // Logout function
     $scope.logout = function() {
         chrome.storage.sync.remove(CHROME_STORAGE_VARS, function () {
-            alert("Logged out.");
+            bootbox.alert("Logged out.");
             $location.path("/login");
             $scope.$apply();
         })

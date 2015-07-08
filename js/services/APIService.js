@@ -21,7 +21,6 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
             timeout: TIMEOUT
         };
 
-        console.log(request);
 
         return $http(request)
         .success(function(data, status, headers, config) {

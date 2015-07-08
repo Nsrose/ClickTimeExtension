@@ -166,6 +166,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
        
     }
 
+
     // Get jobs list for this session and save to local storage
     // Calls the callback on the jobsList
     this.getJobs = function (session, checkLocal, callback) {

@@ -21,6 +21,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             case "hours":
                 $scope.timeEntryErrorHoursZero = false;
                 $scope.timeEntryErrorHoursInvalid = false;
+                $scope.timeEntryErrorHoursNumeral = false;
                 break;
             case "startEndTimes":
                 $scope.timeEntryErrorStartEndTimes = false;
@@ -217,6 +218,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     // Round hour inputs
     $scope.roundHour = function (time, timeToIncrement) {
+        console.log(CTService.isNumeric(time))
+        if (!CTService.isNumeric(time)) {
+            $scope.timeEntryErrorHoursNumeral = true;
+            return;
+        }
         if (time) {
             $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
         }

@@ -4,8 +4,7 @@
 </div>
 
 <button ng-click="logout()">Sign Out</button>
-
-
+<br><br>
 
 <div class="refresh-container">
     <div class="refresh-message">
@@ -13,7 +12,7 @@
     </div>
     <button ng-click="refresh()">Refresh</button>
 </div>
-
+<br>
 <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
@@ -60,31 +59,34 @@
         </label>
     </form>
 </div>
-
+<br>
 <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
 
 <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
 </div>
 
-<h3>Client: </h3>
-<div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)">
+<div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
+        <h3>Client: </h3>
+    <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)">
+    </div>
+
+    <h3>Job: </h3>
+    <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
+    </div>
+
+    <h3>Task: </h3>
+    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
+    </div>
+
+    <form name="entry">
+            <h3>Notes:</h3>
+            <p ng-show="user.RequireComments" style="color: red">* required</p>
+            <textarea name="text" ng-model="notes" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="3999"></textarea><br> 
+            <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
+                <span>Oops! Please limit your note to 4000 characters.</span>
+            </span>
+    </form>
+    <br>
+    <button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
 </div>
-
-<h3>Job: </h3>
-<div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
-</div>
-
-<h3>Task: </h3>
-<div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)">
-</div>
-
-<form name="entry">
-	<h3>Notes:</h3>
-        <p ng-show="user.RequireComments" style="color: red">* required</p>
-	<textarea name="text" ng-model="notes" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="3999"></textarea><br> 
-	<span ng-show="entry.text.$dirty && entry.text.$invalid"> 
-            <span>Oops! Please limit your note to 4000 characters.</span>
-	</span>
-</form>
-
-<button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
+<br>

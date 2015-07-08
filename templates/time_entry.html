@@ -20,9 +20,10 @@
 
         <label ng-show="showHourEntryField">
             Hours:
-            <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, 0.25)" ng-focus="clearError('hours')">
+            <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
             <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Cannot enter 0 hours.</p></span>
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
+            <span style="color:red" ng-show="timeEntryErrorHoursNumeral"><p>Please enter time using only numerals and decimals.</p></span>
         </label>
 
         <label ng-show="showStartEndTimes">

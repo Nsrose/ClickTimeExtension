@@ -33,6 +33,11 @@ myApp.service('CTService', function() {
         return (intpart + howManyIncrements * timeIncrement).toFixed(precision);
     }
 
+    /** Return true if a string is numeric. */
+    this.isNumeric = function (n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
     /** Returns a typical date string format for submitting a new time entry.*/
     this.getDateString = function () {
     	var d = new Date();
@@ -63,4 +68,6 @@ myApp.service('CTService', function() {
         var time = (hrs + min/60 + sec/3600) + '';
         return this.roundToNearest(time, 0.25);
     }
+
+   
 })

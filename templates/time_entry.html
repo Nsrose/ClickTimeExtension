@@ -5,7 +5,6 @@
 
 <button ng-click="logout()">Sign Out</button>
 
-<button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
 
 
 <div class="refresh-container">
@@ -18,10 +17,7 @@
 <button id="stored-time-entry-link" ng-click="showStoredEntries()">Stored Entries</button>
 
 <div class="time-entry-container">
-	<div class="time-entry-select">Time entry method:</div>
-	<div custom-select ng-model="timeEntryMethod" ng-options="method for method in timeEntryMethods" ng-click="changeTimeEntryMethod(timeEntryMethod)"></div> 
-
-    <form name="time-entry-form" novalidate>
+        <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
 
         <label ng-show="showHourEntryField">
@@ -90,3 +86,5 @@
             <span>Oops! Please limit your note to 4000 characters.</span>
 	</span>
 </form>
+
+<button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>

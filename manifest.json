@@ -5,17 +5,14 @@
 
   "description" : "Clicktime extension",
 
-
-
   "browser_action" : {
     "default_icon" : {
         "19": "img/stopwatch19.png",
         "38": "img/stopwatch38.png"
-    }
+    },
     "default_title" : "ClickTime",
     "default_popup" : "templates/main.html"
   },
-
 
     "content_scripts" : [
     {

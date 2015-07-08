@@ -1,5 +1,6 @@
 // Script for the options page for configurability
 // Saves options to chrome.storage
+
 function save_options() {
   var timeEntryMethod = document.getElementById('timeEntryMethod').value;
   chrome.storage.sync.set({
@@ -28,8 +29,7 @@ function restore_options() {
 
 $(document).ready(function() {
 	restore_options();
-
-	$("#save").click(function() {
-		save_options();
-	})
+        $("#timeEntryMethod").on("change", function() {
+            save_options();
+        });
 })

@@ -432,8 +432,4 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
 
     EntityService.getSession(afterGetSession);
-
-
-
-   
 }])

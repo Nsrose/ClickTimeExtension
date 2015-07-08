@@ -26,10 +26,11 @@ function restore_options() {
   });
 }
 
-
 $(document).ready(function() {
-	restore_options();
-        $("#timeEntryMethod").on("change", function() {
-            save_options();
-        });
+    restore_options();
+    $("#timeEntryMethod").on("change", function() {
+        setTimeout(function() {
+           save_options(); 
+        }, 100);
+    });
 })

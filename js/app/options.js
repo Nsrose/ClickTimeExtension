@@ -26,10 +26,23 @@ function restore_options() {
   });
 }
 
+var loggedIn = false;
+var user = null;
+
+
+
 
 $(document).ready(function() {
-	restore_options();
-        $("#timeEntryMethod").on("change", function() {
-            save_options();
-        });
+	  restore_options();
+    $("#timeEntryMethod").on("change", function() {
+        save_options();
+    });
+    chrome.storage.sync.get('user', function (items) {
+      if ('user' in items) {
+        loggedIn = true;
+        user = items.user.data;
+      }
+    })
+
+
 })

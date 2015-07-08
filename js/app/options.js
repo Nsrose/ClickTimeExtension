@@ -36,10 +36,25 @@ $(document).ready(function() {
            save_options(); 
        }, 100);
     });
-    chrome.storage.sync.get('user', function (items) {
+    chrome.storage.sync.get('user', function(items) {
       if ('user' in items) {
         loggedIn = true;
         user = items.user.data;
+        
+        if (user.RequireStopwatch == true) {
+            $('#hours').prop('disabled', 'disabled');
+            $('#start-end').prop('disabled', 'disabled');
+        } else if (user.RequireStartEndTime == true) {
+            $('#hours').prop('disabled', 'disabled');
+        } else {
+            // remove all marks at end if clean
+            $('#hours').removeProp('disabled');
+            $('#start-end').removeProp('disabled');
+        }
       }
     })
 })
+
+
+
+

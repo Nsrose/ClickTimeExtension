@@ -16,7 +16,11 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         }
     })
 
-    
+    $("#password-input").keypress(function(e) {
+        if (e.which == 13) {
+            $scope.login($scope.user);
+        }
+    })
 
     $scope.login = function(user) {
         $scope.rerouting = true;

@@ -13,7 +13,7 @@
     </p>
 
     <p>Password:<br>
-        <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required><br>
+        <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required id="password-input"><br>
         <span style="color:red" ng-show="loginForm.password.$touched && loginForm.password.$invalid">
             <span ng-show="loginForm.password.$error.required">no hacking please.</span>
             <span ng-show="loginForm.password.$error.minlength">minimum is 3 characters.</span>

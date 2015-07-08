@@ -3,12 +3,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.UserName = null;
     $scope.UserID = null;
    
-    $scope.Session = null;
+    // $scope.Session = null;
 
     $scope.jobsList = null;
     $scope.HasEmptyEntities = false;
 
-    $scope.pageReady = false;
+    
 
     // if true, indicate to user that they can set default time entry method in extension options
     $scope.showOptionsMessage = false;
@@ -30,18 +30,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
     }
 
-
-    $scope.$watch('variables', function(newVal, oldVal) {
-        if ($scope.variables.length == NUM_SCOPE_VARS) {
-            $scope.pageReady = true;
-        }
-    }, true)
-
-    $scope.showStoredEntries = function() {
-        var session = $scope.Session;
-        $location.path("/stored_time");
-        $scope.session = session;
-    }
+    $scope.$on("timeEntryError", function() {
+        chrome.storage.sync.remove('stopwatch');
+    })
 
     
     //////////////////////////////////////////////////////////////////
@@ -76,7 +67,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     $scope.saveTimeEntry = function (session, timeEntry) {
         if ($scope.runningStopwatch) {
-            alert("Cannot save entry with a running stopwatch.");
+            alert("Oops! Please stop the active stopwatch in order to save this entry.");
             return;
         }
         var clickTimeEntry = {
@@ -129,7 +120,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         .catch(function (response) {
             if (response.data == null) {
                 var d = new Date();
-                $scope.$broadcast("timeEntryError")
+                $scope.$broadcast("timeEntryError");
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
                     alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
                 }) 
@@ -250,7 +241,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
         console.log("Fetching the most recent data from Clicktime");
-
+        $scope.$parent.$broadcast("pageLoading");
         var afterGetClients = function (clientsList) {
             $scope.clients = clientsList;
             if (clientsList.length == 0) {
@@ -299,6 +290,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }
 
@@ -324,7 +316,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     
     // Get the session of the user from storage.
     var afterGetSession = function (session) {
-        $scope.Session = session;
+        $scope.$parent.Session = session;
         $scope.variables.push('session');
          // default empty time entry
         var dateString = CTService.getDateString();
@@ -418,7 +410,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         var afterGetCompany = function (company) {
             $scope.company = company;
             $scope.variables.push('company');
+            $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
+
         }
 
 

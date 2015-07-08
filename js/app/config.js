@@ -11,10 +11,6 @@ myApp.config(['$routeProvider',
         templateUrl: '../../templates/login.html',
         controller: 'LoginEntryController'
       })
-      .when("/stored_time", {
-        templateUrl: "../../templates/stored_time.html",
-        controller: 'StoredTimeEntryController'
-      })
       .otherwise({
         redirectTo: '/login'
       });

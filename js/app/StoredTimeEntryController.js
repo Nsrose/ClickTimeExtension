@@ -12,19 +12,38 @@ myApp.controller("StoredTimeEntryController", ['$scope', 'TimeEntryService', '$l
 		}
 	})
 
-	// Attempt to save a stored entry. If successful, removes from the stored list
-	$scope.saveStoredEntry = function (timeEntry) {
-		TimeEntryService.saveTimeEntry($scope.session, timeEntry)
-		.then(function (response) {
-            var d = new Date();
-            alert("Entry successfully uploaded at " + d.toTimeString() + ".");
-            $scope.$broadcast("pageReady");
-        })
-        .catch(function (response) {
-            $scope.$broadcast("timeEntryError")
-            alert("Could not save time entry. Entry is still saved locally.");
-            $scope.$broadcast("pageReady");
-        });
+	// Attempts to save the local list of stored time entries. For each successful
+	// save, deletes that time entry from local storage.
+	$scope.saveStoredEntries = function () {
+		$scope.$parent.$broadcast("pageLoading");
+
+		var unsuccessfulStoredEntries = [];
+		var numSuccessfulUploads = 0;
+
+		chrome.storage.sync.get('storedTimeEntries', function (items) {
+			if ('storedTimeEntries' in items) {
+				var storedTimeEntries = items.storedTimeEntries;
+				for (i in storedTimeEntries) {
+					storedEntry = storedTimeEntries[i];
+					TimeEntryService.saveTimeEntry($scope.Session, storedEntry)
+					.then(function (response) {
+						numSuccessfulUploads += 1;
+					})
+					.catch(function (response) {
+						console.log("Could not save time entry. Entry is still saved locally.");
+						unsuccessfulStoredEntries.push(storedEntry);
+					})
+				}
+				chrome.storage.sync.set({
+					'storedTimeEntries' : unsuccessfulStoredEntries
+				}, function() {
+					console.log("Resaved " + unsuccessfulStoredEntries.length + " unsuccessful entries to local storage.");
+					alert("Successfully uploaded " + numSuccessfulUploads + " locally stored entries.");
+					$scope.$parent.$broadcast("pageReady");
+				})
+				
+			}
+		})
 	}
 
 

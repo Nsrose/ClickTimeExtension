@@ -426,7 +426,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         }
 
-
         EntityService.getClients(session, true, afterGetClients);
         EntityService.getJobs(session, true, afterGetJobs);
         EntityService.getTasks(session, true, afterGetTasks);
@@ -434,7 +433,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.getCompany(session, true, afterGetCompany);
 
     }
-
 
     EntityService.getSession(afterGetSession);
 }])

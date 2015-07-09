@@ -6,6 +6,11 @@
 <button ng-click="logout()">Sign Out</button>
 <br><br>
 
+<div>
+    Total hours logged today: {{totalHours}}
+</div>
+<br>
+
 <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>

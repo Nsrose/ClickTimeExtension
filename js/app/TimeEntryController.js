@@ -1,4 +1,5 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
+    // if(navigator.onLine) {
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
@@ -7,9 +8,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     $scope.jobsList = null;
     $scope.HasEmptyEntities = false;
-
-    
-
     // if true, indicate to user that they can set default time entry method in extension options
     $scope.showOptionsMessage = false;
 
@@ -454,6 +452,25 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.getCompany(session, true, afterGetCompany);
         EntityService.getTimeEntries(session, afterGetTimeEntries);
     }
-
     EntityService.getSession(afterGetSession);
+
+    var offlineBox;
+    window.addEventListener('offline', function(e) {
+        offlineBox = bootbox.dialog({
+            message: "You seem to be offline :'(",       
+            show: true,
+            backdrop: true,
+            closeButton: false,
+            animate: true,
+            className: "no-internet-modal",
+        });
+    }, false);
+    
+    setInterval(function(){ 
+        window.addEventListener('online', function(e) {
+            offlineBox.modal('hide');
+        }, false);
+    }, 3000);
+
+    
 }])

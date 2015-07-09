@@ -23,7 +23,7 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
 
 
         return $http(request)
-        .success(function(data, status, headers, config) {
+            .success(function(data, status, headers, config) {
             return data;
         }).
         error(function(data, status, headers, config) {

@@ -1,9 +1,9 @@
 // Services for accessing entities
 // These will only work once the session is open
 myApp.service('EntityService', function ($http, APIService, CTService) {
-	// The users session
-	var Session = null;
-	var UserName = null;
+    // The users session
+    var Session = null;
+    var UserName = null;
     var UserID = null;
     var CompanyID = null;
     var UserEmail = null;
@@ -11,7 +11,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     var SecurityLevel = null;
 
 
-	// Base URL for making API calls to the three main GET methods
+    // Base URL for making API calls to the three main GET methods
     var baseURL = "";
 
     // Function to get the session of a user
@@ -48,7 +48,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     	})
     }
 
-	// Function for making async API calls.
+    // Function for making async API calls.
     // Entity must be plural, except in case of user
     var api = function (entity, email, token, method) {
         if (baseURL == "") {
@@ -76,6 +76,33 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             })
     }
 
+    var getIsoDate = function() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd='0'+dd
+        } 
+        if (mm < 10) {
+            mm='0' + mm
+        }
+
+        today = yyyy + dd + mm;
+        return today;
+    }
+
+    this.getTimeSheet = function (session, callback) {
+        CompanyID = session.CompanyID;
+        UserID = session.UserID;
+        isodate = getIsoDate();
+        url = API_BASE + "Companies/" + CompanyID + "/Users/" + UserID + "/Timesheets?date=" + isodate;
+        APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
+            .then(function (response) {
+                callback(response.data);
+            })
+    }
 
     // Get clients list for this session and save to local storage
     // Calls the callback on the clientsList
@@ -186,6 +213,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Jobs don't exist in local storage. Need to call API
                     return api('Jobs', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
+                        console.log("number of jobs:" + Object.keys(response).length);
                         chrome.storage.local.set({
                             'jobsList' : response,
                         }, function () {

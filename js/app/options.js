@@ -42,14 +42,13 @@ $(document).ready(function() {
         user = items.user.data;
         
         if (user.RequireStopwatch == true) {
-            $('#hours').prop('disabled', 'disabled');
-            $('#start-end').prop('disabled', 'disabled');
+            $('#start-end').remove();
         } else if (user.RequireStartEndTime == true) {
-            $('#hours').prop('disabled', 'disabled');
+            $('#hours').remove();
         } else {
-            // remove all marks at end if clean
-            $('#hours').removeProp('disabled');
-            $('#start-end').removeProp('disabled');
+            // add back all options
+            $('#timeEntryMethod').append('#hours');
+            $('#timeEntryMethod').append('#start-end');
         }
       }
     })

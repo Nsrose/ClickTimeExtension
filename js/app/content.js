@@ -1,4 +1,4 @@
-var API_BASE = "https://dev11.clicktime.com:8443/api/1.3/";
+var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
 var TIMEOUT = 10000;
 
 // Try to send locally stored time entries

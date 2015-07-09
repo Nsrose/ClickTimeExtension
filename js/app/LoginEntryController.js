@@ -7,10 +7,19 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             // Session variable exists
             var session = items.session.data;
             if (session != null) {
-                console.log("Logging in user from previous session");
-                // User does not need to login.
-                $location.path("/time_entry");
-                $scope.$apply();
+                var now = new Date();
+                var lastLoginDate = new Date(session.lastLoginYear, session.lastLoginMonth,
+                    session.lastLoginDay, session.lastLoginHrs, session.lastLoginMin, session.lastLoginSec);
+                var elapsedTimeMS = now - startTime;
+                var elapsedSec = Math.floor(elapsedTimeMS / 1000);
+                var elapsedMin = Math.floor(elapsedSec / 60);
+                var elapsedHrs = Math.floor(elapsedMin / 60);
+                if (!(elapsedHrs > TOKEN_EXPIRE_HOURS)) {
+                    // User does not need to login.
+                    $location.path("/time_entry");
+                    $scope.$apply();
+                }
+                // session has expired.
             }
         }
     })
@@ -27,6 +36,14 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         // Get the session for the user. If it exists, store it in local storage.
         APIService.apiCall(sessionURL, user.email, user.password, 'GET').then(
          function (session) {
+            var d = new Date();
+            var data = session.data;
+            data.lastLoginYear = d.getFullYear();
+            data.lastLoginMonth = d.getMonth();
+            data.lastLoginDay = d.getDate();
+            data.lastLoginHrs = d.getHours();
+            data.lastLoginMin = d.getMinutes();
+            data.lastLoginSec = d.getSeconds();
             chrome.storage.sync.set(
                 {'session' : session},
                 function() {

@@ -243,6 +243,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.logout = function() {
         chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
         chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
+            chrome.browserAction.setBadgeText({text:""});
             bootbox.alert("Logged out.");
             $location.path("/login");
             $scope.$apply();

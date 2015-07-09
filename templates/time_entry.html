@@ -6,11 +6,10 @@
 <button ng-click="logout()">Sign Out</button>
 <br><br>
 
-<div>
-    Total hours logged today: {{totalHours}}
-</div>
+Total hours logged today: {{totalHours}}
 <br>
-
+<a href="http://app.clicktime.com/?dest=App%2FDayView%2F">My Timesheet</a>
+<br><br>
 <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
@@ -63,6 +62,7 @@
         Can't find a recently created client, job, or task? <a href="" ng-click="refresh()">Refresh</a>
     </div>
 </div>
+
 <br>
 <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
 

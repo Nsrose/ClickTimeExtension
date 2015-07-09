@@ -93,7 +93,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         return today;
     }
 
-    this.getTimeEntry = function (session, callback) {
+    this.getTimeEntries = function (session, callback) {
         CompanyID = session.CompanyID;
         UserID = session.UserID;
         isodate = getIsoDate();
@@ -488,7 +488,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             tasksByRecent.push(angular.copy(task));
 
 
-            chrome.local.sync.set({
+            chrome.storage.local.set({
                 'clientsByRecent' : clientsByRecent,
                 'tasksByRecent' : tasksByRecent
             }, function () {

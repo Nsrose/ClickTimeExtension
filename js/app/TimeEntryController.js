@@ -111,9 +111,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
         
         if (!validateTimeEntry(timeEntry)) {
-            console.log("Invalid time entry");
+            console.log(timeEntry);
             return;
         }
+
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
         .then(function (response) {
@@ -131,6 +132,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 }) 
             } else {
                 bootbox.alert("An error occured.");
+                $scope.$broadcast("timeEntryError");
             }
             $scope.pageReady = true;
         });
@@ -139,6 +141,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
+        if (timeEntry.JobID == undefined || timeEntry.TaskID == undefined) {
+            bootbox.alert("Job or task cannot be empty.");
+            return false;
+        }
+
         if (timeEntry.JobID == "" || timeEntry.TaskID == "") {
             bootbox.alert("Job or task cannot be empty.");
             return false;
@@ -428,12 +435,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         }
 
-        var afterGetTimeEntry = function (timeEntry) {
-            $scope.timeEntry = timeEntry;
+        var afterGetTimeEntries = function (timeEntries) {
             $scope.$parent.$broadcast("pageReady");
 
             var totalHours = 0;
-            var timeEntries = timeEntry[0].TimeEntries;
+            var timeEntries = timeEntries[0].TimeEntries;
             var arrayLength = timeEntries.length;
             for (var i = 0; i < arrayLength; i++) {
                 totalHours += timeEntries[i].Hours;
@@ -446,7 +452,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
-        EntityService.getTimeEntry(session, afterGetTimeEntry);
+        EntityService.getTimeEntries(session, afterGetTimeEntries);
     }
 
     EntityService.getSession(afterGetSession);

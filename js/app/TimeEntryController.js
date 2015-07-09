@@ -428,9 +428,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         }
 
-        var afterGetTimeSheet = function (timeSheet) {
-            $scope.timeSheet = timeSheet;
+        var afterGetTimeEntry = function (timeEntry) {
+            $scope.timeEntry = timeEntry;
             $scope.$parent.$broadcast("pageReady");
+
+            var totalHours = 0;
+            var timeEntries = timeEntry[0].TimeEntries;
+            var arrayLength = timeEntries.length;
+            for (var i = 0; i < arrayLength; i++) {
+                totalHours += timeEntries[i].Hours;
+            }
+            $scope.totalHours = totalHours;
         }
 
         EntityService.getClients(session, true, afterGetClients);
@@ -438,7 +446,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
-        EntityService.getTimeSheet(session, afterGetTimeSheet);
+        EntityService.getTimeEntry(session, afterGetTimeEntry);
     }
 
     EntityService.getSession(afterGetSession);

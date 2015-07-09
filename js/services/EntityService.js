@@ -89,15 +89,15 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             mm='0' + mm
         }
 
-        today = yyyy + dd + mm;
+        today = yyyy + mm + dd;
         return today;
     }
 
-    this.getTimeSheet = function (session, callback) {
+    this.getTimeEntry = function (session, callback) {
         CompanyID = session.CompanyID;
         UserID = session.UserID;
         isodate = getIsoDate();
-        url = API_BASE + "Companies/" + CompanyID + "/Users/" + UserID + "/Timesheets?date=" + isodate;
+        url = API_BASE + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
         APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
             .then(function (response) {
                 callback(response.data);

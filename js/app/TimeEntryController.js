@@ -3,8 +3,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.UserName = null;
     $scope.UserID = null;
    
-    // $scope.Session = null;
-
     $scope.jobsList = null;
     $scope.HasEmptyEntities = false;
 
@@ -16,6 +14,23 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.runningStopwatch = false;
 
     //// Interface logic ////
+
+    // Watch for a clientID change in the dropdown to show available jobs
+    $scope.$watch('client.ClientID', function (clientID) {
+        if ($scope.jobsList) {
+            $scope.jobs = $scope.jobsList.filter(function (job) {return job.ClientID == clientID});
+            $scope.job = $scope.jobs[0];
+            $scope.timeEntry.job = $scope.job;
+            $scope.timeEntry.JobID = $scope.job.JobID;
+            TimeEntryService.updateInProgressEntry("job", $scope.job);
+        }
+    })
+
+    // Update in progress entry notes
+    $scope.updateNotes = function() {
+        TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
+    }
+
     $scope.clearError = function (error) {
         switch (error) {
             case "hours":
@@ -25,6 +40,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 break;
             case "startEndTimes":
                 $scope.timeEntryErrorStartEndTimes = false;
+                break;
+            case "activeStopwatch":
+                $scope.timeEntryErrorActiveStopwatch = false;
+                break;
+            case "timeEntryErrorMissingNotes":
+                $scope.timeEntryErrorMissingNotes = false;
                 break;
             default:
                 break;
@@ -38,6 +59,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.$on("timeEntrySuccess", function() {
         $scope.clearError('hours');
         $scope.clearError('startEndTimes');
+    })
+
+    $scope.$on("stoppedStopwatch", function() {
+        $scope.clearError('activeStopwatch');
     })
 
     
@@ -73,9 +98,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     $scope.saveTimeEntry = function (session, timeEntry) {
         if ($scope.runningStopwatch) {
-            bootbox.alert("Oops! Please stop the active stopwatch in order to save this entry.");
+            $scope.timeEntryErrorActiveStopwatch = true;
             return;
         }
+
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
             "Comment" : timeEntry.Comment,
@@ -112,6 +138,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         
         if (!validateTimeEntry(timeEntry)) {
             console.log(timeEntry);
+            $scope.$broadcast("timeEntryError");
             return;
         }
 
@@ -119,6 +146,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
         .then(function (response) {
             var d = new Date();
+            TimeEntryService.removeInProgressEntry();
             bootbox.alert("Entry successfully uploaded at " + d.toTimeString() + ".");
             $scope.$broadcast("timeEntrySuccess");
             $scope.pageReady = true;
@@ -127,6 +155,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             if (response.data == null) {
                 var d = new Date();
                 $scope.$broadcast("timeEntryError");
+                TimeEntryService.removeInProgressEntry();
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
                     bootbox.alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
                 }) 
@@ -139,6 +168,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.updateRecentEntities(timeEntry);
     }
 
+
+
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
         if (timeEntry.JobID == undefined || timeEntry.TaskID == undefined) {
@@ -150,6 +181,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             bootbox.alert("Job or task cannot be empty.");
             return false;
         }
+
+        if ($scope.user.RequireComments && (timeEntry.Comment == undefined || 
+            timeEntry.Comment == "")) {
+            $scope.timeEntryErrorMissingNotes = true;
+            return;
+        }
+
         
         if ($scope.showStartEndTimes) {
             if (timeEntry.ISOStartTime == null || timeEntry.ISOEndTime == null) {
@@ -182,6 +220,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         return true;
     }
 
+
+
     // Add an entity to the scope's time entry. Called with every selection of a dropdown.
     $scope.addEntityTimeEntry = function (entityType, entity) {
         switch (entityType) {
@@ -189,14 +229,18 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.timeEntry.client = entity;
                 $scope.timeEntry.job = $scope.job;
                 $scope.timeEntry.JobID = $scope.job.JobID;
+                TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client);
+                TimeEntryService.updateInProgressEntry("job", $scope.job);
                 break;
             case "job":
                 $scope.timeEntry.job = entity;
                 $scope.timeEntry.JobID = entity.JobID;
+                TimeEntryService.updateInProgressEntry("job", $scope.job);
                 break;
             case "task":
                 $scope.timeEntry.task = entity;
                 $scope.timeEntry.TaskID = entity.TaskID;
+                TimeEntryService.updateInProgressEntry("task", $scope.timeEntry.task);
                 break;
             default:
                 bootbox.alert("Improper entity of type: " + entityType);
@@ -263,6 +307,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.refresh = function() {
         console.log("Fetching the most recent data from Clicktime");
         $scope.$parent.$broadcast("pageLoading");
+
+        TimeEntryService.removeInProgressEntry();
         var afterGetClients = function (clientsList) {
             $scope.clients = clientsList;
             if (clientsList.length == 0) {
@@ -326,23 +372,18 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     
 
-    // Watch for a clientID change in the dropdown to show available jobs
-    $scope.$watch('client.ClientID', function (clientID) {
-        if ($scope.jobsList) {
-            $scope.jobs = $scope.jobsList.filter(function (job) {return job.ClientID == clientID});
-            $scope.job = $scope.jobs[0];
-        }
-    })
+  
 
+    ///// ONLOAD: This will get executed upon opneing the chrome extension. /////////
     
     // Get the session of the user from storage.
     var afterGetSession = function (session) {
         $scope.$parent.Session = session;
         $scope.variables.push('session');
-         // default empty time entry
+        
+        // Default empty entry
         var dateString = CTService.getDateString();
         var now = new Date();
-
         $scope.timeEntry = {
             "BreakTime":0.00,
             "Comment":"",
@@ -355,6 +396,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             "SubPhaseID":null,
             "TaskID":""
         }
+
+        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+            if (inProgressEntry.job != undefined) {
+                $scope.timeEntry.job = inProgressEntry.job;
+                $scope.timeEntry.JobID = inProgressEntry.JobID;
+            }
+            if (inProgressEntry.client != undefined) {
+                $scope.timeEntry.client = inProgressEntry.client;
+            }
+            if (inProgressEntry.task != undefined) {
+                $scope.timeEntry.task = inProgressEntry.task;
+                $scope.timeEntry.TaskID = inProgressEntry.TaskID;
+            }
+            $scope.timeEntry.Comment = inProgressEntry.Comment;
+        })
        
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
             || EntityService.SecurityLevel == 'admin';
@@ -366,13 +422,28 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             if (clientsList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            $scope.client = clientsList[0];
-            if ($scope.timeEntry.client == null) {
-                $scope.timeEntry.client = $scope.client;
-            }
+            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                if (inProgressEntry.client != undefined) {
+                    var filteredClients = $scope.clients.filter(function (client) { 
+                        return client.ClientID == inProgressEntry.client.ClientID
+                    })
 
-            $scope.variables.push('clients');
-            $scope.$apply();
+                    if (filteredClients.length > 0) {
+                        // If in progress entity is in the entity list
+                        $scope.client = filteredClients[0];
+                        $scope.timeEntry.client = inProgressEntry.client;
+                        $scope.variables.push('clients');
+                        $scope.$apply();
+                        return;
+                    }           
+                } 
+                // No in progress entity
+                $scope.client = clientsList[0];
+                $scope.timeEntry.client = $scope.client;
+                TimeEntryService.updateInProgressEntry("client", $scope.client);
+                $scope.variables.push('clients');
+                $scope.$apply();
+            })
         }
 
         var afterGetJobs = function (jobsList) {
@@ -389,13 +460,37 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             if ($scope.jobs.length == 0) {
                 $scope.HasEmptyEntities = true;
                 $scope.job = undefined;
+                $scope.variables.push('jobs');
+                $scope.$apply();
             } else {
-                $scope.job = $scope.jobs[0];
+               TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                if (inProgressEntry.job != undefined) {
+                    var filteredJobs = $scope.jobs.filter(function (job) { 
+                        return job.JobID == inProgressEntry.job.JobID
+                    })
+
+                    if (filteredJobs.length > 0) {
+                        // If in progress entity is in the entity list
+                        $scope.job = filteredJobs[0];
+                        $scope.timeEntry.job = inProgressEntry.job;
+                        $scope.timeEntry.JobID = inProgressEntry.JobID;
+                        $scope.variables.push('jobs');
+                        $scope.$apply();
+                        return;
+                    }           
+                } 
+                // No in progress entity
+                $scope.job = jobsList[0];
                 $scope.timeEntry.job = $scope.job;
                 $scope.timeEntry.JobID = $scope.job.JobID;
+                TimeEntryService.updateInProgressEntry("job", $scope.job);
+                $scope.variables.push('jobs');
+                $scope.$apply();
+            
+            })
+                
             }
-            $scope.variables.push('jobs');
-            $scope.$apply();
+           
         }
 
         var afterGetTasks = function (tasksList) {
@@ -403,11 +498,32 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            $scope.task = tasksList[0];
-            $scope.timeEntry.task = $scope.task;
-            $scope.timeEntry.TaskID = $scope.task.TaskID;
-            $scope.variables.push('tasks');
-            $scope.$apply();
+            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                if (inProgressEntry.task != undefined) {
+                    var filteredTasks = $scope.tasks.filter(function (task) { 
+                        return task.TaskID == inProgressEntry.task.TaskID
+                    })
+
+                    if (filteredTasks.length > 0) {
+                        // If in progress entity is in the entity list
+                        $scope.task = filteredTasks[0];
+                        $scope.timeEntry.task = inProgressEntry.task;
+                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;
+                        $scope.variables.push('tasks');
+                        $scope.$apply();
+                        return;
+                    }           
+                } 
+                // No in progress entity
+                $scope.task = tasksList[0];
+                $scope.timeEntry.task = $scope.task;
+                $scope.timeEntry.TaskID = $scope.task.TaskID;
+                TimeEntryService.updateInProgressEntry("task", $scope.task);
+                $scope.variables.push('tasks');
+                $scope.$apply();
+            
+            })
+            
         }
 
         var afterGetUser = function (user) {
@@ -432,11 +548,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.company = company;
             $scope.variables.push('company');
             $scope.$apply();
+            $scope.$parent.$broadcast("pageReady"); 
 
         }
 
         var afterGetTimeEntries = function (timeEntries) {
-            $scope.$parent.$broadcast("pageReady");
+            
 
             var totalHours = 0;
             var timeEntries = timeEntries[0].TimeEntries;

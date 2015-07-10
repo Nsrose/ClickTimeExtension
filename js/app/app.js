@@ -10,14 +10,15 @@ var CHROME_LOCAL_STORAGE_VARS = [
 	'jobsList',
 	'tasksList',
 	'clientsByRecent',
-	'tasksByRecent'
+	'tasksByRecent',
+	'storedTimeEntries',
 ];
 
 var CHROME_SYNC_STORAGE_VARS = [
     'session',
     'timeEntries',
     'stopwatch',
-    'storedTimeEntries',
+    'inProgressEntry'
 ];
 
 // Default timeout ms

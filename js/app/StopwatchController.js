@@ -72,8 +72,15 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 
 	$scope.stop = function() {
 		if (timerPromise) {
-                    chrome.browserAction.setBadgeText({text: ""});
-		    StopwatchService.markEndTime (function () {
+			if ($scope.$parent.user.RequireComments && ($scope.$parent.timeEntry.Comment == undefined || 
+	            $scope.$parent.timeEntry.Comment == "")) {
+	            $scope.$parent.timeEntryErrorMissingNotes = true;
+	            return;
+	        }
+
+			$scope.$parent.$broadcast("stoppedStopwatch");
+                chrome.browserAction.setBadgeText({text: ""});
+		    	StopwatchService.markEndTime (function () {
 		      	$scope.running = false;
 		      	$scope.$parent.runningStopwatch  = false;
 		      	$interval.cancel(timerPromise);
@@ -101,6 +108,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 
 	$scope.getElapsedTime = function () {
 		StopwatchService.getElapsedTime(function (elapsedObj) {
+			$scope.$parent.runningStopwatch = true;
     		secDisp = elapsedObj.elapsedSec % 60 + '';
     		minDisp = elapsedObj.elapsedMin % 60 + '';
     		hrsDisp = elapsedObj.elapsedHrs + '';

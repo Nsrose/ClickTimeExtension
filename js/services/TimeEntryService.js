@@ -68,11 +68,11 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 
 	// Store a time entry to local storage if no internet connection
 	this.storeTimeEntry = function (timeEntry, callback) {
-		chrome.storage.sync.get('storedTimeEntries', function (items) {
+		chrome.storage.local.get('storedTimeEntries', function (items) {
 			if ('storedTimeEntries' in items) {
 				storedTimeEntries = items.storedTimeEntries;
 				storedTimeEntries.push(timeEntry);
-				chrome.storage.sync.set({
+				chrome.storage.local.set({
 					'storedTimeEntries' : storedTimeEntries
 				}, function() {
 					callback();
@@ -80,13 +80,97 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 			} else {
 				storedTimeEntries = [];
 				storedTimeEntries.push(timeEntry);
-				chrome.storage.sync.set({
+				chrome.storage.local.set({
 					'storedTimeEntries' : storedTimeEntries
 				}, function() {
 					callback();
 				})
 			}
 		})
+	}
+
+	// Get the in progress time entry of a user, if it exists.
+	this.getInProgressEntry = function (callback) {
+		chrome.storage.sync.get('inProgressEntry', function (items) {
+			if ('inProgressEntry' in items) {
+				var inProgressEntry = items.inProgressEntry;
+				var dateString = CTService.getDateString();
+        		inProgressEntry.Date = dateString;
+        		chrome.storage.sync.set({
+        			'inProgressEntry' : inProgressEntry
+        		}, function() {
+        			callback(inProgressEntry);
+        		})
+			} else {
+
+				var dateString = CTService.getDateString();
+        		var now = new Date();
+				var newEntry = {
+		            "BreakTime":0.00,
+		            "Comment":"",
+		            "Date":dateString,
+		            "Hours":0.00,
+		            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+		            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+		            "JobID":"",
+		            "PhaseID":"",
+		            "SubPhaseID":null,
+		            "TaskID":""
+		        }
+		        chrome.storage.sync.set({
+        			'inProgressEntry' : newEntry
+        		}, function() {
+        			callback(newEntry);
+        		})
+
+
+			}
+		})
+	}
+
+	// Change property in inProgressEntry to value.
+	this.updateInProgressEntry = function (property, value, callback) {
+		chrome.storage.sync.get('inProgressEntry', function (items) {
+			if ('inProgressEntry' in items) {
+				var inProgressEntry = items.inProgressEntry;
+				switch (property) {
+					case "Date":
+						inProgressEntry.Date = value;
+						break;
+					case "Comment":
+						inProgressEntry.Comment = value;
+						break;
+					case "Hours":
+						inProgressEntry.Hours = value;
+						break;
+					case "job":
+						inProgressEntry.job = value;
+						inProgressEntry.JobID = value.JobID;
+						break;
+					case "client":
+						inProgressEntry.client = value;
+						break;
+					case "task":
+						inProgressEntry.task = value;
+						inProgressEntry.TaskID = value.TaskID;
+						break;
+					default:
+						bootbox.alert("Invalid time entry property: " + property);
+				}
+				chrome.storage.sync.set({
+					'inProgressEntry' : inProgressEntry
+				}, function() {
+					if (callback != undefined) {
+						callback();
+					}
+				})
+			}
+		})
+	}
+
+	// Remove an in progress entry
+	this.removeInProgressEntry = function() {
+		chrome.storage.sync.remove('inProgressEntry');
 	}
 
 

@@ -71,7 +71,13 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     }
 
     $scope.stop = function() {        
-            if (timerPromise) {
+	if (timerPromise) {
+            if ($scope.$parent.user.RequireComments && ($scope.$parent.timeEntry.Comment == undefined || 
+	            $scope.$parent.timeEntry.Comment == "")) {
+	            $scope.$parent.timeEntryErrorMissingNotes = true;
+	            return;
+            }
+                $scope.$parent.$broadcast("stoppedStopwatch");
                 StopwatchService.markEndTime (function () {
                     $scope.running = false;
                     $scope.$parent.runningStopwatch  = false;
@@ -96,12 +102,12 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
             }
     }
 
-    //updates scope variables
     $scope.getElapsedTime = function () {
         StopwatchService.getElapsedTime(function (elapsedObj) {
-            var secDisp = elapsedObj.elapsedSec % 60 + '';
-            var minDisp = elapsedObj.elapsedMin % 60 + '';
-            var hrsDisp = elapsedObj.elapsedHrs + '';
+            $scope.$parent.runningStopwatch = true;
+            secDisp = elapsedObj.elapsedSec % 60 + '';
+            minDisp = elapsedObj.elapsedMin % 60 + '';
+            hrsDisp = elapsedObj.elapsedHrs + '';
             if (secDisp.length == 1) {
                     secDisp = "0" + secDisp;
             }

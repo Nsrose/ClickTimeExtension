@@ -8,7 +8,7 @@
 
 Total hours logged today: {{totalHours}}
 <br>
-<a href="http://app.clicktime.com/?dest=App%2FDayView%2F">My Timesheet</a>
+<a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a>
 <br><br>
 <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
@@ -75,7 +75,7 @@ Total hours logged today: {{totalHours}}
     </div>
 
     <h3>Job: </h3>
-    <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-click="addEntityTimeEntry('job', job)">
+    <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-init="console.log(job)" ng-click="addEntityTimeEntry('job', job)">
     </div>
 
     <h3>Task: </h3>
@@ -85,12 +85,16 @@ Total hours logged today: {{totalHours}}
     <form name="entry">
             <h3>Notes:</h3>
             <p ng-show="user.RequireComments" style="color: red">* required</p>
-            <textarea name="text" ng-model="notes" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="3999"></textarea><br> 
+            <textarea name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
             <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
                 <span>Oops! Please limit your note to 4000 characters.</span>
+            </span>
+            <span ng-show="timeEntryErrorMissingNotes"> 
+                <span style="color:red">Oops! Please enter some notes in order to save this entry.</span>
             </span>
     </form>
     <br>
     <button id="save-time-entry" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
+    <span ng-show="timeEntryErrorActiveStopwatch" style="color:red"><p>Oops! Please stop the active stopwatch in order to save this entry.</p></span>
 </div>
 <br>

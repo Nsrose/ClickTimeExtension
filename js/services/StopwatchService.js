@@ -55,7 +55,7 @@ myApp.service("StopwatchService", function() {
 
 	// Mark end time 
 	this.markEndTime = function (callback) {
-		chrome.storage.sync.get('stopwatch', function (items) {
+		chrome.storage.sync.get('stopwatch', function(items) {
 			if ('stopwatch' in items) {
 				var stopwatch = items.stopwatch;
 				var endTime = new Date();

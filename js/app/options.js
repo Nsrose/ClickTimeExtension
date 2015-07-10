@@ -36,6 +36,16 @@ $(document).ready(function() {
            save_options(); 
        }, 100);
     });
+
+    chrome.storage.sync.get('inProgressEntry', function (items) {
+      if ('inProgressEntry' in items) {
+        if (items.inProgressEntry.inProgress) {
+          alert("Cannot change time entry method with an in progress time entry.");
+          $("#timeEntryMethod").hide();
+        }
+      }
+    })
+
     chrome.storage.local.get('user', function(items) {
       if ('user' in items) {
         loggedIn = true;

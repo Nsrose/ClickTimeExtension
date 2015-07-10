@@ -290,6 +290,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
         if (time) {
             $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
+            TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
+                TimeEntryService.updateInProgressEntry('inProgress', true);
+            });
         }
         
     }
@@ -533,6 +536,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 if ('defaultTimeEntryMethod' in items) {
                     $scope.timeEntryMethod = items.defaultTimeEntryMethod;
                     $scope.changeTimeEntryMethod(items.defaultTimeEntryMethod);
+                    if ($scope.timeEntryMethod == "Hours") {
+                        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                            $scope.timeEntry.Hours = inProgressEntry.Hours;
+                        })
+                    }
                     $scope.$apply();
                 } else {
                     $scope.showOptionsMessage = true;

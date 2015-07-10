@@ -29,6 +29,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
     }
 
+    $scope.clearAllErrors = function () {
+        $scope.clearError("hours");
+        $scope.clearError("startEndTimes");
+        $scope.clearError("activeStopwatch");
+        $scope.clearError("timeEntryErrorMissingNotes");
+    }
+
     $scope.clearError = function (error) {
         switch (error) {
             case "hours":
@@ -99,6 +106,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.timeEntryErrorActiveStopwatch = true;
             return;
         }
+
+        console.log($scope.job);
+        console.log($scope.timeEntry.job);
 
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
@@ -227,8 +237,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.timeEntry.client = entity;
                 $scope.timeEntry.job = $scope.job;
                 $scope.timeEntry.JobID = $scope.job.JobID;
-                TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client);
-                TimeEntryService.updateInProgressEntry("job", $scope.job);
+                TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client, function() {
+                    TimeEntryService.updateInProgressEntry("job", $scope.job);
+                });
                 break;
             case "job":
                 $scope.timeEntry.job = entity;
@@ -304,6 +315,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
         console.log("Fetching the most recent data from Clicktime");
+        $scope.clearAllErrors();
         $scope.$parent.$broadcast("pageLoading");
 
         TimeEntryService.removeInProgressEntry();
@@ -367,9 +379,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         EntityService.getCompany($scope.Session, false, afterGetCompany);
     }
 
-
-    
-
   
 
     ///// ONLOAD: This will get executed upon opneing the chrome extension. /////////
@@ -396,18 +405,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-            if (inProgressEntry.job != undefined) {
-                $scope.timeEntry.job = inProgressEntry.job;
-                $scope.timeEntry.JobID = inProgressEntry.JobID;
-            }
-            if (inProgressEntry.client != undefined) {
-                $scope.timeEntry.client = inProgressEntry.client;
-            }
-            if (inProgressEntry.task != undefined) {
-                $scope.timeEntry.task = inProgressEntry.task;
-                $scope.timeEntry.TaskID = inProgressEntry.TaskID;
-            }
             $scope.timeEntry.Comment = inProgressEntry.Comment;
+            TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);
         })
        
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
@@ -478,7 +477,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                     }           
                 } 
                 // No in progress entity
-                $scope.job = jobsList[0];
+                $scope.job = $scope.jobs[0];
                 $scope.timeEntry.job = $scope.job;
                 $scope.timeEntry.JobID = $scope.job.JobID;
                 TimeEntryService.updateInProgressEntry("job", $scope.job);

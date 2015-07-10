@@ -129,11 +129,14 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 	}
 
 	// Change property in inProgressEntry to value.
-	this.updateInProgressEntry = function (property, value) {
+	this.updateInProgressEntry = function (property, value, callback) {
 		chrome.storage.sync.get('inProgressEntry', function (items) {
 			if ('inProgressEntry' in items) {
 				var inProgressEntry = items.inProgressEntry;
 				switch (property) {
+					case "Date":
+						inProgressEntry.Date = value;
+						break;
 					case "Comment":
 						inProgressEntry.Comment = value;
 						break;
@@ -156,6 +159,10 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 				}
 				chrome.storage.sync.set({
 					'inProgressEntry' : inProgressEntry
+				}, function() {
+					if (callback != undefined) {
+						callback();
+					}
 				})
 			}
 		})

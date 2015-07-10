@@ -154,6 +154,9 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 						inProgressEntry.task = value;
 						inProgressEntry.TaskID = value.TaskID;
 						break;
+					case "inProgress":
+						inProgressEntry.inProgress = value;
+						break;
 					default:
 						bootbox.alert("Invalid time entry property: " + property);
 				}

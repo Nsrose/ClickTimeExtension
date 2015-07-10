@@ -1,5 +1,4 @@
 myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', function ($scope, APIService, $http, $location) {
-
     $scope.rerouting = false;
     // Get the session, if it exists, go to popup. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {
@@ -64,5 +63,22 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             $location.path("/login");
         })
     }
-   
+    var offlineBox;
+    window.addEventListener('offline', function(e) {
+        offlineBox = bootbox.dialog({
+            message: "You seem to be offline :'(",       
+            show: true,
+            backdrop: true,
+            closeButton: false,
+            animate: true,
+            className: "no-internet-modal",
+        });
+    }, false);
+    
+    setInterval(function(){ 
+        window.addEventListener('online', function(e) {
+            offlineBox.modal('hide');
+        }, false);
+    }, 3000);
+
 }])

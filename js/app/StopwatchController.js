@@ -62,11 +62,11 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                     startTime = start;
                     $scope.running = true;
                     $scope.$parent.runningStopwatch = true;
-                    chrome.extension.getBackgroundPage().updateBadge();
+                    chrome.extension.getBackgroundPage().updateBadge(StopwatchService);
                     timerPromise = $interval(function() {
                         $scope.getElapsedTime();
                     }, 31);
-                }) 		
+                })
             }
     }
 

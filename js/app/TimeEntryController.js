@@ -558,8 +558,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         var afterGetTimeEntries = function (timeEntries) {
-            
-
             var totalHours = 0;
             var timeEntries = timeEntries[0].TimeEntries;
             var arrayLength = timeEntries.length;
@@ -595,6 +593,4 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             offlineBox.modal('hide');
         }, false);
     }, 3000);
-
-    
 }])

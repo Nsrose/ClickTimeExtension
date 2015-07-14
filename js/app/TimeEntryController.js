@@ -10,6 +10,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.showOptionsMessage = false;
 
     $scope.runningStopwatch = false;
+    $scope.abandonedStopwatch = false;
 
     //// Interface logic ////
 
@@ -102,13 +103,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     }
 
     $scope.saveTimeEntry = function (session, timeEntry) {
-        if ($scope.runningStopwatch) {
+        if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
             $scope.timeEntryErrorActiveStopwatch = true;
             return;
         }
-
-        console.log($scope.job);
-        console.log($scope.timeEntry.job);
 
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
@@ -127,7 +125,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             clickTimeEntry.Hours = timeEntry.Hours;
         }
 
-        if ($scope.showStartEndTimes) {
+        if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
             var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
             clickTimeEntry.Hours = hourDiff;
             var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
@@ -136,7 +134,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
 
-        if ($scope.showStopwatch) {
+        if ($scope.showStopwatch && !$scope.abandonedStopwatch) {
             var hrs = parseInt($("#hrs").text());
             var min = parseInt($("#min").text());
             var sec = parseInt($("#sec").text());
@@ -157,6 +155,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             TimeEntryService.removeInProgressEntry();
             bootbox.alert("Entry successfully uploaded at " + d.toTimeString() + ".");
             $scope.$broadcast("timeEntrySuccess");
+            $scope.abandonedStopwatch = false;
             $scope.pageReady = true;
         })
         .catch(function (response) {
@@ -169,7 +168,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 }) 
             } else {
                 bootbox.alert("An error occured.");
-                $scope.$broadcast("timeEntryError");
+                if (!$scope.abandonedStopwatch) {
+                    $scope.$broadcast("timeEntryError");
+                }   
             }
             $scope.pageReady = true;
         });
@@ -197,7 +198,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         
-        if ($scope.showStartEndTimes) {
+        if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
             if (timeEntry.ISOStartTime == null || timeEntry.ISOEndTime == null) {
                 $scope.timeEntryErrorStartEndTimes = true;
                 return false;
@@ -212,7 +213,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             }
         }
 
-        if ($scope.showHourEntryField || $scope.showStopwatch) {
+        if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch) {
             if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
                 return false;
@@ -226,6 +227,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         
         return true;
+    }
+
+    $scope.cancelAbandonedStopwatch = function() {
+        $scope.$broadcast("clearStopwatch");
+        chrome.storage.sync.remove('inProgressEntry', function () {
+            $scope.abandonedStopwatch = false;
+            $scope.$apply();
+        })
     }
 
 
@@ -532,7 +541,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.$apply();
 
              // Set the default time entry method
-            chrome.storage.sync.get('defaultTimeEntryMethod', function (items) {
+            chrome.storage.sync.get(['defaultTimeEntryMethod', 'stopwatch'], function (items) {
                 if ('defaultTimeEntryMethod' in items) {
                     $scope.timeEntryMethod = items.defaultTimeEntryMethod;
                     $scope.changeTimeEntryMethod(items.defaultTimeEntryMethod);
@@ -545,6 +554,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 } else {
                     $scope.showOptionsMessage = true;
                     $scope.$apply();  
+                }
+
+                // Check for abandoned stopwatch
+                if ('stopwatch' in items) {
+                    var now = new Date();
+                    var stopwatch = items.stopwatch;
+                    if (stopwatch.running) {
+                        if (now.getDate() - stopwatch.startDay > 0) {
+                            if (now.getMonth() - stopwatch.startMonth == 0 
+                                || now.getFullYear() - stopwatch.startYear == 0) {
+                                $scope.abandonedStopwatch = true;
+                                $scope.runningStopwatch = false;
+                            }
+                        }
+                    }
                 }
             })
         }

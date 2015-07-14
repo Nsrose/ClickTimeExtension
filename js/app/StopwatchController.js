@@ -45,6 +45,10 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     	$scope.clear();
     })
 
+    $scope.$on("clearStopwatch", function() {
+        $scope.clear();
+    })
+
     $scope.clear = function() {
     	$scope.elapsedSec = "00";
     	$scope.elapsedMin = "00";
@@ -53,7 +57,11 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     	$scope.$parent.runningStopwatch = false;
     	$interval.cancel(timerPromise);
     	timerPromise = undefined;
-    	StopwatchService.clear(function() {console.log("Cleared stopwatch")})
+    	StopwatchService.clear(function() {
+            clearInterval(chrome.extension.getBackgroundPage().stopBadge());
+            chrome.browserAction.setBadgeText({text: ""});
+            console.log("Cleared stopwatch");
+        })
     }
 
     $scope.start = function () {

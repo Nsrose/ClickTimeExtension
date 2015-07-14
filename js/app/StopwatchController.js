@@ -92,7 +92,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                     $interval.cancel(timerPromise);
                     timerPromise = undefined;
                     $scope.$apply();
-                    clearInterval(chrome.extension.getBackgroundPage().stopBadge());                
+                    chrome.extension.getBackgroundPage().stopBadge();                
                     bootbox.confirm("Save time entry of " + $scope.elapsedHrs + ":" +
                             $scope.elapsedMin + ":" + $scope.elapsedSec + "?", function (response) {
                             if (response) {

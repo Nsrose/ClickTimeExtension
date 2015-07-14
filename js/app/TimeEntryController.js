@@ -582,8 +582,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         var afterGetTimeEntries = function (timeEntries) {
-            
-
             var totalHours = 0;
             var timeEntries = timeEntries[0].TimeEntries;
             var arrayLength = timeEntries.length;
@@ -605,7 +603,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     var offlineBox;
     window.addEventListener('offline', function(e) {
         offlineBox = bootbox.dialog({
-            message: "You seem to be offline :'(",       
+            message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
             show: true,
             backdrop: true,
             closeButton: false,
@@ -619,6 +617,4 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             offlineBox.modal('hide');
         }, false);
     }, 3000);
-
-    
 }])

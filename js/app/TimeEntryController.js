@@ -581,7 +581,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     var offlineBox;
     window.addEventListener('offline', function(e) {
         offlineBox = bootbox.dialog({
-            message: "You seem to be offline :'(",       
+            message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
             show: true,
             backdrop: true,
             closeButton: false,

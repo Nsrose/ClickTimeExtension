@@ -108,6 +108,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             return;
         }
 
+        $scope.clearAllErrors();
+
         var clickTimeEntry = {
             "BreakTime" : timeEntry.BreakTime,
             "Comment" : timeEntry.Comment,
@@ -126,6 +128,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
+            if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
+                $scope.timeEntryErrorStartEndTimesInvalid = true;
+                return;
+            }
             var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
             clickTimeEntry.Hours = hourDiff;
             var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
@@ -157,6 +163,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.$broadcast("timeEntrySuccess");
             $scope.abandonedStopwatch = false;
             $scope.pageReady = true;
+            $scope.clearAllErrors();
         })
         .catch(function (response) {
             if (response.data == null) {
@@ -165,7 +172,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 TimeEntryService.removeInProgressEntry();
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
                     bootbox.alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
-                }) 
+                })
             } else {
                 bootbox.alert("An error occured.");
                 if (!$scope.abandonedStopwatch) {

@@ -198,13 +198,33 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Calls the callback on the jobsList
     this.getJobs = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.local.get('jobsList', function (items) {
+            chrome.storage.local.get(['jobsList', 'jobsByRecent'], function (items) {
                 if ('jobsList' in items) {
                     // jobs were stored locally, great!
                     var jobsList = items.jobsList.data;
                     if (jobsList != null) {
+                        var jobsByRecent = [];
+                        // See if the recently used were available to reorder list
+                        if ('jobsByRecent' in items) {
+                            jobsByRecent = items.jobsByRecent;
+                        }
+
+                        var entityList = [];
+                        // First add any job not in the recent list
+                        for (i in jobsList) {
+                            j = jobsList[i];
+                            if (jobsByRecent && !containsJob(jobsByRecent, j)) {
+                                entityList.push(j);  
+                            }
+                        }
+
+                        // Then add the recent jobs
+                        for (i in jobsByRecent) {
+                            r = jobsByRecent[i];
+                            entityList.unshift(r);
+                        }
                         console.log("Fetched jobs list from local storage");
-                        callback(jobsList);
+                        callback(entityList);
                     } 
                 } else {
                     // This is a forced call to the api. Do not check local storage first.
@@ -213,12 +233,32 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                     // Jobs don't exist in local storage. Need to call API
                     return api('Jobs', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
-                        console.log("number of jobs:" + Object.keys(response).length);
                         chrome.storage.local.set({
                             'jobsList' : response,
                         }, function () {
+                            var jobsList = response.data;
+                            var jobsByRecent = [];
+
+                            if ('jobsByRecent' in items) {
+                                jobsByRecent = items.jobsByRecent;
+                            }
+
+                            var entityList = [];
+                            // First add any job not in the recent list
+                            for (i in jobsList) {
+                                j = jobsList[i];
+                                if (jobsByRecent && !containsJob(jobsByRecent, j)) {
+                                    entityList.push(j);  
+                                }
+                            }
+
+                            // Then add the recent jobs
+                            for (i in jobsByRecent) {
+                                r = jobsByRecent[i];
+                                entityList.unshift(r);
+                            }
                             console.log("Set jobs list to local storage");
-                            callback(response.data);
+                            callback(entityList);
                         })
                     })
                 }
@@ -417,6 +457,17 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         return false;
     }
 
+    // Returns true iff list contains the job object.
+    var containsJob = function (list, job) {
+        for (i in list) {
+            var j = list[i];
+            if (j.JobID == job.JobID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Returns true iff list contains the task object.
     var containsTask = function (list, task) {
         for (i in list) {
@@ -439,6 +490,17 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         return -1;
     }
 
+     // Returns the index of the job object, or -1 if it doesn't exist.
+    var indexOfJob = function (list, job) {
+        for (i in list) {
+            var j = list[i];
+            if (j.JobID == job.JobID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     // Returns the index of the task object, or -1 if it doesn't exist.
     var indexOfTask = function (list, task) {
         for (i in list) {
@@ -454,14 +516,16 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     this.updateRecentEntities = function (timeEntry) {
         var task = timeEntry.task;
         var client = timeEntry.client;
+        var job = timeEntry.job;
 
 
         //// Caching the most recent ////
         // Get caches from local storage and update them
-        chrome.storage.local.get(['clientsByRecent', 'tasksByRecent'], function (items) {
+        chrome.storage.local.get(['clientsByRecent', 'jobsByRecent', 'tasksByRecent'], function (items) {
             
             var clientsByRecent = [];
             var tasksByRecent = [];
+            var jobsByRecent = [];
 
             if ('clientsByRecent' in items) {
                 clientsByRecent = items.clientsByRecent;
@@ -475,6 +539,16 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             clientsByRecent.push(angular.copy(client));
 
 
+            if ('jobsByRecent' in items) {
+                jobsByRecent = items.jobsByRecent;
+            }
+
+            jindex = indexOfJob(jobsByRecent, job);
+            if (jindex != -1) {
+                jobsByRecent.splice(jindex, 1);
+            }
+
+            jobsByRecent.push(angular.copy(job));
 
             if ('tasksByRecent' in items) {
                 tasksByRecent = items.tasksByRecent;
@@ -490,6 +564,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
 
             chrome.storage.local.set({
                 'clientsByRecent' : clientsByRecent,
+                'jobsByRecent' : jobsByRecent,
                 'tasksByRecent' : tasksByRecent
             }, function () {
                 console.log("Saved most recent lists to local storage");

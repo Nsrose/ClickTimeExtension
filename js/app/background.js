@@ -1,3 +1,15 @@
+// Constants
+var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
+// Time before asking user again if they want to enter time
+var NOTIFICATION_POLL_PERIOD = 900000; 
+// Delayed if User says "remind me later"
+var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
 // this timer is for display purposes only
 // stopping/starting it will have no effect on 
 // the internal sync timer
@@ -70,3 +82,135 @@ var updateBadgeHours = function(StopwatchService) {
 var stopBadge = function() {
     clearInterval(timer);
 }
+
+///////// Notifications /////////////////////////////////////////////////
+
+
+
+var options = {
+    type: "basic",
+    title: "Clicktime Extension",
+    message: "Let's track your time!",
+    iconUrl: "../../img/clicktime128x128.png",
+    buttons: [
+        {
+            "title" : "Enter time"
+        },
+        {
+            "title" : "Remind me later"
+        }
+    ]
+}
+
+// Initial test ask
+chrome.storage.sync.get('stopwatch', function (items) {
+    if ('stopwatch' in items) {
+        if (!items.stopwatch.running) {
+             chrome.notifications.create(options);
+        }
+    } else {
+        chrome.notifications.create(options);
+    }
+})
+
+
+// Notify the user every x mins to enter time
+var notificationInterval = setInterval(function() {
+    chrome.storage.sync.get('stopwatch', function (items) {
+        if ('stopwatch' in items) {
+            if (!items.stopwatch.running) {
+                 chrome.notifications.create(options);
+            }
+        } else {
+            chrome.notifications.create(options);
+        }
+    })
+}, NOTIFICATION_POLL_PERIOD)
+
+
+// Button actions
+chrome.notifications.onButtonClicked.addListener(function (notificationId, buttonIndex) {
+    // Go to time entry
+    if (buttonIndex == 0) {
+        chrome.tabs.create({
+            url : "../../templates/main.html"
+        })
+    } else {
+        // Remind me later
+        clearInterval(notificationInterval);
+        notificationInterval = setInterval(function() {
+            chrome.storage.sync.get('stopwatch', function (items) {
+                if ('stopwatch' in items) {
+                    if (!items.stopwatch.running) {
+                         chrome.notifications.create(options);
+                    }
+                } else {
+                    chrome.notifications.create(options);
+                }
+            })
+        }, DELAYED_NOTIFICATION_POLL_PERIOD)
+    }
+    
+})
+
+////////////////////////////////////////////////////////////////////
+
+
+
+////////////////  API ////////////////////////////////////
+
+// Make an api call.
+function apiCall(requestURL, email, password, requestMethod, data, callback) {
+    var credentials = btoa(email + ":" + password);
+
+    var beforeSend = function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Basic ' + credentials);
+    }
+
+    $.ajax({
+        method: requestMethod,
+        beforeSend: beforeSend, 
+        url: requestURL,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (response) {
+            callback(response);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            callback(response);
+        }
+    })
+
+}
+
+// Make an API call to locally store the newest entities from clicktime. 
+function refreshFromApi(session) {
+    var companyURL = API_BASE + "Companies/" + session.CompanyID;
+    var userURL = companyURL + "/Users/" + session.UserID;
+    var clientsURL = userURL + "/Clients";
+    var jobsURL = userURL + "/Jobs";
+    var tasksURL = userURL + "/Tasks";
+    apiCall(companyURL, session.UserEmail, session.Token, "GET", function (response) {
+        if (response.data != null) {
+            chrome.storage.local.set({
+                "clientsListTest" : response.data
+            })
+        } else {
+            chrome.storage.local.set({
+                "clientsListTest" : "didnt work"
+            })
+        }
+    })
+ }
+
+
+chrome.runtime.onStartup.addListener(function() {
+    chrome.storage.sync.get('session', function (items) {
+        if ('session' in items) {
+            // User is already logged in, make API call
+            var session = items.session.data;
+            refreshFromApi(session);
+        }
+    })
+})
+

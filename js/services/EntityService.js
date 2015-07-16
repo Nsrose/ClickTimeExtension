@@ -104,6 +104,8 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             })
     }
 
+
+
     // Get clients list for this session and save to local storage
     // Calls the callback on the clientsList
     // checkLocal - if true, check local storage first.

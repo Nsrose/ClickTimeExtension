@@ -15,7 +15,8 @@ LIVE_API_URL = '"https://app.clicktime.com/api/1.3/"'
 EXT_FOLDER_NAME = "chrome-ext"
 
 # All files with API_BASE links defined.
-API_LINKED_FILES = {EXT_FOLDER_NAME + "/js/app/app.js",  EXT_FOLDER_NAME + "/js/app/content.js"}
+API_LINKED_FILES = {EXT_FOLDER_NAME + "/js/app/app.js",  EXT_FOLDER_NAME + "/js/app/content.js", 
+    EXT_FOLDER_NAME + "/js/app/background.js"}
 
 
 def create_chrome_ext():

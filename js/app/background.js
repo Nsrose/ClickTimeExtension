@@ -160,7 +160,7 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, butto
 ////////////////  API ////////////////////////////////////
 
 // Make an api call.
-function apiCall(requestURL, email, password, requestMethod, data, callback) {
+function apiCall(requestURL, email, password, requestMethod, callback) {
     var credentials = btoa(email + ":" + password);
 
     var beforeSend = function (xhr) {
@@ -171,16 +171,17 @@ function apiCall(requestURL, email, password, requestMethod, data, callback) {
         method: requestMethod,
         beforeSend: beforeSend, 
         url: requestURL,
-        data: JSON.stringify(data),
         contentType: "application/json",
-        success: function (response) {
+        success: function (res) {
+            var response = {
+                "data" : res
+            }
             callback(response);
         },
         error: function (jqXHR, textStatus, errorThrown) {
             callback(response);
         }
     })
-
 }
 
 // Make an API call to locally store the newest entities from clicktime. 
@@ -193,13 +194,54 @@ function refreshFromApi(session) {
     apiCall(companyURL, session.UserEmail, session.Token, "GET", function (response) {
         if (response.data != null) {
             chrome.storage.local.set({
-                "clientsListTest" : response.data
-            })
-        } else {
-            chrome.storage.local.set({
-                "clientsListTest" : "didnt work"
+                "company" : response
             })
         }
+    });
+
+    apiCall(userURL, session.UserEmail, session.Token, "GET", function (response) {
+        if (response.data != null) {
+            chrome.storage.local.set({
+                "user" : response
+            })
+        }
+    });
+
+    apiCall(tasksURL, session.UserEmail, session.Token, "GET", function (response) {
+        if (response.data != null) {
+            chrome.storage.local.set({
+                "tasksList" : response
+            })
+        }
+    });
+
+    apiCall(jobsURL, session.UserEmail, session.Token, "GET", function (response) {
+        if (response.data != null) {
+            var jobsList = response.data;
+            apiCall(clientsURL, session.UserEmail, session.Token, 'GET', function (response) {
+                var clientsList = response.data;
+                var jobClientsList = [];
+                for (i in jobsList) {
+                    var job = jobsList[i];
+                    for (j in clientsList) {
+                        var client = clientsList[j];
+                       
+                        if (job.ClientID == client.ClientID) {
+                            var jobClient = {
+                                'client' : client,
+                                'job' : job,
+                                'DisplayName' : client.DisplayName + " - " + job.DisplayName
+                            }
+                            jobClientsList.push(jobClient);
+                        }
+                    }
+                }
+                var stringJobClientsList = JSON.stringify(jobClientsList);
+                chrome.storage.local.set({
+                    "stringJobClientsList" : stringJobClientsList
+                })
+            })  
+        }      
     })
  }
 

@@ -6,10 +6,9 @@ var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your req
 var CHROME_LOCAL_STORAGE_VARS = [
 	'user',
 	'company',
-	'clientsList',
-	'jobsList',
 	'tasksList',
-	'clientsByRecent',
+	'jobClientsList',
+	'jobClientsByRecent',
 	'tasksByRecent',
 	'storedTimeEntries',
 ];

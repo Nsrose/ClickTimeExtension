@@ -364,6 +364,121 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
        
     }
 
+    // Get an interleaved list of client/job pairs
+    this.getJobClients = function (session, checkLocal, callback) {
+        if (checkLocal) {
+            chrome.storage.local.get(['jobClientsList', 'jobClientsByRecent'], function (items) {
+                if ('jobClientsList' in items) {
+                    var jobClientsList = items.jobClientsList;
+
+                    var jobClientsByRecent = [];
+
+                    if ('jobClientsByRecent' in items) {
+                        jobClientsByRecent = items.jobClientsByRecent;
+                    }
+
+                    var entityList = [];
+                    // First add any jobClient not in the recent list
+                    for (j in jobClientsList) {
+                        jobClient = jobClientsList[j];
+                        if (jobClientsByRecent && !containsJobClient(jobClientsByRecent, jobClient)) {
+                            entityList.push(jobClient);  
+                        }
+                    }
+
+                    // Then add the recent jobClients
+                    for (i in jobClientsByRecent) {
+                        r = jobClientsByRecent[i];
+                        entityList.unshift(r);
+                    }
+                    callback(entityList);
+                } else {
+                    // Job Clients don't exist in local storage. Need to call API.
+                    api('Jobs', session.UserEmail, session.Token, 'GET')
+                    .then(function (response) {
+                        var jobsList = response.data;
+                        api('Clients', session.UserEmail, session.Token, 'GET')
+                        .then(function (response) {
+                            var clientsList = response.data;
+                            var jobClientsList = [];
+                            for (i in jobsList) {
+                                var job = jobsList[i];
+                                for (j in clientsList) {
+                                    var client = clientsList[j];
+                                    if (job.ClientID == client.ClientID) {
+                                        var jobClient = {
+                                            'client' : client,
+                                            'job' : job,
+                                            'DisplayName' : client.DisplayName + " - " + job.DisplayName
+                                        }
+                                        jobClientsList.push(jobClient);
+                                    }
+                                }
+                            }
+                            chrome.storage.local.set({
+                                'jobClientsList' : jobClientsList
+                            }, function () {
+                                var jobClientsByRecent = [];
+
+                                if ('jobClientsByRecent' in items) {
+                                    jobClientsByRecent = items.jobClientsByRecent;
+                                }
+
+                                var entityList = [];
+                                // First add any jobClient not in the recent list
+                                for (j in jobClientsList) {
+                                    jobClient = jobClientsList[j];
+                                    if (jobClientsByRecent && !containsJobClient(jobClientsByRecent, jobClient)) {
+                                        entityList.push(jobClient);  
+                                    }
+                                }
+
+                                // Then add the recent jobClients
+                                for (i in jobClientsByRecent) {
+                                    r = jobClientsByRecent[i];
+                                    entityList.unshift(r);
+                                }
+                                callback(entityList);
+                            })
+                        })
+                    })
+                }
+            })
+
+        } else {
+            CompanyID = session.CompanyID;
+            UserID = session.UserID;
+            api('Jobs', session.UserEmail, session.Token, 'GET')
+            .then(function (response) {
+                var jobsList = response.data;
+                api('Clients', session.UserEmail, session.Token, 'GET')
+                .then(function (response) {
+                    var clientsList = response.data;
+                    var jobClientsList = [];
+                    for (i in jobsList) {
+                        var job = jobsList[i];
+                        for (j in clientsList) {
+                            var client = clientsList[j];
+                            if (job.ClientID == client.ClientID) {
+                                var jobClient = {
+                                    'client' : client,
+                                    'job' : job,
+                                    'DisplayName' : client.DisplayName + " - " + job.DisplayName
+                                }
+                                jobClientsList.push(jobClient);
+                            }
+                        }
+                    }
+                    chrome.storage.local.set({
+                        'jobClientsList' : jobClientsList
+                    }, function () {
+                        callback(jobClientsList);
+                    })
+                })
+            })
+        }
+    }
+
     // Returns the User
     this.getUser = function (session, checkLocal, callback) {
         if (checkLocal) {
@@ -447,6 +562,18 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     }
 
    
+    // Returns true iff list conatins the jobClient object.
+    var containsJobClient = function (list, jobClient) {
+        for (i in list) {
+            var jc = list[i];
+            if (jc.client.ClientID == jobClient.client.ClientID 
+                && jc.job.JobID == jobClient.job.JobID
+                && jc.job.ClientID == jobClient.job.ClientID) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Returns true iff list contains the client object.
     var containsClient = function (list, client) {
@@ -479,6 +606,19 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             }
         }
         return false;
+    }
+
+    // Returns the index of the jobClient object, or -1 if it doesn't exist.
+    var indexOfJobClient = function (list, jobClient) {
+        for (i in list) {
+            var jc = list[i];
+            if (jc.client.ClientID == jobClient.client.ClientID 
+                && jc.job.JobID == jobClient.job.JobID
+                && jc.job.ClientID == jobClient.job.ClientID) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // Returns the index of the client object, or -1 if it doesn't exist.
@@ -520,37 +660,31 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         var client = timeEntry.client;
         var job = timeEntry.job;
 
+        var jobClient = {
+            'job' : job,
+            'client' : client,
+            'DisplayName' :  client.DisplayName + " - " + job.DisplayName 
+        }
+
 
         //// Caching the most recent ////
         // Get caches from local storage and update them
-        chrome.storage.local.get(['clientsByRecent', 'jobsByRecent', 'tasksByRecent'], function (items) {
-            
-            var clientsByRecent = [];
+        chrome.storage.local.get(['jobClientsByRecent', 'tasksByRecent'], function (items) {
+          
+            var jobClientsByRecent = [];  
+          
             var tasksByRecent = [];
-            var jobsByRecent = [];
+            
 
-            if ('clientsByRecent' in items) {
-                clientsByRecent = items.clientsByRecent;
+            if ('jobClientsByRecent' in items) {
+                jobClientsByRecent = items.jobClientsByRecent;
+            }
+            jcindex = indexOfJobClient(jobClientsByRecent, jobClient);
+            if (jcindex != -1) {
+                jobClientsByRecent.splice(jcindex, 1);
             }
 
-            cindex = indexOfClient(clientsByRecent, client);
-            if (cindex != -1) {
-                clientsByRecent.splice(cindex, 1);
-            }
-
-            clientsByRecent.push(angular.copy(client));
-
-
-            if ('jobsByRecent' in items) {
-                jobsByRecent = items.jobsByRecent;
-            }
-
-            jindex = indexOfJob(jobsByRecent, job);
-            if (jindex != -1) {
-                jobsByRecent.splice(jindex, 1);
-            }
-
-            jobsByRecent.push(angular.copy(job));
+            jobClientsByRecent.push(angular.copy(jobClient));
 
             if ('tasksByRecent' in items) {
                 tasksByRecent = items.tasksByRecent;
@@ -563,10 +697,10 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
 
             tasksByRecent.push(angular.copy(task));
 
+            console.log(jobClientsByRecent);
 
             chrome.storage.local.set({
-                'clientsByRecent' : clientsByRecent,
-                'jobsByRecent' : jobsByRecent,
+                'jobClientsByRecent' : jobClientsByRecent,
                 'tasksByRecent' : tasksByRecent
             }, function () {
                 console.log("Saved most recent lists to local storage");

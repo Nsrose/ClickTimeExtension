@@ -76,13 +76,9 @@ Total hours logged today: {{totalHours}}
 </div>
 
 <div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
-        <h3>Client: </h3>
-    <div custom-select ng-model="client" ng-options="client as client.DisplayName for client in clients" ng-click="addEntityTimeEntry('client', client)" ng-disabled="abandonedStopwatch">
-    </div>
 
-    <h3>Job: </h3>
-    <div custom-select ng-model="job" ng-options="job as job.DisplayName for job in jobs" ng-init="console.log(job)" ng-click="addEntityTimeEntry('job', job)" ng-disabled="abandonedStopwatch">
-    </div>
+    <h3>Client/Job: </h3>
+    <div custom-select ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch"></div>
 
     <h3>Task: </h3>
     <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch">

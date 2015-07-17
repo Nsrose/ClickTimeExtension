@@ -367,9 +367,9 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
     // Get an interleaved list of client/job pairs
     this.getJobClients = function (session, checkLocal, callback) {
         if (checkLocal) {
-            chrome.storage.local.get(['jobClientsList', 'jobClientsByRecent'], function (items) {
-                if ('jobClientsList' in items) {
-                    var jobClientsList = items.jobClientsList;
+            chrome.storage.local.get(['stringJobClientsList', 'jobClientsByRecent'], function (items) {
+                if ('stringJobClientsList' in items) {
+                    var jobClientsList = JSON.parse(items.stringJobClientsList);
 
                     var jobClientsByRecent = [];
 
@@ -405,6 +405,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                                 var job = jobsList[i];
                                 for (j in clientsList) {
                                     var client = clientsList[j];
+                                   
                                     if (job.ClientID == client.ClientID) {
                                         var jobClient = {
                                             'client' : client,
@@ -415,8 +416,9 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                                     }
                                 }
                             }
+                            var stringJobClientsList = JSON.stringify(jobClientsList);
                             chrome.storage.local.set({
-                                'jobClientsList' : jobClientsList
+                                'stringJobClientsList' : stringJobClientsList
                             }, function () {
                                 var jobClientsByRecent = [];
 
@@ -469,8 +471,9 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
                             }
                         }
                     }
+                    var stringJobClientsList = JSON.stringify(jobClientsList);
                     chrome.storage.local.set({
-                        'jobClientsList' : jobClientsList
+                        'stringJobClientsList' : stringJobClientsList
                     }, function () {
                         callback(jobClientsList);
                     })

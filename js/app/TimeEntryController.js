@@ -3,8 +3,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
+
+    //Company custom terms
+    $scope.customTerms = {};
    
-    $scope.jobsList = null;
+
     $scope.HasEmptyEntities = false;
     // if true, indicate to user that they can set default time entry method in extension options
     $scope.showOptionsMessage = false;
@@ -24,6 +27,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         $scope.clearError("startEndTimes");
         $scope.clearError("activeStopwatch");
         $scope.clearError("timeEntryErrorMissingNotes");
+
+        $scope.generalError = false;
     }
 
     $scope.clearError = function (error) {
@@ -148,7 +153,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         .then(function (response) {
             var d = new Date();
             TimeEntryService.removeInProgressEntry();
-            bootbox.alert("Entry successfully uploaded at " + d.toTimeString() + ".");
+            $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
+            $scope.generalSuccess = true;
             $scope.$broadcast("timeEntrySuccess");
             $scope.abandonedStopwatch = false;
             $scope.pageReady = true;
@@ -161,10 +167,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.$broadcast("timeEntryError");
                 TimeEntryService.removeInProgressEntry();
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                    bootbox.alert('Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established'); 
+                    $scope.errorMessage = 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established';
+                    $scope.generalError = true;
                 })
             } else {
-                bootbox.alert("An error occured.");
+                $scope.errorMessage = "An unknown error occurred.";
+                $scope.generalError = true;
                 if (!$scope.abandonedStopwatch) {
                     $scope.$broadcast("timeEntryError");
                 }   
@@ -179,18 +187,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
         if (timeEntry.JobID == undefined || timeEntry.TaskID == undefined) {
-            bootbox.alert("Job or task cannot be empty.");
+            $scope.errorMessage = "Job or task cannot be empty.";
+            $scope.generalError = true;
             return false;
         }
 
         if (timeEntry.JobID == "" || timeEntry.TaskID == "") {
-            bootbox.alert("Job or task cannot be empty.");
+            $scope.errorMessage = "Job or task cannot be empty.";
+            $scope.generalError = true;
             return false;
         }
 
         if ($scope.user.RequireComments && (timeEntry.Comment == undefined || 
             timeEntry.Comment == "")) {
             $scope.timeEntryErrorMissingNotes = true;
+            $scope.errorMessage = "Oops! Please enter some notes in order to save this entry.";
+            $scope.generalError = true;
             return;
         }
 
@@ -203,6 +215,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
             if (hourDiff <=0 ) {
                 $scope.timeEntryErrorStartEndTimesNegative = true;
+
+                $scope.errorMessage = "Please enter an end time later than your start time.";
+                $scope.generalError = true;
                 return false;
             } else if (hourDiff > 24) {
                 $scope.timeEntryErrorStartEndTimesInvalid = true;
@@ -213,10 +228,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch) {
             if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
+                $scope.errorMessage = "Oops! Please log some time in order to save this entry.";
+                $scope.generalError = true;
                 return false;
             }
             if (timeEntry.Hours > 24.00 || timeEntry.Hours < 0) {
                 $scope.timeEntryErrorHoursInvalid = true;
+                $scope.errorMessage = "Please make sure your daily hourly total is less than 24 hours.";
+                $scope.generalError = true;
                 return false;
             }
         }
@@ -239,19 +258,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // Add an entity to the scope's time entry. Called with every selection of a dropdown.
     $scope.addEntityTimeEntry = function (entityType, entity) {
         switch (entityType) {
-            // case "client":
-            //     $scope.timeEntry.client = entity;
-            //     $scope.timeEntry.job = $scope.job;
-            //     $scope.timeEntry.JobID = $scope.job.JobID;
-            //     TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client, function() {
-            //         TimeEntryService.updateInProgressEntry("job", $scope.job);
-            //     });
-            //     break;
-            // case "job":
-            //     $scope.timeEntry.job = entity;
-            //     $scope.timeEntry.JobID = entity.JobID;
-            //     TimeEntryService.updateInProgressEntry("job", $scope.job);
-            //     break;
             case "task":
                 $scope.timeEntry.task = entity;
                 $scope.timeEntry.TaskID = entity.TaskID;
@@ -300,6 +306,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.roundHour = function (time, timeToIncrement) {
         if (!CTService.isNumeric(time)) {
             $scope.timeEntryErrorHoursNumeral = true;
+            $scope.errorMessage = "Please enter time using only numerals and decimals.";
+            $scope.generalError = true;
             return;
         }
         if (time) {
@@ -336,34 +344,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         $scope.$parent.$broadcast("pageLoading");
 
         TimeEntryService.removeInProgressEntry();
-        var afterGetClients = function (clientsList) {
-            $scope.clients = clientsList;
-            if (clientsList.length == 0) {
+
+        var afterGetJobClients = function (jobClientsList) {
+            $scope.jobClients = jobClientsList;
+            $scope.jobClient = jobClientsList[0];
+            $scope.timeEntry.job = $scope.jobClient.job;
+            $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
+            $scope.timeEntry.client = $scope.jobClient.client;
+
+            if ($scope.jobClients.length == 0) {
                 $scope.HasEmptyEntities = true;
+                $scope.jobClient = undefined;
             }
-            $scope.client = clientsList[0];
-            $scope.timeEntry.client = $scope.client;
             $scope.$apply();
-        }
 
-        var afterGetJobs = function (jobsList) {
-            if ($scope.client) {
-                $scope.jobs = jobsList.filter(function (job) { return job.ClientID == $scope.client.ClientID})
-            } else {
-                 $scope.jobs = jobsList;
-            }
-
-            // Extra assign to global jobsList variable, which will always contain the full jobsList
-            $scope.jobsList = jobsList;
-            ///////
-
-            if ($scope.jobs.length == 0) {
-                $scope.HasEmptyEntities = true;
-            }
-            $scope.job = $scope.jobs[0];
-            $scope.timeEntry.job = $scope.job;
-            $scope.timeEntry.JobID = $scope.job.JobID;
-            $scope.$apply();
         }
 
         var afterGetTasks = function (tasksList) {
@@ -384,13 +378,27 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            $scope.customTerms = {
+                'clientTermSingLow' : company.ClientTermSingular,
+                'clientTermPlurLow' : company.ClientTermPlural,
+                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
+                'jobTermSingLow' : company.JobTermSingular,
+                'jobTermPlurLow' : company.JobTermPlural,
+                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                'taskTermSingLow' : company.TaskTermSingular,
+                'taskTermPlurLow' : company.TaskTermPlural,
+                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            }
             $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }
 
 
-        EntityService.getClients($scope.Session, false, afterGetClients);
-        EntityService.getJobs($scope.Session, false, afterGetJobs);
+       
+        EntityService.getJobClients($scope.Session, false, afterGetJobClients);
         EntityService.getTasks($scope.Session, false, afterGetTasks);
         EntityService.getUser($scope.Session, false, afterGetUser);
         EntityService.getCompany($scope.Session, false, afterGetCompany);
@@ -504,6 +512,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            $scope.customTerms = {
+                'clientTermSingLow' : company.ClientTermSingular,
+                'clientTermPlurLow' : company.ClientTermPlural,
+                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
+                'jobTermSingLow' : company.JobTermSingular,
+                'jobTermPlurLow' : company.JobTermPlural,
+                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                'taskTermSingLow' : company.TaskTermSingular,
+                'taskTermPlurLow' : company.TaskTermPlural,
+                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            }
             $scope.variables.push('company');
             $scope.$apply();
             $scope.$parent.$broadcast("pageReady"); 

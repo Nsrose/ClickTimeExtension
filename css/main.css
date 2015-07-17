@@ -6,7 +6,7 @@ body {
   min-width: 500px;
   width: 500px;
   min-height: 10px;
-  height: 500px;
+  /* height: 500px; */
   margin: 12px;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -16,6 +16,9 @@ body {
 
 .img-scaled {
   width: 100%;
+}
+.clear {
+  clear: both;
 }
 
 #spinner {
@@ -66,4 +69,25 @@ body {
 #alert-content {
     margin-top: 25%;
     padding: 20px;
+}
+
+.header {
+    width: 100%;
+    overflow: auto;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+}
+
+.header-item {
+    float: left;
+}
+
+#header-item-settings {
+    float: right;
+    cursor: pointer;
+}
+.total-hours-log {
+    float: right;
 }

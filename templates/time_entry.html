@@ -1,15 +1,45 @@
-<h1>Time Entry</h1>
- <div id="loading-mask" ng-hide="pageReady">
+<div id="loading-mask" ng-hide="pageReady">
     <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
-  </div>
+</div>
 
 <button ng-click="logout()" ng-disabled="abandonedStopwatch" class="btn btn-danger">Sign Out</button>
-<br><br>
 
-Total hours logged today: {{totalHours}}
-<br>
-<a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a>
-<br><br>
+
+
+
+<div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
+
+
+    <div class="total-hours-log">{{totalHours}} hours recorded today - <a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a></div>
+
+    <div class="clear"></div>
+
+    <div class="fieldtitle">{{customTerms.clientTermSingHigh}}/{{customTerms.jobTermSingHigh}}:</div>
+    <div custom-select ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch"></div>
+
+    <div class="fieldtitle">{{customTerms.taskTermSingHigh}}:</div>
+    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch">
+    </div>
+
+
+    <form name="entry">
+        <div class="fieldtitle">Notes:</div>
+        <p ng-show="user.RequireComments" style="color: red">* required</p>
+        <textarea name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
+        <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
+            <span>Oops! Please limit your note to 4000 characters.</span>
+        </span>
+        <span ng-show="timeEntryErrorMissingNotes"> 
+            <span style="color:red">Oops! Please enter some notes in order to save this entry.</span>
+        </span>
+    </form>
+
+
+</div>
+
+
+
+
 <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
@@ -65,38 +95,32 @@ Total hours logged today: {{totalHours}}
 
 <div class="refresh-container" ng-hide="abandonedStopwatch">
     <div class="refresh-message">
-        Can't find a recently created client, job, or task? <a href="" ng-click="refresh()">Refresh</a>
+        Can't find a recently created {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, or {{customTerms.taskTermSingLow}}? <a href="" ng-click="refresh()">Refresh</a>
     </div>
 </div>
 
 <br>
-<div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one client, job, and task to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
+<div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
 
-<div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one client, job, and task so you can begin tracking time.
+<div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} so you can begin tracking time.
 </div>
 
-<div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
 
-    <h3>Client/Job: </h3>
-    <div custom-select ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch"></div>
+   
 
-    <h3>Task: </h3>
-    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch">
-    </div>
+    
 
-    <form name="entry">
-            <h3>Notes:</h3>
-            <p ng-show="user.RequireComments" style="color: red">* required</p>
-            <textarea name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
-            <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
-                <span>Oops! Please limit your note to 4000 characters.</span>
-            </span>
-            <span ng-show="timeEntryErrorMissingNotes"> 
-                <span style="color:red">Oops! Please enter some notes in order to save this entry.</span>
-            </span>
-    </form>
-    <br>
-    <button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save Time</button>
-    <span ng-show="timeEntryErrorActiveStopwatch" style="color:red"><p>Oops! Please stop the active stopwatch in order to save this entry.</p></span>
-</div>
+<span style="color:red" ng-show="generalError">
+    <p>{{errorMessage}}</p>
+</span>
+
+<span style="color:green" ng-show="generalSuccess">
+    <p>{{successMessage}}</p>
+</span>
+
+<button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save</button>
+<span ng-show="timeEntryErrorActiveStopwatch" style="color:red"><p>Oops! Please stop the active stopwatch in order to save this entry.</p></span>
+
+
+
 <br>

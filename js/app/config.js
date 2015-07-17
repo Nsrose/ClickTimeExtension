@@ -11,6 +11,10 @@ myApp.config(['$routeProvider',
         templateUrl: '../../templates/login.html',
         controller: 'LoginEntryController'
       })
+      .when('/settings', {
+        templateUrl: '../../templates/settings.html',
+        controller: 'SettingsController'
+      })
       .otherwise({
         redirectTo: '/login'
       });

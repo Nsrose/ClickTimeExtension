@@ -1,4 +1,4 @@
-myApp.controller("AppController", ['$scope', function ($scope) {
+myApp.controller("AppController", ['$scope', '$location', function ($scope, $location) {
     $scope.Session = null;
     $scope.pageReady = false;
     $scope.$on('pageReady', function() {
@@ -8,4 +8,7 @@ myApp.controller("AppController", ['$scope', function ($scope) {
         $scope.pageReady = false;
     })
   
+  	$scope.settingsPage = function () {
+  		$location.path("/settings");
+  	}
 }])

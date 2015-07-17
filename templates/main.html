@@ -32,6 +32,7 @@
   <script src="../js/app/TimeEntryController.js"></script>
   <script src="../js/app/StopwatchController.js"></script>
   <script src="../js/app/AppController.js"></script>
+  <script src="../js/app/SettingsController.js"></script>
 
   <!-- Services -->
 	<script src="../js/services/APIService.js"></script>
@@ -43,7 +44,14 @@
    
 </head>
 <body id="main" ng-controller="AppController">
- 
+  <div class="header">
+      <div class="header-item" id="header-item-logo">
+         <img src="../img/clicktimelogo.gif" class="img-scaled">
+      </div>
+      <div class="header-item" id="header-item-settings" ng-click="settingsPage()">
+          <img src="../img/preferences_icon.png" class="img-scaled">
+      </div>
+  </div>
 	<div ng-view></div>
 	<div class="contact"><a href="http://www.clicktime.com/company/contact" target="_blank">Contact Us</a></div>
 </body>

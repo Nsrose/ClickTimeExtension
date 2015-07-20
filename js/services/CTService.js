@@ -118,9 +118,9 @@ myApp.service('CTService', function() {
     }
 
     /** Compile hrs, min, and sec to a Clicktime Hour stamp */
-    this.compileHours = function (hrs, min, sec) {
+    this.compileHours = function (hrs, min, sec, timeIncrement) {
         var time = (hrs + min/60 + sec/3600) + '';
-        return this.roundToNearest(time, 0.25);
+        return this.roundToNearest(time, timeIncrement);
     }
 
    

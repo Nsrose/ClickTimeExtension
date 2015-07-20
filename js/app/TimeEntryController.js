@@ -33,6 +33,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     }
 
     $scope.stopStopwatch = function() {
+        $scope.saveFromTimer = true;
         $scope.$broadcast("stopStopwatch");
         $scope.showStartTimer = true;
     }
@@ -87,8 +88,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         var now = new Date();
         $scope.timeEntry.ISOStartTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
         $scope.timeEntry.ISOEndTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        $scope.clearError('hours');
-        $scope.clearError('startEndTimes');
+        $scope.clearAllErrors();
+        $scope.saveFromTimer = false;
+        $scope.abandonedStopwatch = false;
+        $scope.pageReady = true;
     })
 
     $scope.$on("stoppedStopwatch", function() {
@@ -147,7 +150,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             "client" : timeEntry.client
         }
       
-        if ($scope.showHourEntryField) {
+        if ($scope.showHourEntryField && !$scope.saveFromTimer) {
             clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
         }
 
@@ -164,12 +167,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
 
-        if ($scope.showStopwatch && !$scope.abandonedStopwatch) {
+        if ($scope.saveFromTimer || $scope.showStopwatch && !$scope.abandonedStopwatch) {
             var hrs = parseInt($("#hrs").text());
             var min = parseInt($("#min").text());
             var sec = parseInt($("#sec").text());
-            clickTimeEntry.Hours = CTService.compileHours(hrs, min, sec);
-            timeEntry.Hours = clickTimeEntry.Hours;
+            var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
+            clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
+            timeEntry.Hours = compiledHours;
         }
         
         if (!validateTimeEntry(timeEntry)) {
@@ -177,6 +181,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.$broadcast("timeEntryError");
             return;
         }
+
 
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
@@ -186,9 +191,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
             $scope.generalSuccess = true;
             $scope.$broadcast("timeEntrySuccess");
-            $scope.abandonedStopwatch = false;
-            $scope.pageReady = true;
-            $scope.clearAllErrors();
             EntityService.updateRecentEntities(timeEntry);
         })
         .catch(function (response) {
@@ -255,7 +257,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             }
         }
 
-        if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch) {
+        if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch
+            && !$scope.saveFromTimer) {
             if (timeEntry.Hours == "0:00" || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
                 $scope.errorMessage = "Oops! Please log some time in order to save this entry.";

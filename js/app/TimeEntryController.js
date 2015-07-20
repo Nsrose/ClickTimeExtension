@@ -192,6 +192,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.generalSuccess = true;
             $scope.$broadcast("timeEntrySuccess");
             EntityService.updateRecentEntities(timeEntry);
+            EntityService.getTimeEntries($scope.Session, function (timeEntries) {
+                var totalHours = 0;
+                var timeEntries = timeEntries[0].TimeEntries;
+                var arrayLength = timeEntries.length;
+                for (var i = 0; i < arrayLength; i++) {
+                    totalHours += timeEntries[i].Hours;
+                }
+                $scope.totalHours = totalHours;
+            });
         })
         .catch(function (response) {
             if (response.data == null) {

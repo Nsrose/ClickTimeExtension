@@ -148,7 +148,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
       
         if ($scope.showHourEntryField) {
-            clickTimeEntry.Hours = timeEntry.Hours;
+            clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
         }
 
         if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
@@ -341,8 +341,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             return;
         }
         if (time) {
-            $scope.showStartTimer = false;
             $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
+            if ($scope.timeEntry.Hours != "0:00") {
+                $scope.showStartTimer = false;
+            }
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
                 TimeEntryService.updateInProgressEntry('inProgress', true);
             });
@@ -448,7 +450,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         var dateString = CTService.getDateString();
         var now = new Date();
         $scope.timeEntry = {
-            "BreakTime":"0:00",
+            "BreakTime":0.00,
             "Comment":"",
             "Date":dateString,
             "Hours":"0:00",

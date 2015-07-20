@@ -11,35 +11,16 @@ myApp.service('CTService', function() {
         if (time.indexOf(":") != -1) {
             return this.roundToNearestTime(time, timeIncrement);
         } else {
-            return this.roundToNearestDecimal(time, timeIncrement);
+            var decimal = this.roundToNearestDecimal(time, timeIncrement);
+            return this.toHours(decimal);
         }
        
     }
 
     /** Round to nearest for H:MM format */
     this.roundToNearestTime = function (time, timeIncrement) {
-        var splitTime = time.split(":");
-        if (splitTime.length != 2) {
-            return null;
-        }
-        var hrs = parseInt(splitTime[0]);
-        var min = parseInt(splitTime[1]);
-        var decMin = min / 60;
-        var decimal = hrs + decMin;
-        var rounded = this.roundToNearestDecimal(decimal, timeIncrement);
-        var roundedSplit = rounded.toString().split(".");
-        if (roundedSplit.length == 1) {
-            var roundedHrs = roundedSplit[0];
-            return roundedHrs + ":00";
-        } else if (roundedSplit.length == 2) {
-            var mm = (("." + roundedSplit[1]) * 60).toString(); 
-            if (mm.length == 1) {
-                var mm = mm + "0";
-            }
-            return roundedHrs + ":" + mm;
-        } else {
-            return null;
-        }
+        var rounded = this.roundToNearestDecimal(this.toDecimal(time), timeIncrement);
+        return this.toHours(rounded);
     }
 
     /** Round to nearest for h.mm format */
@@ -64,6 +45,38 @@ myApp.service('CTService', function() {
         var howManyIncrements = Math.round(parseFloat(decpart / timeIncrement).toFixed(10));
         if (intpart == 0 && howManyIncrements == 0 && time > 0) howManyIncrements = 1;
         return (intpart + howManyIncrements * timeIncrement).toFixed(precision); 
+    }
+
+    /** Return the h.mm representation of a hh:mm format. */
+    this.toDecimal = function(time) {
+        var splitTime = time.split(":");
+        if (splitTime.length != 2) {
+            console.log("Invalid time to convert to decimal: " + time);
+            return;
+        }
+        var hrs = parseInt(splitTime[0]);
+        var min = parseInt(splitTime[1]);
+        var decMin = min / 60;
+        var decimal = hrs + decMin;
+        return decimal;
+    }
+
+    /** Return the h:mm representation of a h.mm format. */
+    this.toHours = function(time) {
+        var splitTime = time.toString().split(".");
+        var splitHrs = splitTime[0];
+        if (splitTime.length == 1) {
+            return splitHrs + ":00";
+        } else if (splitTime.length == 2) {
+            var mm = (("." + splitTime[1]) * 60).toString();
+            if (mm.length == 1) {
+                var mm = mm + '0';
+            }
+            return splitHrs + ":" + mm;
+        } else {
+            console.log("Invalid time to convert to hours: " + time);
+            return;
+        }
     }
 
     /** Return true if a string is numeric. */

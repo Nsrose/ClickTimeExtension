@@ -109,7 +109,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 		            "BreakTime":0.00,
 		            "Comment":"",
 		            "Date":dateString,
-		            "Hours":0.00,
+		            "Hours":"0:00",
 		            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
 		            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
 		            "JobID":"",

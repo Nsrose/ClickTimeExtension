@@ -22,12 +22,36 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
     }
 
+
+
+
+    $scope.showStartTimer = true;
+
+    $scope.startStopwatch = function () {
+        $scope.$broadcast("startStopwatch");
+        $scope.showStartTimer = false;
+    }
+
+    $scope.stopStopwatch = function() {
+        $scope.$broadcast("stopStopwatch");
+        $scope.showStartTimer = true;
+    }
+
+
+    $scope.clearHours = function() {
+        $scope.timeEntry.Hours = "0:00";
+        $scope.showStartTimer = true;
+        $scope.clearAllErrors();
+        TimeEntryService.removeInProgressEntry();
+    }
+
+
+
     $scope.clearAllErrors = function () {
         $scope.clearError("hours");
         $scope.clearError("startEndTimes");
         $scope.clearError("activeStopwatch");
         $scope.clearError("timeEntryErrorMissingNotes");
-
         $scope.generalError = false;
     }
 
@@ -57,7 +81,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     })
 
     $scope.$on("timeEntrySuccess", function() {
-        $scope.timeEntry.Hours = 0;
+        $scope.timeEntry.Hours = "0:00";
         $scope.timeEntry.Comment = "";
         $scope.$broadcast("clearStopwatch");
         var now = new Date();
@@ -232,7 +256,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
 
         if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch) {
-            if (timeEntry.Hours == 0.00 || timeEntry.Hours == 0) {
+            if (timeEntry.Hours == "0:00" || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
                 $scope.errorMessage = "Oops! Please log some time in order to save this entry.";
                 $scope.generalError = true;
@@ -317,6 +341,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             return;
         }
         if (time) {
+            $scope.showStartTimer = false;
             $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
                 TimeEntryService.updateInProgressEntry('inProgress', true);
@@ -423,10 +448,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         var dateString = CTService.getDateString();
         var now = new Date();
         $scope.timeEntry = {
-            "BreakTime":0.00,
+            "BreakTime":"0:00",
             "Comment":"",
             "Date":dateString,
-            "Hours":0.00,
+            "Hours":"0:00",
             "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
             "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
             "JobID":"",
@@ -437,6 +462,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
             $scope.timeEntry.Comment = inProgressEntry.Comment;
+            if (inProgressEntry.Hours != "0:00") {
+                $scope.showStartTimer = false;
+            }
             TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);
         })
        

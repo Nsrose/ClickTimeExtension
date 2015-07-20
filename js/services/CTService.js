@@ -9,8 +9,41 @@ myApp.service('CTService', function() {
      */
     this.roundToNearest = function (time, timeIncrement) {
         if (time.indexOf(":") != -1) {
-        	return null;
+            return this.roundToNearestTime(time, timeIncrement);
+        } else {
+            return this.roundToNearestDecimal(time, timeIncrement);
         }
+       
+    }
+
+    /** Round to nearest for H:MM format */
+    this.roundToNearestTime = function (time, timeIncrement) {
+        var splitTime = time.split(":");
+        if (splitTime.length != 2) {
+            return null;
+        }
+        var hrs = parseInt(splitTime[0]);
+        var min = parseInt(splitTime[1]);
+        var decMin = min / 60;
+        var decimal = hrs + decMin;
+        var rounded = this.roundToNearestDecimal(decimal, timeIncrement);
+        var roundedSplit = rounded.toString().split(".");
+        if (roundedSplit.length == 1) {
+            var roundedHrs = roundedSplit[0];
+            return roundedHrs + ":00";
+        } else if (roundedSplit.length == 2) {
+            var mm = (("." + roundedSplit[1]) * 60).toString(); 
+            if (mm.length == 1) {
+                var mm = mm + "0";
+            }
+            return roundedHrs + ":" + mm;
+        } else {
+            return null;
+        }
+    }
+
+    /** Round to nearest for h.mm format */
+    this.roundToNearestDecimal = function (time, timeIncrement) {
         var precision;
         switch (timeIncrement) {
             case "1":
@@ -30,12 +63,20 @@ myApp.service('CTService', function() {
         var decpart = parseFloat(time - intpart);
         var howManyIncrements = Math.round(parseFloat(decpart / timeIncrement).toFixed(10));
         if (intpart == 0 && howManyIncrements == 0 && time > 0) howManyIncrements = 1;
-        return (intpart + howManyIncrements * timeIncrement).toFixed(precision);
+        return (intpart + howManyIncrements * timeIncrement).toFixed(precision); 
     }
 
     /** Return true if a string is numeric. */
     this.isNumeric = function (n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
+        return this.isTime(n) || !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    /** Returns true if the string is an acceptable duration entry format. */
+    this.isTime = function (time) {
+        if (time.match(/(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)|(^([0-9]|[1][0-9]|[2][0-3])$)/)) {
+            return true;
+        }
+        return false;
     }
 
     /** Returns a typical date string format for submitting a new time entry.*/

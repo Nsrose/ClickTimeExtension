@@ -41,11 +41,13 @@
         <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch">
             <div class="fieldtitle time-entry">Hours</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
+                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')"  ng-disabled="runningStopwatch">
             </div>
-            <div class="time-entry-item-clear">Clear hours</div>
+            <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
     </div>
+
+    <div class="clear"></div>
 
 
     <span style="color:red" ng-show="generalError">
@@ -56,12 +58,22 @@
         <p>{{successMessage}}</p>
     </span>
 
-    <button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save</button>
+    <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch" ng-hide="showStartTimer || runningStopwatch">Save</button>
 
-    <button id="start-stopwatch" class="btn btn-success" ng-click="start()" ng-hide="running">Start Timer</button>
+    <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch">Start Timer</button>
 
+    <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch">Stop/Save</button>
 
-
+    <div id="stopwatch" ng-controller="StopwatchController" ng-show="runningStopwatch">
+        <div id='elapsed-time'>
+            <div class='elapsed-time-unit' id='hrs'>{{elapsedHrs}}</div>
+            <div class='elapsed-time-unit'>:</div>
+            <div class='elapsed-time-unit' id='min'>{{elapsedMin}}</div>
+            <div class='elapsed-time-unit'>:</div>
+            <div class='elapsed-time-unit' id='sec'>{{elapsedSec}}</div>
+        </div>
+        <div id="cancel-stopwatch" class="time-entry-item-clear" ng-click="clear()">Cancel timer</div>
+    </div>
 
 
 </div>

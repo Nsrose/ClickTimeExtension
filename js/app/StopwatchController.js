@@ -49,12 +49,21 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
         $scope.clear();
     })
 
+    $scope.$on("startStopwatch", function() {
+        $scope.start();
+    })
+
+    $scope.$on("stopStopwatch", function() {
+        $scope.stop();
+    })
+
     $scope.clear = function() {
     	$scope.elapsedSec = "00";
     	$scope.elapsedMin = "00";
 		$scope.elapsedHrs = "00";
     	$scope.running = false;
     	$scope.$parent.runningStopwatch = false;
+        $scope.$parent.showStartTimer = true;
     	$interval.cancel(timerPromise);
     	timerPromise = undefined;
     	StopwatchService.clear(function() {
@@ -93,19 +102,8 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                     timerPromise = undefined;
                     $scope.$apply();
                     chrome.extension.getBackgroundPage().stopBadge();                
-                    bootbox.confirm("Save time entry of " + $scope.elapsedHrs + ":" +
-                            $scope.elapsedMin + ":" + $scope.elapsedSec + "?", function (response) {
-                            if (response) {
-                                    $("#save-time-entry").click();
-                            } else {
-                                    $scope.elapsedSec = "00";
-                                    $scope.elapsedMin = "00";
-                                    $scope.elapsedHrs = "00";
-                                    StopwatchService.clear(function () { console.log("Canceled stopwatch")});
-                                    $scope.$apply();
-                            }
-                            chrome.browserAction.setBadgeText({text: ""});
-                    })
+                    $("#save-time-entry").click();
+                    chrome.browserAction.setBadgeText({text: ""});
                 })
             }
     }

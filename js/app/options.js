@@ -48,15 +48,17 @@ $(document).ready(function() {
 
     chrome.storage.local.get('user', function(items) {
       if ('user' in items) {
-        loggedIn = true;
+          loggedIn = true;
         user = items.user.data;
-        
+       console.log(user); 
         if (user.RequireStopwatch == true) {
             $('#start-end').remove();
         } else if (user.RequireStartEndTime == true) {
             $('#hours').remove();
         } else {
             // add back all options
+            // this doesn't work on page load. you must relog back in.
+            // you need to relog teh session
             $('#timeEntryMethod').append('#hours');
             $('#timeEntryMethod').append('#start-end');
         }

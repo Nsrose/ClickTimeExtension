@@ -1,12 +1,10 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
-    // if(navigator.onLine) {
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
 
     //Company custom terms
     $scope.customTerms = {};
-   
 
     $scope.HasEmptyEntities = false;
     // if true, indicate to user that they can set default time entry method in extension options
@@ -515,7 +513,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 }
             })
         }
-
+        
         var afterGetCompany = function (company) {
             $scope.company = company;
             $scope.customTerms = {

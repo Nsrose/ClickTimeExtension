@@ -57,6 +57,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     })
 
     $scope.$on("timeEntrySuccess", function() {
+        $scope.timeEntry.Hours = 0;
+        $scope.timeEntry.Comment = "";
+        $scope.$broadcast("clearStopwatch");
+        var now = new Date();
+        $scope.timeEntry.ISOStartTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
+        $scope.timeEntry.ISOEndTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
         $scope.clearError('hours');
         $scope.clearError('startEndTimes');
     })

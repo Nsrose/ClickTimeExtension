@@ -35,6 +35,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
+
     height: 100%;
     background-color: white;
     z-index: 700;
@@ -90,4 +91,33 @@ body {
 }
 .total-hours-log {
     float: right;
+}
+.time-entry-container {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 10px;
+}
+
+#notes-field {
+    display: inline-block;
+    width: 300px;
+    height: 70px;
+}
+
+.time-entry-item {
+}
+
+.time-entry-form {
+}
+
+.time-entry-form-input {
+    width: 80px;
+    height: 70px;
+    font-size: 30px;
+}
+.notes-field-container {
+    display: inline-block;
+}
+.fieldtitle {
+    margin-top: 10px;
 }

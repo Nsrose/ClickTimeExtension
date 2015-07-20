@@ -22,17 +22,46 @@
     </div>
 
 
-    <form name="entry">
+    <!-- Notes field -->
+    <form name="entry" class="notes-field-container">
         <div class="fieldtitle">Notes:</div>
         <p ng-show="user.RequireComments" style="color: red">* required</p>
-        <textarea name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
-        <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
+        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
+        <!-- <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
             <span>Oops! Please limit your note to 4000 characters.</span>
-        </span>
-        <span ng-show="timeEntryErrorMissingNotes"> 
+        </span> -->
+       <!--  <span ng-show="timeEntryErrorMissingNotes"> 
             <span style="color:red">Oops! Please enter some notes in order to save this entry.</span>
-        </span>
+        </span> -->
     </form>
+
+
+    <!-- Time entry form -->
+    <div class="time-entry-container">
+        <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch">
+            <div class="fieldtitle time-entry">Hours</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
+            </div>
+            <div class="time-entry-item-clear">Clear hours</div>
+        </div>
+    </div>
+
+
+    <span style="color:red" ng-show="generalError">
+        <p>{{errorMessage}}</p>
+    </span>
+
+    <span style="color:green" ng-show="generalSuccess">
+        <p>{{successMessage}}</p>
+    </span>
+
+    <button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save</button>
+
+    <button id="start-stopwatch" class="btn btn-success" ng-click="start()" ng-hide="running">Start Timer</button>
+
+
+
 
 
 </div>
@@ -40,7 +69,7 @@
 
 
 
-<div class="time-entry-container">
+<!-- <div class="time-entry-container">
         <form name="time-entry-form" novalidate>
         <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
 
@@ -91,7 +120,7 @@
             <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
         </label>
     </form>
-</div>
+</div> -->
 
 <div class="refresh-container" ng-hide="abandonedStopwatch">
     <div class="refresh-message">
@@ -110,17 +139,5 @@
 
     
 
-<span style="color:red" ng-show="generalError">
-    <p>{{errorMessage}}</p>
-</span>
-
-<span style="color:green" ng-show="generalSuccess">
-    <p>{{successMessage}}</p>
-</span>
-
-<button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save</button>
-<span ng-show="timeEntryErrorActiveStopwatch" style="color:red"><p>Oops! Please stop the active stopwatch in order to save this entry.</p></span>
 
 
-
-<br>

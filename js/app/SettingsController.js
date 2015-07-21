@@ -10,6 +10,7 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
         if ('allowReminders' in items) {         
           chrome.storage.sync.set({'allowReminders': true});         
         }
+      })
     } else {
       chrome.storage.sync.get('allowReminders', function(items) {
         if ('allowReminders' in items) {
@@ -17,6 +18,7 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
               chrome.storage.sync.set({'allowReminders': false})
             }
         }
+      })
       chrome.extension.getBackgroundPage().stopNotifications();
     }
   }); 

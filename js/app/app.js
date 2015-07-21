@@ -31,11 +31,6 @@ var TOKEN_EXPIRE_HOURS = 24;
 
 var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap']);
 
-//default allow desktop reminders
-chrome.storage.sync.set({
-	'allowReminders': true,
-})
-
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }

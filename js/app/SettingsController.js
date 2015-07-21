@@ -4,6 +4,16 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
       $(this).addClass("active").siblings().removeClass("active");
     });
 
+  // initial toggle display
+  chrome.storage.sync.get('allowReminders', function(items) {
+    if (('allowReminders' in items) && (items.allowReminders)) {
+      $('#reminder-toggle').prop('checked', true);
+    } else {
+      $('#reminder-toggle').prop('checked', false);
+    }
+  })
+
+  // when toggling, switch function in local storage
   $('#reminder-toggle').click(function() {
     if ($('#reminder-toggle').is(':checked')) {
       chrome.storage.sync.get('allowReminders', function(items) {
@@ -23,6 +33,8 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
     }
   }); 
 });
+
+
 
 	// Script for the options page for configurability
 // Saves options to chrome.storage

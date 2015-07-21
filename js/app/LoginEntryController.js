@@ -49,7 +49,9 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             data.lastLoginMin = d.getMinutes();
             data.lastLoginSec = d.getSeconds();
             chrome.storage.sync.set(
-                {'session' : session},
+                {   'session' : session, 
+                    'allowReminders': true
+                },
                 function() {
                     console.log("Set session in local storage.");
                     $location.path("/time_entry");

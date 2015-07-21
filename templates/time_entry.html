@@ -38,13 +38,31 @@
 
     <!-- Time entry form -->
     <div class="time-entry-container">
+
         <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch">
             <div class="fieldtitle time-entry">Hours</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')"  ng-disabled="runningStopwatch">
+                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction()" ng-disabled="runningStopwatch" placeholder="0:00">
             </div>
             <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
+
+        <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
+            <div class="fieldtitle time-entry">Start</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction()"  ng-disabled="runningStopwatch">
+            </div>
+        </div>
+
+        <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
+            <div class="fieldtitle time-entry">End</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction()"  ng-disabled="runningStopwatch">
+            </div>
+        </div>
+
+        <div class="time-entry-item-clear" ng-click="clearStartEndTimes()" ng-show="showStartEndTimes && !runningStopwatch" ng-hide="runningStopwatch || showHourEntryField">Reset Start and End Times</div>
+
     </div>
 
     <div class="clear"></div>
@@ -58,9 +76,9 @@
         <p>{{successMessage}}</p>
     </span>
 
-    <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch" ng-hide="showStartTimer || runningStopwatch">Save</button>
+    <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch || generalError" ng-hide="showStartTimer || runningStopwatch">Save</button>
 
-    <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch">Start Timer</button>
+    <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError">Start Timer</button>
 
     <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch">Stop/Save</button>
 

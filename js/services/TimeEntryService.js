@@ -105,13 +105,20 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 
 				var dateString = CTService.getDateString();
         		var now = new Date();
+        		var min = null;
+		        if ((now.getMinutes() + '').length == 1) {
+		            min = "0" + now.getMinutes(); 
+		        } else {
+		            min = now.getMinutes();
+		        }
+		        var nowString = now.getHours() + ":" + min;
 				var newEntry = {
 		            "BreakTime":0.00,
 		            "Comment":"",
 		            "Date":dateString,
-		            "Hours":"0:00",
-		            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
-		            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+		            "Hours":DEFAULT_EMPTY_HOURS,
+		            "ISOEndTime": nowString,
+		            "ISOStartTime":nowString,
 		            "JobID":"",
 		            "PhaseID":"",
 		            "SubPhaseID":null,

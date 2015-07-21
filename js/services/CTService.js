@@ -111,10 +111,11 @@ myApp.service('CTService', function() {
     	return result;
     }
 
-    /** Convert a stupid Angular ISO date to Clicktime's ISO time string */
-    this.convertISO = function (date) {
+    /** Convert a hh:mm format to Clicktime's ISO time string */
+    this.convertISO = function (time) {
     	// T splits date/time, . splits ms and the rest
-    	return date.toISOString().split('T')[1].split('.')[0];
+    	// return date.toISOString().split('T')[1].split('.')[0];
+        return time + ":00"; 
     }
 
     /** Compile hrs, min, and sec to a Clicktime Hour stamp */

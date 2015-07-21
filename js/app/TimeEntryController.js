@@ -1,4 +1,5 @@
-myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
+myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', 
+                                function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
     // if(navigator.onLine) {
     $scope.variables = [];
     $scope.UserName = null;
@@ -22,8 +23,25 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
     }
 
+    // Swap action button from start timer to save and vice versa.
+    $scope.swapAction = function() {
+        var input = $("#time-entry-form-start");
+        var strLength = input.val().length * 2;
+        $timeout(function() {
+             input[0].setSelectionRange(strLength, strLength);
+         });        
+       
 
-
+        if ($scope.generalError) {
+            // cannot swap action with an active error
+            return;
+        }
+        if ($scope.showStartTimer) {
+            $scope.showStartTimer = false;
+        } else {
+            $scope.showStartTimer = true;
+        }
+    }
 
     $scope.showStartTimer = true;
 
@@ -40,7 +58,23 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
 
     $scope.clearHours = function() {
-        $scope.timeEntry.Hours = "0:00";
+        $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
+        $scope.showStartTimer = true;
+        $scope.clearAllErrors();
+        TimeEntryService.removeInProgressEntry();
+    }
+
+    $scope.clearStartEndTimes = function() {
+        var now = new Date();
+        var min = null;
+        if ((now.getMinutes() + '').length == 1) {
+            min = "0" + now.getMinutes(); 
+        } else {
+            min = now.getMinutes();
+        }
+        var nowString = now.getHours() + ":" + min;
+        $scope.timeEntry.ISOStartTime = nowString;
+        $scope.timeEntry.ISOEndTime = nowString;
         $scope.showStartTimer = true;
         $scope.clearAllErrors();
         TimeEntryService.removeInProgressEntry();
@@ -82,12 +116,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     })
 
     $scope.$on("timeEntrySuccess", function() {
-        $scope.timeEntry.Hours = "0:00";
+        $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.timeEntry.Comment = "";
         $scope.$broadcast("clearStopwatch");
         var now = new Date();
-        $scope.timeEntry.ISOStartTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
-        $scope.timeEntry.ISOEndTime = new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds());
+        var min = null;
+        if ((now.getMinutes() + '').length == 1) {
+            min = "0" + now.getMinutes(); 
+        } else {
+            min = now.getMinutes();
+        }
+        var nowString = now.getHours() + ":" + min;
+        $scope.timeEntry.ISOStartTime = nowString;
+        $scope.timeEntry.ISOEndTime = nowString;
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.abandonedStopwatch = false;
@@ -98,6 +139,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         $scope.clearError('activeStopwatch');
     })
 
+    $scope.validateStartEndTimes = function(startTime, endTime) {
+        if (!CTService.isTime(startTime)) {
+            $scope.errorMessage = "Oops! Please enter a valid value for start time.";
+            $scope.generalError = true;
+        } else if (!CTService.isTime(endTime)) {
+            $scope.errorMessage = "Oops! Please enter a valid value for end time.";
+            $scope.generalError = true;
+        } else if (CTService.toDecimal(startTime) >= CTService.toDecimal(endTime)) {
+            $scope.errorMessage = "Oops! Please enter a start time later than the end time.";
+            $scope.generalError = true;
+        }
+        else {
+            $scope.generalError = false;
+            $scope.showStartTimer = false;
+        }
+    }
     
     //////////////////////////////////////////////////////////////////
 
@@ -159,7 +216,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.timeEntryErrorStartEndTimesInvalid = true;
                 return;
             }
-            var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
+            var startTimeDecimal = CTService.toDecimal(timeEntry.ISOStartTime);
+            var endTimeDecimal = CTService.toDecimal(timeEntry.ISOEndTime);
+            var hourDiff = (endTimeDecimal - startTimeDecimal);
             clickTimeEntry.Hours = hourDiff;
             var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
             var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
@@ -181,7 +240,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.$broadcast("timeEntryError");
             return;
         }
-
 
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
@@ -268,7 +326,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch
             && !$scope.saveFromTimer) {
-            if (timeEntry.Hours == "0:00" || timeEntry.Hours == 0) {
+            if (timeEntry.Hours == DEFAULT_EMPTY_HOURS || timeEntry.Hours == 0) {
                 $scope.timeEntryErrorHoursZero = true;
                 $scope.errorMessage = "Oops! Please log some time in order to save this entry.";
                 $scope.generalError = true;
@@ -346,6 +404,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     // Round hour inputs
     $scope.roundHour = function (time, timeToIncrement) {
+        $scope.generalError = false;
+        if (time == null) {
+            $scope.errorMessage = "Oops! Please enter some time before saving.";
+            $scope.generalError = true;
+            return;
+        }
         if (!CTService.isNumeric(time)) {
             $scope.timeEntryErrorHoursNumeral = true;
             $scope.errorMessage = "Please enter time using only numerals and decimals.";
@@ -354,7 +418,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         }
         if (time) {
             $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
-            if ($scope.timeEntry.Hours != "0:00") {
+            if ($scope.timeEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
@@ -461,13 +525,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
         // Default empty entry
         var dateString = CTService.getDateString();
         var now = new Date();
+        var min = null;
+        if ((now.getMinutes() + '').length == 1) {
+            min = "0" + now.getMinutes(); 
+        } else {
+            min = now.getMinutes();
+        }
+        var nowString = now.getHours() + ":" + min;
         $scope.timeEntry = {
             "BreakTime":0.00,
             "Comment":"",
             "Date":dateString,
-            "Hours":"0:00",
-            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
-            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+            "Hours":DEFAULT_EMPTY_HOURS,
+            "ISOEndTime":nowString,
+            "ISOStartTime":nowString,
             "JobID":"",
             "PhaseID":"",
             "SubPhaseID":null,
@@ -476,7 +547,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
             $scope.timeEntry.Comment = inProgressEntry.Comment;
-            if (inProgressEntry.Hours != "0:00") {
+            if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
             TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);

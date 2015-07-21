@@ -8,11 +8,13 @@
 </div>
 
 <br>
-<h5>Time Entry Method</h5> 
-<div class="btn-group">
+<div ng-hide="requireStopwatch" id="timeEntryMethod" class="btn-group">
+    <h5>Time Entry Method</h5>   
     <button type="button" class="btn btn-info">Duration</button>
     <button type="button" class="btn btn-info">Start & End Times</button>
+<div id="status"></div>
 </div>
+
 
 <br><br>
 <div>
@@ -21,16 +23,13 @@
 <br>
 <div class="settings-controls" ng-controller="TimeEntryController">
     <a ng-click="refresh()" my-tooltip="#tooltip" data-placement="right">Refresh Lists</a><br>
-    <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists.</span><br>
+    <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span><br>
     <a ng-click="logout()">Sign out of ClickTime</a>
 </div>
 <br>
 <a href="http://www.clicktime.com/company/contact" target="_blank">Contact Us</a>
 
-
-
-
-<!--
+<!-- 
 <div>
     Default time entry method:<br>
     <select id="timeEntryMethod">
@@ -38,6 +37,4 @@
          <option value="Start/End Times" id="start-end">Start / End Times</option>
          <option value="Stopwatch" id="stopwatch">Stopwatch</option>
     </select>
-</div>
-<div id="status"></div>
--->
+</div> -->

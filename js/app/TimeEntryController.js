@@ -101,89 +101,97 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     }
 
     $scope.saveTimeEntry = function (session, timeEntry) {
+
         if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
             $scope.timeEntryErrorActiveStopwatch = true;
             return;
         }
 
-        $scope.clearAllErrors();
+        $scope.refresh();
 
-        var clickTimeEntry = {
-            "BreakTime" : timeEntry.BreakTime,
-            "Comment" : timeEntry.Comment,
-            "Date" : timeEntry.Date,
-            "JobID" : timeEntry.JobID,
-            "PhaseID" : timeEntry.PhaseID,
-            "SubPhaseID" : timeEntry.SubPhaseID,
-            "TaskID" : timeEntry.TaskID,
-            "job" : timeEntry.job,
-            "task" : timeEntry.task,
-            "client" : timeEntry.client
-        }
-      
-        if ($scope.showHourEntryField) {
-            clickTimeEntry.Hours = timeEntry.Hours;
-        }
+        // when array length = 4, execute callback
+        $scope.$watchCollection($scope.doneRefresh, function() {
+            if ($scope.doneRefresh.length == 4) {
+                //done
+                $scope.clearAllErrors();
 
-        if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
-            if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
-                $scope.timeEntryErrorStartEndTimesInvalid = true;
-                return;
-            }
-            var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
-            clickTimeEntry.Hours = hourDiff;
-            var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
-            var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
-            clickTimeEntry.ISOStartTime = ISOStartTime;
-            clickTimeEntry.ISOEndTime = ISOEndTime;
-        }
+                var clickTimeEntry = {
+                    "BreakTime" : timeEntry.BreakTime,
+                    "Comment" : timeEntry.Comment,
+                    "Date" : timeEntry.Date,
+                    "JobID" : timeEntry.JobID,
+                    "PhaseID" : timeEntry.PhaseID,
+                    "SubPhaseID" : timeEntry.SubPhaseID,
+                    "TaskID" : timeEntry.TaskID,
+                    "job" : timeEntry.job,
+                    "task" : timeEntry.task,
+                    "client" : timeEntry.client
+                }
+              
+                if ($scope.showHourEntryField) {
+                    clickTimeEntry.Hours = timeEntry.Hours;
+                }
 
-        if ($scope.showStopwatch && !$scope.abandonedStopwatch) {
-            var hrs = parseInt($("#hrs").text());
-            var min = parseInt($("#min").text());
-            var sec = parseInt($("#sec").text());
-            clickTimeEntry.Hours = CTService.compileHours(hrs, min, sec);
-            timeEntry.Hours = clickTimeEntry.Hours;
-        }
-        
-        if (!validateTimeEntry(timeEntry)) {
-            console.log(timeEntry);
-            $scope.$broadcast("timeEntryError");
-            return;
-        }
+                if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
+                    if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
+                        $scope.timeEntryErrorStartEndTimesInvalid = true;
+                        return;
+                    }
+                    var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
+                    clickTimeEntry.Hours = hourDiff;
+                    var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                    var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                    clickTimeEntry.ISOStartTime = ISOStartTime;
+                    clickTimeEntry.ISOEndTime = ISOEndTime;
+                }
 
-        $scope.pageReady = false;
-        TimeEntryService.saveTimeEntry(session, clickTimeEntry)
-        .then(function (response) {
-            var d = new Date();
-            TimeEntryService.removeInProgressEntry();
-            $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
-            $scope.generalSuccess = true;
-            $scope.$broadcast("timeEntrySuccess");
-            $scope.abandonedStopwatch = false;
-            $scope.pageReady = true;
-            $scope.clearAllErrors();
-            EntityService.updateRecentEntities(timeEntry);
-        })
-        .catch(function (response) {
-            if (response.data == null) {
-                var d = new Date();
-                $scope.$broadcast("timeEntryError");
-                TimeEntryService.removeInProgressEntry();
-                TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                    $scope.errorMessage = 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established';
-                    $scope.generalError = true;
-                })
-            } else {
-                $scope.errorMessage = "An unknown error occurred.";
-                $scope.generalError = true;
-                if (!$scope.abandonedStopwatch) {
+                if ($scope.showStopwatch && !$scope.abandonedStopwatch) {
+                    var hrs = parseInt($("#hrs").text());
+                    var min = parseInt($("#min").text());
+                    var sec = parseInt($("#sec").text());
+                    clickTimeEntry.Hours = CTService.compileHours(hrs, min, sec);
+                    timeEntry.Hours = clickTimeEntry.Hours;
+                }
+                
+                if (!validateTimeEntry(timeEntry)) {
+                    console.log(timeEntry);
                     $scope.$broadcast("timeEntryError");
-                }   
+                    return;
+                }
+
+                $scope.pageReady = false;
+                TimeEntryService.saveTimeEntry(session, clickTimeEntry)
+                .then(function (response) {
+                    var d = new Date();
+                    TimeEntryService.removeInProgressEntry();
+                    $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
+                    $scope.generalSuccess = true;
+                    $scope.$broadcast("timeEntrySuccess");
+                    $scope.abandonedStopwatch = false;
+                    $scope.pageReady = true;
+                    $scope.clearAllErrors();
+                    EntityService.updateRecentEntities(timeEntry);
+                })
+                .catch(function (response) {
+                    if (response.data == null) {
+                        var d = new Date();
+                        $scope.$broadcast("timeEntryError");
+                        TimeEntryService.removeInProgressEntry();
+                        TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
+                            $scope.errorMessage = 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established';
+                            $scope.generalError = true;
+                        })
+                    } else {
+                        $scope.errorMessage = "An unknown error occurred.";
+                        $scope.generalError = true;
+                        if (!$scope.abandonedStopwatch) {
+                            $scope.$broadcast("timeEntryError");
+                        }   
+                    }
+                    $scope.pageReady = true;
+                });
             }
-            $scope.pageReady = true;
-        });
-        
+        })       
     }
 
 
@@ -340,6 +348,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
 
     }
 
+    $scope.doneRefresh = [];
+
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
@@ -360,6 +370,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 $scope.HasEmptyEntities = true;
                 $scope.jobClient = undefined;
             }
+
+            $scope.doneRefresh.push("jobClients");
             $scope.$apply();
 
         }
@@ -372,11 +384,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
             $scope.task = tasksList[0];
             $scope.timeEntry.task = $scope.task;
             $scope.timeEntry.TaskID = $scope.task.TaskID;
+            $scope.doneRefresh.push("tasks");
             $scope.$apply();
         }
 
         var afterGetUser = function (user) {
             $scope.user = user;
+            $scope.doneRefresh.push("user");
             $scope.$apply();
         }
 
@@ -396,6 +410,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
                 'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
             }
+            $scope.doneRefresh.push("company");
             $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }

@@ -14,8 +14,8 @@
 
   "browser_action" : {
     "default_icon" : {
-        "19": "img/stopwatch19.png",
-        "38": "img/stopwatch38.png"
+        "19": "img/19.png",
+        "38": "img/38.png"
     },
     "default_title" : "ClickTime",
     "default_popup" : "templates/main.html"
@@ -35,8 +35,6 @@
     "js/*",
     "templates/*"
   ],
-
-  "options_page": "templates/options.html",
   
   "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications" ]
 

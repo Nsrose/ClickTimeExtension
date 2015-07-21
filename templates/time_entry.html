@@ -2,11 +2,6 @@
     <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
 </div>
 
-<button ng-click="logout()" ng-disabled="abandonedStopwatch" class="btn btn-danger">Sign Out</button>
-
-
-
-
 <div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
 
 
@@ -121,12 +116,6 @@
         </label>
     </form>
 </div> -->
-
-<div class="refresh-container" ng-hide="abandonedStopwatch">
-    <div class="refresh-message">
-        Can't find a recently created {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, or {{customTerms.taskTermSingLow}}? <a href="" ng-click="refresh()">Refresh</a>
-    </div>
-</div>
 
 <br>
 <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>

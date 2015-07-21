@@ -343,7 +343,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
-        console.log("Fetching the most recent data from Clicktime");
+        console.log('im refreshed');
         $scope.clearAllErrors();
         $scope.$parent.$broadcast("pageLoading");
 

@@ -58,7 +58,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     	$interval.cancel(timerPromise);
     	timerPromise = undefined;
     	StopwatchService.clear(function() {
-            clearInterval(chrome.extension.getBackgroundPage().stopBadge());
+            chrome.extension.getBackgroundPage().stopBadge();
             chrome.browserAction.setBadgeText({text: ""});
             console.log("Cleared stopwatch");
         })

@@ -5,10 +5,7 @@ var NOTIFICATION_POLL_PERIOD = 900000;
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
-
 //////////////////////////////////////////////////////////////////////////
-
-
 
 // this timer is for display purposes only
 // stopping/starting it will have no effect on 
@@ -85,8 +82,6 @@ var stopBadge = function() {
 
 ///////// Notifications /////////////////////////////////////////////////
 
-
-
 var options = {
     type: "basic",
     title: "Clicktime Extension",
@@ -102,6 +97,9 @@ var options = {
     ]
 }
 
+//notifications function (declared here to avoid hoisting confusion)
+var notificationInterval;
+
 // Initial test ask
 chrome.storage.sync.get('stopwatch', function (items) {
     if ('stopwatch' in items) {
@@ -113,20 +111,33 @@ chrome.storage.sync.get('stopwatch', function (items) {
     }
 })
 
-
-// Notify the user every x mins to enter time
-var notificationInterval = setInterval(function() {
-    chrome.storage.sync.get('stopwatch', function (items) {
-        if ('stopwatch' in items) {
-            if (!items.stopwatch.running) {
-                 chrome.notifications.create(options);
+/* create notifications if user allowed it */
+var createNotifications = function(poll_period) {
+    chrome.storage.sync.get('allowReminders', function(items) {
+        if ('allowReminders' in items) {
+            if (items.allowReminders) {
+                //reminders are allowed. poll the user every x mins to enter time
+                notificationInterval = setInterval(function() {
+                    chrome.storage.sync.get('stopwatch', function (items) {
+                        if ('stopwatch' in items) {
+                            if (!items.stopwatch.running) {
+                                 chrome.notifications.create(options);
+                            }
+                        } else {
+                            chrome.notifications.create(options);
+                        }
+                    })
+                }, poll_period)
             }
-        } else {
-            chrome.notifications.create(options);
         }
     })
-}, NOTIFICATION_POLL_PERIOD)
+}
 
+createNotifications(NOTIFICATION_POLL_PERIOD);
+
+var stopNotifications = function() {
+    clearInterval(notificationInterval);
+}
 
 // Button actions
 chrome.notifications.onButtonClicked.addListener(function (notificationId, buttonIndex) {
@@ -136,21 +147,10 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, butto
             url : "../../templates/main.html"
         })
     } else {
-        // Remind me later
-        clearInterval(notificationInterval);
-        notificationInterval = setInterval(function() {
-            chrome.storage.sync.get('stopwatch', function (items) {
-                if ('stopwatch' in items) {
-                    if (!items.stopwatch.running) {
-                         chrome.notifications.create(options);
-                    }
-                } else {
-                    chrome.notifications.create(options);
-                }
-            })
-        }, DELAYED_NOTIFICATION_POLL_PERIOD)
-    }
-    
+        // Remind me later. create larger poll period
+        stopNotifications();
+        createNotifications(DELAYED_NOTIFICATION_POLL_PERIOD);
+    }    
 })
 
 ////////////////////////////////////////////////////////////////////
@@ -245,7 +245,6 @@ function refreshFromApi(session) {
     })
  }
 
-
 chrome.runtime.onStartup.addListener(function() {
     chrome.storage.sync.get('session', function (items) {
         if ('session' in items) {
@@ -255,4 +254,3 @@ chrome.runtime.onStartup.addListener(function() {
         }
     })
 })
-

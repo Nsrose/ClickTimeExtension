@@ -116,7 +116,6 @@ var createNotifications = function(poll_period) {
     })
 }
 
-createNotifications(NOTIFICATION_POLL_PERIOD);
 
 var stopNotifications = function() {
     clearInterval(notificationInterval);

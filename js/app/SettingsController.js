@@ -4,37 +4,32 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
       $(this).addClass("active").siblings().removeClass("active");
     });
 
-  // initial toggle display
-  chrome.storage.sync.get('allowReminders', function(items) {
-    if (('allowReminders' in items) && (items.allowReminders)) {
-      $('#reminder-toggle').prop('checked', true);
-    } else {
-      $('#reminder-toggle').prop('checked', false);
-    }
+    // initial toggle display
+    chrome.storage.sync.get('allowReminders', function(items) {
+      if (('allowReminders' in items) && (items.allowReminders)) {
+        $('#reminder-toggle').prop('checked', true);
+      } else {
+        $('#reminder-toggle').prop('checked', false);
+      }
+    })
+
+    // when toggling, switch value in local storage
+    $('#reminder-toggle').click(function() {
+      chrome.storage.sync.get('allowReminders', function(items) {
+        if ('allowReminders' in items) {   
+          if ($('#reminder-toggle').is(':checked')) { 
+            chrome.storage.sync.set({'allowReminders': true});
+            var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
+            chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+          } else {
+            chrome.storage.sync.set({'allowReminders': false});
+            chrome.extension.getBackgroundPage().stopNotifications();
+          }
+        }
+      })
+    })
   })
-
-  // when toggling, switch function in local storage
-  $('#reminder-toggle').click(function() {
-    if ($('#reminder-toggle').is(':checked')) {
-      chrome.storage.sync.get('allowReminders', function(items) {
-        if ('allowReminders' in items) {         
-          chrome.storage.sync.set({'allowReminders': true});         
-        }
-      })
-    } else {
-      chrome.storage.sync.get('allowReminders', function(items) {
-        if ('allowReminders' in items) {
-            if (items.allowReminders) {
-              chrome.storage.sync.set({'allowReminders': false})
-            }
-        }
-      })
-      chrome.extension.getBackgroundPage().stopNotifications();
-    }
-  }); 
-});
-
-
+}])
 
 	// Script for the options page for configurability
 // Saves options to chrome.storage
@@ -105,4 +100,3 @@ $(document).ready(function() {
 })
 */
 
-}])

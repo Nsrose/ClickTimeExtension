@@ -100,35 +100,18 @@ var options = {
 //notifications function (declared here to avoid hoisting confusion)
 var notificationInterval;
 
-// Initial test ask
-chrome.storage.sync.get('stopwatch', function (items) {
-    if ('stopwatch' in items) {
-        if (!items.stopwatch.running) {
-             chrome.notifications.create(options);
-        }
-    } else {
-        chrome.notifications.create(options);
-    }
-})
-
 /* create notifications if user allowed it */
 var createNotifications = function(poll_period) {
     chrome.storage.sync.get('allowReminders', function(items) {
-        if ('allowReminders' in items) {
-            if (items.allowReminders) {
-                //reminders are allowed. poll the user every x mins to enter time
-                notificationInterval = setInterval(function() {
-                    chrome.storage.sync.get('stopwatch', function (items) {
-                        if ('stopwatch' in items) {
-                            if (!items.stopwatch.running) {
-                                 chrome.notifications.create(options);
-                            }
-                        } else {
-                            chrome.notifications.create(options);
-                        }
-                    })
-                }, poll_period)
-            }
+        if (('allowReminders' in items) && (items.allowReminders)) {
+            //reminders are allowed. poll the user every x mins to enter time
+            notificationInterval = setInterval(function() {
+                chrome.storage.sync.get('stopwatch', function (items) {
+                    if (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running))) {                         
+                        chrome.notifications.create(options);
+                    }
+                })
+            }, poll_period)
         }
     })
 }
@@ -147,7 +130,7 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, butto
             url : "../../templates/main.html"
         })
     } else {
-        // Remind me later. create larger poll period
+        // Remind me later
         stopNotifications();
         createNotifications(DELAYED_NOTIFICATION_POLL_PERIOD);
     }    

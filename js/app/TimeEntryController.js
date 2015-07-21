@@ -25,13 +25,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Swap action button from start timer to save and vice versa.
     $scope.swapAction = function() {
-        var input = $("#time-entry-form-start");
-        var strLength = input.val().length * 2;
-        $timeout(function() {
-             input[0].setSelectionRange(strLength, strLength);
-         });        
-       
-
         if ($scope.generalError) {
             // cannot swap action with an active error
             return;
@@ -63,6 +56,54 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearAllErrors();
         TimeEntryService.removeInProgressEntry();
     }
+
+
+    // Validate and round hour input field on blur.
+    $scope.roundHour = function (time, timeToIncrement) {
+        $scope.generalError = false;
+        if (time == null) {
+            $scope.errorMessage = "Oops! Please enter some time before saving.";
+            $scope.generalError = true;
+            return;
+        }
+        if (!CTService.isNumeric(time)) {
+            $scope.timeEntryErrorHoursNumeral = true;
+            $scope.errorMessage = "Please enter time using only numerals and decimals.";
+            $scope.generalError = true;
+            return;
+        }
+        if (time) {
+            var decimalHrs = time;
+            if ((decimalHrs + '').indexOf(":") != -1) {
+                // HH:MM format
+                decimalHrs = CTService.toDecimal(time);   
+            }
+
+            var roundedDecHrs = CTService.roundToNearestDecimal(decimalHrs, timeToIncrement);
+
+            if (roundedDecHrs == 0) {
+                $scope.errorMessage = "Oops! Please enter some time before saving.";
+                $scope.generalError = true;
+                return;
+            }
+            if (roundedDecHrs > 24) {
+                $scope.errorMessage = "Please make sure your daily hourly total is less than 24 hours.";
+                $scope.generalError = true;
+                return; 
+            }
+           
+            var hrs = CTService.roundToNearest(time, timeToIncrement);
+            $scope.timeEntry.Hours = hrs;
+            if ($scope.timeEntry.Hours != DEFAULT_EMPTY_HOURS) {
+                $scope.showStartTimer = false;
+            }
+            TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
+                TimeEntryService.updateInProgressEntry('inProgress', true);
+            });
+        }
+        
+    }
+
 
     $scope.clearStartEndTimes = function() {
         var now = new Date();
@@ -400,32 +441,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             return !$scope.showStopwatch && !$scope.showStartEndTimes;
         }
         bootbox.alert("Need to get user before calling showHourEntryField");
-    }
-
-    // Round hour inputs
-    $scope.roundHour = function (time, timeToIncrement) {
-        $scope.generalError = false;
-        if (time == null) {
-            $scope.errorMessage = "Oops! Please enter some time before saving.";
-            $scope.generalError = true;
-            return;
-        }
-        if (!CTService.isNumeric(time)) {
-            $scope.timeEntryErrorHoursNumeral = true;
-            $scope.errorMessage = "Please enter time using only numerals and decimals.";
-            $scope.generalError = true;
-            return;
-        }
-        if (time) {
-            $scope.timeEntry.Hours = CTService.roundToNearest(time, timeToIncrement);
-            if ($scope.timeEntry.Hours != DEFAULT_EMPTY_HOURS) {
-                $scope.showStartTimer = false;
-            }
-            TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
-                TimeEntryService.updateInProgressEntry('inProgress', true);
-            });
-        }
-        
     }
 
     ////////////////////////////

@@ -50,13 +50,17 @@ myApp.service('CTService', function() {
     /** Return the h.mm representation of a hh:mm format. */
     this.toDecimal = function(time) {
         var splitTime = time.split(":");
-        if (splitTime.length != 2) {
+        if (splitTime.length != 1 && splitTime.length != 2) {
             console.log("Invalid time to convert to decimal: " + time);
             return;
         }
         var hrs = parseInt(splitTime[0]);
-        var min = parseInt(splitTime[1]);
-        var decMin = min / 60;
+        var decMin = 0
+        if (splitTime.length == 2) {
+            var min = parseInt(splitTime[1]);
+            decMin = min / 60;
+        }
+        
         var decimal = hrs + decMin;
         return decimal;
     }
@@ -81,14 +85,17 @@ myApp.service('CTService', function() {
 
     /** Return true if a string is numeric. */
     this.isNumeric = function (n) {
-        return this.isTime(n) || !isNaN(parseFloat(n)) && isFinite(n);
+        return this.isTime(n) || (!isNaN(parseFloat(n)) && isFinite(n));
     }
 
     /** Returns true if the string is an acceptable duration entry format. */
     this.isTime = function (time) {
-        if (time.match(/(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)|(^([0-9]|[1][0-9]|[2][0-3])$)/)) {
+        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-4]):[0-5][0-9]$/)) {
             return true;
         }
+        /*if (time.match(/(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)|(^([0-9]|[1][0-9]|[2][0-3])$)/)) {
+            return true;
+        }*/
         return false;
     }
 

@@ -20,7 +20,49 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.defaultStartEndTime = CTService.getNowString();
 
-    //// Interface logic ////
+    /////////////////////////////////////////// Interface logic /////////////////////////////////////
+
+    //// Handling keypress events ////
+
+    // disable backspace (weird behavior)
+    $(document).keydown(function(e) {
+        if (e.which == 8) {
+            return false;
+        }
+    })
+
+    // start stopwatch, if there
+    $(document).keypress(function(e) {
+        if (e.which == 13) {
+            if ($scope.showStartTimer && !$scope.runningStopwatch) {
+                $("#start-stopwatch").click();
+            }
+        }
+    })
+
+    $("#time-entry-form-hours").keypress(function(e) {
+        if (e.which == 13) {
+            $("#time-entry-form-hours").blur();
+            $("#save-time-entry").click();
+        }
+    })
+
+    $("#time-entry-form-start").keypress(function(e) {
+        if (e.which == 13) {
+            $("#time-entry-form-start").blur();
+            $("#time-entry-form-end").blur();
+            $("#save-time-entry").click();
+        }
+    })
+
+    $("#time-entry-form-end").keypress(function(e) {
+        if (e.which == 13) {
+            $("#time-entry-form-start").blur();
+            $("#time-entry-form-end").blur();
+            $("#save-time-entry").click();
+        }
+    })
+
 
     // Update in progress entry notes
     $scope.updateNotes = function() {
@@ -80,7 +122,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
         if (time == null) {
-            $scope.setError("hours", "Oops! Please enter some time before saving.");
+            $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
             return;
         }
         if (!CTService.isNumeric(time)) {
@@ -97,7 +139,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             var roundedDecHrs = CTService.roundToNearestDecimal(decimalHrs, timeToIncrement);
 
             if (roundedDecHrs == 0) {
-                $scope.setError("hours", "Oops! Please enter some time before saving.");
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return;
             }
             if (roundedDecHrs > 24) {
@@ -319,6 +361,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
       
         if ($scope.showHourEntryField && !$scope.saveFromTimer) {
+            if (!timeEntry.Hours) {
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
+                return;
+            }
             clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
         }
 

@@ -50,18 +50,23 @@ myApp.service('CTService', function() {
     /** Return the h.mm representation of a hh:mm format. */
     this.toDecimal = function(time) {
         var splitTime = time.split(":");
-        if (splitTime.length != 1 && splitTime.length != 2) {
+        if (splitTime.length != 1 && splitTime.length != 2 && splitTime.length != 3) {
             console.log("Invalid time to convert to decimal: " + time);
             return;
         }
         var hrs = parseInt(splitTime[0]);
-        var decMin = 0
+        var decMin = 0;
+        var decSec = 0;
         if (splitTime.length == 2) {
             var min = parseInt(splitTime[1]);
             decMin = min / 60;
         }
+        if (splitTime.length == 3) {
+            var sec = parseInt(splitTime[2]);
+            decSec = sec / 3600;
+        }
         
-        var decimal = hrs + decMin;
+        var decimal = hrs + decMin + decSec;
         return decimal;
     }
 
@@ -93,9 +98,6 @@ myApp.service('CTService', function() {
         if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-4]):[0-5][0-9]$/)) {
             return true;
         }
-        /*if (time.match(/(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)|(^([0-9]|[1][0-9]|[2][0-3])$)/)) {
-            return true;
-        }*/
         return false;
     }
 
@@ -129,6 +131,19 @@ myApp.service('CTService', function() {
     this.compileHours = function (hrs, min, sec, timeIncrement) {
         var time = (hrs + min/60 + sec/3600) + '';
         return this.roundToNearest(time, timeIncrement);
+    }
+
+    /** Get a string representation of now's time.*/
+    this.getNowString = function() {
+        var now = new Date();
+        var min = null;
+        if ((now.getMinutes() + '').length == 1) {
+            min = "0" + now.getMinutes(); 
+        } else {
+            min = now.getMinutes();
+        }
+        var nowString = now.getHours() + ":" + min;
+        return nowString;
     }
 
    

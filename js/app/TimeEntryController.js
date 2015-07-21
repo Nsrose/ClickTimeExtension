@@ -16,6 +16,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.runningStopwatch = false;
     $scope.abandonedStopwatch = false;
 
+    //Default start end time display
+
+    $scope.defaultStartEndTime = CTService.getNowString();
+
     //// Interface logic ////
 
     // Update in progress entry notes
@@ -24,9 +28,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     // Swap action button from start timer to save and vice versa.
-    $scope.swapAction = function() {
+    // input is a string representing from what input field the action
+    // was called from.
+    $scope.swapAction = function(input) {
         if ($scope.generalError) {
             // cannot swap action with an active error
+            $scope.clearError(input);
+            return;
+        }
+        if (
+            ( $scope.showStartEndTimes &&
+            ( !$scope.timeEntry.ISOStartTime
+            || !$scope.timeEntry.ISOEndTime))) {
+            // cannot swap action with empty fields
             return;
         }
         if ($scope.showStartTimer) {
@@ -49,6 +63,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.showStartTimer = true;
     }
 
+    $scope.clearStopwatch = function() {
+        $scope.$broadcast("clearStopwatch");
+    }
+
 
     $scope.clearHours = function() {
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
@@ -62,14 +80,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
         if (time == null) {
-            $scope.errorMessage = "Oops! Please enter some time before saving.";
-            $scope.generalError = true;
+            $scope.setError("hours", "Oops! Please enter some time before saving.");
             return;
         }
         if (!CTService.isNumeric(time)) {
-            $scope.timeEntryErrorHoursNumeral = true;
-            $scope.errorMessage = "Please enter time using only numerals and decimals.";
-            $scope.generalError = true;
+            $scope.setError("hours", "Please enter time using a valid format.");
             return;
         }
         if (time) {
@@ -82,13 +97,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             var roundedDecHrs = CTService.roundToNearestDecimal(decimalHrs, timeToIncrement);
 
             if (roundedDecHrs == 0) {
-                $scope.errorMessage = "Oops! Please enter some time before saving.";
-                $scope.generalError = true;
+                $scope.setError("hours", "Oops! Please enter some time before saving.");
                 return;
             }
             if (roundedDecHrs > 24) {
-                $scope.errorMessage = "Please make sure your daily hourly total is less than 24 hours.";
-                $scope.generalError = true;
+                $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
                 return; 
             }
            
@@ -104,18 +117,35 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         
     }
 
+    // Validate start end times on blur.
+    $scope.validateStartEndTimes = function(startTime, endTime) {
+        if (!startTime || !endTime) {
+            return;
+        }
+        if (!CTService.isTime(startTime)) {
+            $scope.setError("startTime", "Please enter time using a valid format.");
+        } else if (!CTService.isTime(endTime)) {
+            $scope.setError("endTime", "Please enter time using a valid format.");
+        } else if (CTService.toDecimal(startTime) >= CTService.toDecimal(endTime)) {
+            $scope.setError("startEndTimes", "Oops! Please enter a start time later than the end time.");
+        } else {
+            var startTimeDecimal = CTService.toDecimal(startTime);
+            var endTimeDecimal = CTService.toDecimal(endTime);
+            var hourDiff = (endTimeDecimal - startTimeDecimal);
+            var roundedDecHrs = CTService.roundToNearestDecimal(hourDiff, $scope.company.MinTimeIncrement);
+            if (roundedDecHrs > 24) {
+                $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
+            } else {
+                $scope.generalError = false;
+                $scope.showStartTimer = false; 
+            }
+        }
+    }
+
 
     $scope.clearStartEndTimes = function() {
-        var now = new Date();
-        var min = null;
-        if ((now.getMinutes() + '').length == 1) {
-            min = "0" + now.getMinutes(); 
-        } else {
-            min = now.getMinutes();
-        }
-        var nowString = now.getHours() + ":" + min;
-        $scope.timeEntry.ISOStartTime = nowString;
-        $scope.timeEntry.ISOEndTime = nowString;
+        $scope.timeEntry.ISOStartTime = null;
+        $scope.timeEntry.ISOEndTime = null;
         $scope.showStartTimer = true;
         $scope.clearAllErrors();
         TimeEntryService.removeInProgressEntry();
@@ -124,52 +154,88 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
 
     $scope.clearAllErrors = function () {
-        $scope.clearError("hours");
-        $scope.clearError("startEndTimes");
-        $scope.clearError("activeStopwatch");
-        $scope.clearError("timeEntryErrorMissingNotes");
         $scope.generalError = false;
+        $scope.clearError("hours");
+        $scope.clearError("notes");
+        $scope.clearError("startTime");
+        $scope.clearError("endTime");
+        $scope.clearError("startEndTimes");
     }
 
-    $scope.clearError = function (error) {
-        switch (error) {
+    $scope.clearError = function (errorField) {
+        switch (errorField) {
             case "hours":
-                $scope.timeEntryErrorHoursZero = false;
-                $scope.timeEntryErrorHoursInvalid = false;
-                $scope.timeEntryErrorHoursNumeral = false;
+                $("#time-entry-form-hours").css("border", "1px solid grey");
+                break;
+            case "notes":
+                $("#notes-field").css("border", "1px solid grey");
+                break;
+            case "startTime":
+                $("#time-entry-form-start").css("border", "1px solid grey");
+                break;
+            case "endTime":
+                $("#time-entry-form-end").css("border", "1px solid grey");
                 break;
             case "startEndTimes":
-                $scope.timeEntryErrorStartEndTimes = false;
+                $("#time-entry-form-start").css("border", "1px solid grey");
+                $("#time-entry-form-end").css("border", "1px solid grey");
+                break;
+            case "jobClient":
+                $("#jobClient-dropdown").css("border", "1px solid grey");
+                break;
+            case "task":
+                $("#task-dropdown").css("border", "1px solid grey");
                 break;
             case "activeStopwatch":
                 $scope.timeEntryErrorActiveStopwatch = false;
-                break;
-            case "timeEntryErrorMissingNotes":
-                $scope.timeEntryErrorMissingNotes = false;
                 break;
             default:
                 break;
         }
     }
 
+    // Display an error messagen and highlight the specified field in red.
+    $scope.setError = function (errorField, errorMessage) {
+        $scope.errorMessage = errorMessage;
+        $scope.generalError = true;
+        switch (errorField) {
+            case "hours":
+                $("#time-entry-form-hours").css("border", "1px solid red");
+                break;
+            case "notes":
+                $("#notes-field").css("border", "1px solid red");
+                break;
+            case "startTime":
+                $("#time-entry-form-start").css("border", "1px solid red");
+                break;
+            case "endTime":
+                $("#time-entry-form-end").css("border", "1px solid red");
+                break;
+            case "startEndTimes":
+                $("#time-entry-form-start").css("border", "1px solid red");
+                $("#time-entry-form-end").css("border", "1px solid red");
+                break;
+            case "jobClient":
+                $("#jobClient-dropdown").css("border", "1px solid red");
+                break;
+            case "task":
+                $("#task-dropdown").css("border", "1px solid red");
+                break;
+            default:
+                break;
+        }
+    }  
+
     $scope.$on("timeEntryError", function() {
-        chrome.storage.sync.remove('stopwatch');
+        $scope.clearStopwatch();
     })
 
     $scope.$on("timeEntrySuccess", function() {
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.timeEntry.Comment = "";
         $scope.$broadcast("clearStopwatch");
-        var now = new Date();
-        var min = null;
-        if ((now.getMinutes() + '').length == 1) {
-            min = "0" + now.getMinutes(); 
-        } else {
-            min = now.getMinutes();
-        }
-        var nowString = now.getHours() + ":" + min;
-        $scope.timeEntry.ISOStartTime = nowString;
-        $scope.timeEntry.ISOEndTime = nowString;
+        $scope.timeEntry.ISOStartTime = null;
+        $scope.timeEntry.ISOEndTime = null;
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.abandonedStopwatch = false;
@@ -180,22 +246,26 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearError('activeStopwatch');
     })
 
-    $scope.validateStartEndTimes = function(startTime, endTime) {
-        if (!CTService.isTime(startTime)) {
-            $scope.errorMessage = "Oops! Please enter a valid value for start time.";
-            $scope.generalError = true;
-        } else if (!CTService.isTime(endTime)) {
-            $scope.errorMessage = "Oops! Please enter a valid value for end time.";
-            $scope.generalError = true;
-        } else if (CTService.toDecimal(startTime) >= CTService.toDecimal(endTime)) {
-            $scope.errorMessage = "Oops! Please enter a start time later than the end time.";
-            $scope.generalError = true;
+
+    $scope.elapsedHrs = 0;
+    $scope.elapsedMin = 0;
+    $scope.elapsedSec = 0;
+
+
+    $scope.$on("updateStopwatch", function() {
+        $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
+    })
+
+    // Clear an in progress entry and remove display fields
+    $scope.clearTimeEntry = function() {
+        if ($scope.showStartEndTimes) {
+            $scope.clearStartEndTimes();
+        } else if ($scope.showHourEntryField) {
+            $scope.clearHours();
         }
-        else {
-            $scope.generalError = false;
-            $scope.showStartTimer = false;
-        }
+        $scope.clearStopwatch();
     }
+
     
     //////////////////////////////////////////////////////////////////
 
@@ -268,9 +338,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         if ($scope.saveFromTimer || $scope.showStopwatch && !$scope.abandonedStopwatch) {
-            var hrs = parseInt($("#hrs").text());
-            var min = parseInt($("#min").text());
-            var sec = parseInt($("#sec").text());
+            var hrs = $scope.elapsedHrs;
+            var min = $scope.elapsedMin;
+            var sec = $scope.elapsedSec;
             var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
             clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
             timeEntry.Hours = compiledHours;
@@ -281,6 +351,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.$broadcast("timeEntryError");
             return;
         }
+
+        // console.log(clickTimeEntry);
+        // return;
 
         $scope.pageReady = false;
         TimeEntryService.saveTimeEntry(session, clickTimeEntry)
@@ -307,12 +380,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.$broadcast("timeEntryError");
                 TimeEntryService.removeInProgressEntry();
                 TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                    $scope.errorMessage = 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established';
-                    $scope.generalError = true;
+                    $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
                 })
             } else {
-                $scope.errorMessage = "An unknown error occurred.";
-                $scope.generalError = true;
+                $scope.setError(null, "An unknown error occurred.");
                 if (!$scope.abandonedStopwatch) {
                     $scope.$broadcast("timeEntryError");
                 }   
@@ -327,56 +398,49 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
         if (timeEntry.JobID == undefined || timeEntry.TaskID == undefined) {
-            $scope.errorMessage = "Job or task cannot be empty.";
-            $scope.generalError = true;
+            $scope.setError("jobClient", "Job or task cannot be empty.");
             return false;
         }
 
         if (timeEntry.JobID == "" || timeEntry.TaskID == "") {
-            $scope.errorMessage = "Job or task cannot be empty.";
-            $scope.generalError = true;
+            $scope.setError("jobClient", "Job or task cannot be empty.");
             return false;
         }
 
         if ($scope.user.RequireComments && (timeEntry.Comment == undefined || 
             timeEntry.Comment == "")) {
-            $scope.timeEntryErrorMissingNotes = true;
-            $scope.errorMessage = "Oops! Please enter some notes in order to save this entry.";
-            $scope.generalError = true;
+            $scope.setError("notes", "Oops! Please enter some notes in order to save this entry.");
             return;
         }
 
         
         if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
-            if (timeEntry.ISOStartTime == null || timeEntry.ISOEndTime == null) {
-                $scope.timeEntryErrorStartEndTimes = true;
+            if (timeEntry.ISOStartTime == null) {
+                $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
+                return false;
+            }
+            if (timeEntry.ISOEndTime == null) {
+                $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                 return false;
             }
             var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
             if (hourDiff <=0 ) {
-                $scope.timeEntryErrorStartEndTimesNegative = true;
-
-                $scope.errorMessage = "Please enter an end time later than your start time.";
-                $scope.generalError = true;
+                $scope.setError("startEndTimes",  "Please enter an end time later than your start time.");
                 return false;
             } else if (hourDiff > 24) {
-                $scope.timeEntryErrorStartEndTimesInvalid = true;
-                return false;
+                $scope.setError("startEndTimes",  "Please make sure your daily hourly total is less than 24 hours.");
+                return false;e;
             }
         }
 
         if ($scope.showHourEntryField || $scope.showStopwatch && !$scope.abandonedStopwatch
             && !$scope.saveFromTimer) {
             if (timeEntry.Hours == DEFAULT_EMPTY_HOURS || timeEntry.Hours == 0) {
-                $scope.timeEntryErrorHoursZero = true;
-                $scope.errorMessage = "Oops! Please log some time in order to save this entry.";
-                $scope.generalError = true;
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return false;
             }
             if (timeEntry.Hours > 24.00 || timeEntry.Hours < 0) {
-                $scope.timeEntryErrorHoursInvalid = true;
-                $scope.errorMessage = "Please make sure your daily hourly total is less than 24 hours.";
-                $scope.generalError = true;
+                $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
                 return false;
             }
         }
@@ -539,21 +603,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         
         // Default empty entry
         var dateString = CTService.getDateString();
-        var now = new Date();
-        var min = null;
-        if ((now.getMinutes() + '').length == 1) {
-            min = "0" + now.getMinutes(); 
-        } else {
-            min = now.getMinutes();
-        }
-        var nowString = now.getHours() + ":" + min;
         $scope.timeEntry = {
             "BreakTime":0.00,
             "Comment":"",
             "Date":dateString,
             "Hours":DEFAULT_EMPTY_HOURS,
-            "ISOEndTime":nowString,
-            "ISOStartTime":nowString,
+            "ISOEndTime":null,
+            "ISOStartTime":null,
             "JobID":"",
             "PhaseID":"",
             "SubPhaseID":null,

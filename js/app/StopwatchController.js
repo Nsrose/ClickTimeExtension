@@ -126,6 +126,10 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
             $scope.elapsedSec = secDisp;
             $scope.elapsedMin = minDisp;
             $scope.elapsedHrs = hrsDisp;
+            $scope.$parent.elapsedSec = secDisp;
+            $scope.$parent.elapsedMin = minDisp;
+            $scope.$parent.elapsedHrs = hrsDisp;
+            $scope.$emit("updateStopwatch");
         })
     }
 }])

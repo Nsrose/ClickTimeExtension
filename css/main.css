@@ -137,3 +137,6 @@ body {
     vertical-align: top;
     margin-left: 20px;
 }
+#time-entry-form-timer {
+    width: 120px;
+}

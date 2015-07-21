@@ -111,14 +111,13 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 		        } else {
 		            min = now.getMinutes();
 		        }
-		        var nowString = now.getHours() + ":" + min;
 				var newEntry = {
 		            "BreakTime":0.00,
 		            "Comment":"",
 		            "Date":dateString,
 		            "Hours":DEFAULT_EMPTY_HOURS,
-		            "ISOEndTime": nowString,
-		            "ISOStartTime":nowString,
+		            "ISOEndTime": null,
+		            "ISOStartTime": null,
 		            "JobID":"",
 		            "PhaseID":"",
 		            "SubPhaseID":null,

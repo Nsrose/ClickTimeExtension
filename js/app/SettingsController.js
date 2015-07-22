@@ -4,6 +4,14 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
     $location.path("/time_entry");
   }
 
+  $scope.$on("refresh", function() {
+   var status = document.getElementById('refresh-status');
+    status.textContent = 'Lists refreshed!';
+    setTimeout(function() {
+      status.textContent = '';
+    }, 750);
+  })
+
   $(document).ready(function() {
 
     // gets initial allowReminders value to display

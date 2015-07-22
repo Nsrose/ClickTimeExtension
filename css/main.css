@@ -129,11 +129,6 @@ body {
     margin-top: 10px;
 }
 
-.settings-controls a {
-    cursor: pointer; 
-    cursor: hand; 
-}
-
 .settings-controls .tooltip > .tooltip-inner {
     background-color: #563d7c; 
     color: #FFFFFF; 
@@ -166,8 +161,8 @@ video {
 }
 
 .btn-group>.btn.active {
-  background-color: #7C6296;
-  border-color: #7C6296;
+    background-color: #7C6296;
+    border-color: #7C6296;
 }
 
 .settings-column {
@@ -199,4 +194,18 @@ video {
 
 .btn {
     font-size: 12px;
+}
+
+#refresh-status {
+    color: #009900;
+    font-size: 12px;
+    position: absolute;
+}
+
+.settings-column a {
+    text-decoration: none;
+}
+
+#refresh-button {
+    text-align: left;
 }

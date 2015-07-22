@@ -11,10 +11,13 @@
         <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
     </div>
 
-    <div class="settings-controls" ng-controller="TimeEntryController">
-        <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="right" class="btn icon-group btn-custom settings-width"> <i class="fa fa-refresh"></i>&nbsp; Refresh Lists</button>
+    <div class="settings-controls icon-group" ng-controller="TimeEntryController">
+        <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button"> <i class="fa fa-refresh"></i>&nbsp; Refresh Lists</button>
         <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span>
+        <div id="refresh-status"></div>
     </div>
+
+
 
     <input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders
 
@@ -24,12 +27,13 @@
 <div class="settings-column">
     <button class="settings-width btn btn-custom settings-btn icon-group" id="settings-help"> <i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
     
+    <a href="http://www.clicktime.com/company/contact" target="_blank">
+        <button class="settings-width btn btn-custom settings-btn icon-group"><i class="fa fa-phone"></i>&nbsp;
+            Contact Us
+        </button>
+    </a>
 
-    <button href="http://www.clicktime.com/company/contact" target="_blank" class="settings-width btn btn-custom settings-btn icon-group"><i class="fa fa-phone"></i>&nbsp;
-        Contact Us
-    </button>
-
-    <button id="sign-out" class="settings-width icon-group settings-controls btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
+    <button id="sign-out" class="settings-width icon-group btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
         Sign out of ClickTime
     </button>
 </div>

@@ -1,4 +1,6 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', function ($scope, $q, $interval, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
+    
+   
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
@@ -356,7 +358,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
-        console.log('im refreshed');
+
+        if ($location.url() == '/settings') {
+            $scope.$emit("refresh");
+            console.log("correct refresh")
+        }
+
         $scope.clearAllErrors();
         $scope.$parent.$broadcast("pageLoading");
 

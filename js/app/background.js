@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
-// Time before asking user again if they want to enter time
-var NOTIFICATION_POLL_PERIOD = 900000; 
+// Time before asking user again if they want to enter time. Remind every 4 hours
+var NOTIFICATION_POLL_PERIOD = 14400000; 
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
@@ -103,7 +103,7 @@ var notificationInterval;
 /* create notifications if user allowed it */
 var createNotifications = function(poll_period) {
     chrome.storage.sync.get('allowReminders', function(items) {
-        if (('allowReminders' in items) && (items.allowReminders)) {
+        if (('allowReminders' in items) && (items.allowReminders.permission)) {
             //reminders are allowed. poll the user every x mins to enter time
             notificationInterval = setInterval(function() {
                 chrome.storage.sync.get('stopwatch', function (items) {

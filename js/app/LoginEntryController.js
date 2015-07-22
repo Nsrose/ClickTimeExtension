@@ -34,6 +34,19 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         }
     })
 
+    function loginHelper() {
+        $location.path("/time_entry");
+
+        // notifications should start happening if allowReminders will be set to true
+        chrome.storage.sync.get('allowReminders', function(items) {
+            if (('allowReminders' in items) && (items.allowReminders.permission)) {
+                var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
+                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+            }
+        })
+        $scope.$apply();
+    }
+
     $scope.login = function(user) {
         $scope.rerouting = true;
         var sessionURL = API_BASE + "Session";
@@ -48,23 +61,47 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             data.lastLoginHrs = d.getHours();
             data.lastLoginMin = d.getMinutes();
             data.lastLoginSec = d.getSeconds();
-            chrome.storage.sync.set(
-                {   'session' : session, 
-                    'allowReminders': true,
-                    'timeEntryMethod': 'duration'
-                },
-                function() {
-                    console.log("Set session in local storage.");
-                    $location.path("/time_entry");
 
-                    // at initial log in, allowReminders will be set to true
-                    // notifications should start happening
-                    var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
-                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                    
-                    $scope.$apply();
+            // timeEntryMethod and allowReminders will stay forever in the sync storage
+            // it is updated if a different user is logged in, or if it has never been set before
+            chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
+                if (('timeEntryMethod' in items) || ('allowReminders' in items)) {
+                    // not same user
+                    if (session.data.UserID != items.timeEntryMethod.UserID) {
+                        chrome.storage.sync.set({
+                            'timeEntryMethod' : {
+                                'method' : 'duration',
+                                'UserID' : session.data.UserID
+                            }
+                        })
+                    }
+                    if (session.data.UserID != items.allowReminders.UserID) {
+                        chrome.storage.sync.set({
+                            'allowReminders' : {
+                                'permission' : true,
+                                'UserID' : session.data.UserID
+                            }
+                        })
+                    } 
+                    // regardless of same user, set session id
+                    chrome.storage.sync.set({
+                        'session' : session
+                    }, loginHelper);
+                } else {
+                    // have never installed chrome extension before
+                    chrome.storage.sync.set({
+                        'session' : session,
+                        'allowReminders' : {
+                            'permission' : true,
+                            'UserID' : session.data.UserID
+                        },
+                        'timeEntryMethod' : {
+                            'method' : 'duration',
+                            'UserID' : session.data.UserID
+                        }
+                    }, loginHelper);
                 }
-            )
+            })
         })
         .catch(function (error) {
             $scope.loginError = true;

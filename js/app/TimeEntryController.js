@@ -154,7 +154,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
                 }
                 
                 if (!validateTimeEntry(timeEntry)) {
-                    console.log(timeEntry);
                     $scope.$broadcast("timeEntryError");
                     return;
                 }

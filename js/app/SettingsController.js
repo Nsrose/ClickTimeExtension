@@ -7,7 +7,7 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
 
     // gets initial allowReminders value to display
     chrome.storage.sync.get('allowReminders', function(items) {
-      if (('allowReminders' in items) && (items.allowReminders)) {
+      if (('allowReminders' in items) && (items.allowReminders.permission)) {
         $('#reminder-toggle').prop('checked', true);
       } else {
         $('#reminder-toggle').prop('checked', false);
@@ -17,13 +17,24 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
     // when toggling, update Allow Reminders value in local storage
     $('#reminder-toggle').click(function() {
       chrome.storage.sync.get('allowReminders', function(items) {
-        if ('allowReminders' in items) {   
+        if ('allowReminders' in items) {
+          var userID = items.allowReminders.UserID;
           if ($('#reminder-toggle').is(':checked')) { 
-            chrome.storage.sync.set({'allowReminders': true});
+            chrome.storage.sync.set({
+              'allowReminders': {
+                UserID: userID, 
+                permission: true
+              }
+            });
             var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
             chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
           } else {
-            chrome.storage.sync.set({'allowReminders': false});
+            chrome.storage.sync.set({
+              'allowReminders': {
+                UserID: userID, 
+                permission: false
+              }
+            });
             chrome.extension.getBackgroundPage().stopNotifications();
           }
         }
@@ -32,7 +43,7 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
 
     // gets initial defaultTimeEntryMethod to display
     chrome.storage.local.get('user', function(items) {
-      // if there's no choice based on settings, hide block
+      // if there's no choice based on settings, hide element
       if ('user' in items) {
         if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
           $scope.requireStartEndTime = true;
@@ -40,9 +51,9 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
           //query the local storage for last-set method
           chrome.storage.sync.get('timeEntryMethod', function(items) {
             if ('timeEntryMethod' in items) {
-              if (items.timeEntryMethod == 'duration') {
+              if (items.timeEntryMethod.method == 'duration') {
                 $('#duration').addClass('active').siblings().removeClass('active');
-              } else if (items.timeEntryMethod == 'start-end') {
+              } else if (items.timeEntryMethod.method == 'start-end') {
                 $('#start-end').addClass('active').siblings().removeClass('active');
               }
             }
@@ -58,10 +69,21 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
       //storage set
       chrome.storage.sync.get('timeEntryMethod', function (items) {
         if ('timeEntryMethod' in items) {
+          var userID = items.timeEntryMethod.UserID;
           if ($('#duration').hasClass('active')) {
-            chrome.storage.sync.set({'timeEntryMethod': 'duration'});
+            chrome.storage.sync.set({
+              'timeEntryMethod': {
+                UserID: userID,
+                method: 'duration'
+              }
+            })
           } else if ($('#start-end').hasClass('active')) {
-            chrome.storage.sync.set({'timeEntryMethod': 'start-end'});
+            chrome.storage.sync.set({
+              'timeEntryMethod': {
+                UserID: userID,
+                method: 'start-end'
+              }
+            });
           }
         }
       })

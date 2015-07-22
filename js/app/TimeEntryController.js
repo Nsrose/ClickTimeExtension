@@ -78,6 +78,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.clearError(input);
             return;
         }
+        if ($scope.showHourEntryField && $scope.timeEntry.Hours) {
+            // Cannot swap action if user has entered hours
+            return;
+        }
         if (
             ( $scope.showStartEndTimes &&
             ( !$scope.timeEntry.ISOStartTime
@@ -158,7 +162,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
         if (time == null) {
-            $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
+            $scope.showStartTimer = true;
             return;
         }
         if (!CTService.isNumeric(time)) {

@@ -1,6 +1,7 @@
 
-<button id="header-item-button" ng-click="timeEntryPage()">Back to tracking time</button>
-
+<button id="header-item-button" type="button" class="btn btn-custom header-item" ng-click="timeEntryPage()">
+    Back to tracking time
+</button>
 
 <div id="filler">
     <video controls muted autoplay name="media">
@@ -13,8 +14,8 @@
 <br>
 <div ng-hide="requireStartEndTime" id="timeEntryMethod" class="btn-group">
     <h5>Time Entry Method</h5>   
-    <button id="duration" type="button" class="btn btn-info">Duration</button>
-    <button id="start-end" type="button" class="btn btn-info">Start & End Times</button>
+    <button id="duration" type="button" class="btn btn-custom">Duration</button>
+    <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
 </div>
 
 

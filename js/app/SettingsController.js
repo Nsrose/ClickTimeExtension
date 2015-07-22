@@ -1,9 +1,9 @@
 myApp.controller('SettingsController', ['$scope', function ($scope) {
 
   $(document).ready(function() {
-    $(".btn-group > .btn").click(function(){
-      $(this).addClass("active").siblings().removeClass("active");
-    });
+    // $(".btn-group > .btn").click(function(){
+    //   $(this).addClass("active").siblings().removeClass("active");
+    // });
 
     // gets initial allowReminders value to display
     chrome.storage.sync.get('allowReminders', function(items) {
@@ -32,83 +32,39 @@ myApp.controller('SettingsController', ['$scope', function ($scope) {
 
     // gets initial defaultTimeEntryMethod to display
     chrome.storage.local.get('user', function(items) {
-      
+      // if there's no choice based on settings, hide block
       if ('user' in items) {
-        if (items.user.data.RequireStopwatch) {
-          $scope.requireStopwatch = true;
+        if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
+          $scope.requireStartEndTime = true;
+        } else {
+          //query the local storage for last-set method
+          chrome.storage.sync.get('timeEntryMethod', function(items) {
+            if ('timeEntryMethod' in items) {
+              if (items.timeEntryMethod == 'duration') {
+                $('#duration').addClass('active').siblings().removeClass('active');
+              } else if (items.timeEntryMethod == 'start-end') {
+                $('#start-end').addClass('active').siblings().removeClass('active');
+              }
+            }
+          })
         }
       }
     })
 
-
+    // when toggling, update defaultTimeEntryMethod in local storage
+    $(".btn-group > .btn").click(function() {
+      // visuals
+      $(this).addClass("active").siblings().removeClass("active");
+      //storage set
+      chrome.storage.sync.get('timeEntryMethod', function (items) {
+        if ('timeEntryMethod' in items) {
+          if ($('#duration').hasClass('active')) {
+            chrome.storage.sync.set({'timeEntryMethod': 'duration'});
+          } else if ($('#start-end').hasClass('active')) {
+            chrome.storage.sync.set({'timeEntryMethod': 'start-end'});
+          }
+        }
+      })
+    });
   })
 }])
-
-// 	// Script for the options page for configurability
-// // Saves options to chrome.storage
-
-        
-// function save_options() {
-//   var timeEntryMethod = document.getElementById('timeEntryMethod').value;
-//   chrome.storage.sync.set({
-//     defaultTimeEntryMethod: timeEntryMethod
-//   }, function() {
-//     // Update status to let user know options were saved.
-//     var status = document.getElementById('status');
-//     status.textContent = 'Saved';
-//     setTimeout(function() {
-//       status.textContent = '';
-//     }, 750);
-//   })
-// }
-
-// // Restores select box and checkbox state using the preferences
-// // stored in chrome.storage.
-// function restore_options() {
-//   // Use default value color = 'red' and likesColor = true.
-//   chrome.storage.sync.get({
-//     defaultTimeEntryMethod : 'hours'
-//   }, function(items) {
-//     document.getElementById('timeEntryMethod').value = items.defaultTimeEntryMethod;
-//   });
-// }
-
-
-// $(document).ready(function() {
-//     restore_options();
-//     $("#timeEntryMethod").on("change", function() {
-//        setTimeout(function() {
-//            save_options(); 
-//        }, 100);
-//     });
-
-//     chrome.storage.sync.get('inProgressEntry', function (items) {
-//       if ('inProgressEntry' in items) {
-//         if (items.inProgressEntry.inProgress) {
-//           alert("Cannot change time entry method with an in progress time entry.");
-//           $("#timeEntryMethod").hide();
-//         }
-//       }
-//     })
-
-//     var user = null;
-
-//     chrome.storage.local.get('user', function(items) {
-//       if ('user' in items) {
-//         user = items.user.data;
-//         if (user.RequireStopwatch == true) {
-//             $('#start-end').remove();
-//         } else if (user.RequireStartEndTime == true) {
-//             $('#hours').remove();
-//         } else {
-//             // add back all options
-//             // this doesn't work on page load. you must relog back in.
-//             // you need to relog teh session
-//             $('#timeEntryMethod').append('#hours');
-//             $('#timeEntryMethod').append('#start-end');
-//         }
-//       }
-//     })
-// })
-
-

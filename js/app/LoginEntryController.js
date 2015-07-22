@@ -50,13 +50,14 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             data.lastLoginSec = d.getSeconds();
             chrome.storage.sync.set(
                 {   'session' : session, 
-                    'allowReminders': true
+                    'allowReminders': true,
+                    'timeEntryMethod': 'duration'
                 },
                 function() {
                     console.log("Set session in local storage.");
                     $location.path("/time_entry");
 
-                    // in initial log in, allowReminders will be set to true
+                    // at initial log in, allowReminders will be set to true
                     // notifications should start happening
                     var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
                     chrome.extension.getBackgroundPage().createNotifications(pollPeriod);

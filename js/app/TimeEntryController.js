@@ -25,11 +25,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //// Handling keypress events ////
 
     // disable backspace (weird behavior)
-    $(document).keydown(function(e) {
-        if (e.which == 8) {
-            return false;
-        }
-    })
+    // $(document).keydown(function(e) {
+    //     if (e.which == 8) {
+    //         return false;
+    //     }
+    // })
 
     // start stopwatch, if there
     $(document).keypress(function(e) {
@@ -93,21 +93,57 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     $scope.showStartTimer = true;
+     // For the stopwatch display on start/end times:
+    $scope.endTimePromise = undefined;
 
     $scope.startStopwatch = function () {
-        $scope.$broadcast("startStopwatch");
         $scope.showStartTimer = false;
+        if ($scope.showHourEntryField) {
+            $scope.$broadcast("startStopwatch");
+        } else {
+            $scope.noValidateStartEndTimes = true;
+            $scope.$broadcast("startStopwatch");
+            $scope.timeEntry.ISOStartTime = CTService.getNowString();
+            $scope.timeEntry.ISOEndTime = CTService.getNowString();
+            TimeEntryService.updateInProgressEntry('startEndTimes',
+                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+            $scope.endTimePromise = $interval(function() {
+                $scope.timeEntry.ISOEndTime = CTService.getNowString();
+                TimeEntryService.updateInProgressEntry('startEndTimes',
+                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+            }, 60000);
+        }
+       
     }
 
     $scope.stopStopwatch = function() {
         $scope.saveFromTimer = true;
         $scope.$broadcast("stopStopwatch");
         $scope.showStartTimer = true;
+        $scope.noValidateStartEndTimes = false;
     }
 
     $scope.clearStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
+        $interval.cancel($scope.endTimePromise);
     }
+
+    $scope.$on("stoppedStopwatch", function() {
+        $scope.clearError('activeStopwatch');
+    })
+
+
+    $scope.elapsedHrs = 0;
+    $scope.elapsedMin = 0;
+    $scope.elapsedSec = 0;
+
+   
+
+    $scope.$on("updateStopwatch", function() {
+        if ($scope.showHourEntryField) {
+            $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
+        }
+    })
 
 
     $scope.clearHours = function() {
@@ -161,6 +197,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Validate start end times on blur.
     $scope.validateStartEndTimes = function(startTime, endTime) {
+        console.log($scope.noValidateStartEndTimes);
+        if ($scope.noValidateStartEndTimes) {
+            // don't validate if saving from timer
+            return;
+        }
         if (!startTime || !endTime) {
             return;
         }
@@ -284,19 +325,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.pageReady = true;
     })
 
-    $scope.$on("stoppedStopwatch", function() {
-        $scope.clearError('activeStopwatch');
-    })
-
-
-    $scope.elapsedHrs = 0;
-    $scope.elapsedMin = 0;
-    $scope.elapsedSec = 0;
-
-
-    $scope.$on("updateStopwatch", function() {
-        $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
-    })
 
     // Clear an in progress entry and remove display fields
     $scope.clearTimeEntry = function() {
@@ -377,13 +405,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             var endTimeDecimal = CTService.toDecimal(timeEntry.ISOEndTime);
             var hourDiff = (endTimeDecimal - startTimeDecimal);
             clickTimeEntry.Hours = hourDiff;
+            timeEntry.Hours = hourDiff;
             var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
             var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
             clickTimeEntry.ISOStartTime = ISOStartTime;
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
 
-        if ($scope.saveFromTimer || $scope.showStopwatch && !$scope.abandonedStopwatch) {
+        if ($scope.saveFromTimer && !$scope.showStartEndTimes || $scope.showStopwatch && !$scope.abandonedStopwatch) {
             var hrs = $scope.elapsedHrs;
             var min = $scope.elapsedMin;
             var sec = $scope.elapsedSec;
@@ -469,13 +498,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                 return false;
             }
-            var hourDiff = (timeEntry.ISOEndTime - timeEntry.ISOStartTime) / 36e5;
-            if (hourDiff <=0 ) {
+            var startTimeDecimal = CTService.toDecimal(timeEntry.ISOStartTime);
+            var endTimeDecimal = CTService.toDecimal(timeEntry.ISOEndTime);
+            var hourDiff = (endTimeDecimal - startTimeDecimal);
+            var roundedDecHrs = CTService.roundToNearestDecimal(hourDiff, $scope.company.MinTimeIncrement);
+            if (roundedDecHrs <=0 ) {
                 $scope.setError("startEndTimes",  "Please enter an end time later than your start time.");
                 return false;
-            } else if (hourDiff > 24) {
+            } else if (roundedDecHrs > 24) {
                 $scope.setError("startEndTimes",  "Please make sure your daily hourly total is less than 24 hours.");
-                return false;e;
+                return false;
+            } else if (!timeEntry.Hours) {
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
+                return false;
             }
         }
 
@@ -560,36 +595,48 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Logout function
     $scope.logout = function() {
-        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
+        $scope.removeLocalStorageVars();
+        $scope.removeSyncStorageVars();
+        bootbox.alert("Logged out.");
+        $location.path("/login");
+    }
+
+    $scope.removeLocalStorageVars = function() {
         chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
             chrome.browserAction.setBadgeText({text:""});
-            bootbox.alert("Logged out.");
-            $location.path("/login");
-            $scope.$apply();
         })
+    }
 
+    $scope.removeSyncStorageVars = function() {
+        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
     }
 
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
         console.log("Fetching the most recent data from Clicktime");
+        $scope.HasEmptyEntities = false;
         $scope.clearAllErrors();
         $scope.$parent.$broadcast("pageLoading");
 
         TimeEntryService.removeInProgressEntry();
 
+        $scope.removeLocalStorageVars();
+
         var afterGetJobClients = function (jobClientsList) {
             $scope.jobClients = jobClientsList;
             $scope.jobClient = jobClientsList[0];
-            $scope.timeEntry.job = $scope.jobClient.job;
-            $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
-            $scope.timeEntry.client = $scope.jobClient.client;
-
-            if ($scope.jobClients.length == 0) {
+            if (!$scope.jobClient) {
+                $scope.timeEntry.job = null;
+                $scope.timeEntry.JobID = null;
+                $scope.timeEntry.client = null;
                 $scope.HasEmptyEntities = true;
-                $scope.jobClient = undefined;
+            } else {
+                $scope.timeEntry.job = $scope.jobClient.job;
+                $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
+                $scope.timeEntry.client = $scope.jobClient.client;
             }
+            
             $scope.$apply();
 
         }
@@ -601,7 +648,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.task = tasksList[0];
             $scope.timeEntry.task = $scope.task;
-            $scope.timeEntry.TaskID = $scope.task.TaskID;
+            if ($scope.task) {
+                $scope.timeEntry.TaskID = $scope.task.TaskID;
+            }
             $scope.$apply();
         }
 
@@ -667,6 +716,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
+            if (inProgressEntry.ISOStartTime && inProgressEntry.ISOEndTime) {
+                $scope.timeEntry.ISOStartTime = inProgressEntry.ISOStartTime;
+                $scope.timeEntry.ISOEndTime = CTService.getNowString();
+            }
             TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);
         })
        
@@ -679,6 +732,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.tasks = tasksList;
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
+                return;
             }
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
                 if (inProgressEntry.task != undefined) {

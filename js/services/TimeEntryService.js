@@ -163,6 +163,16 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 					case "inProgress":
 						inProgressEntry.inProgress = value;
 						break;
+					case "ISOStartTime":
+						inProgressEntry.ISOStartTime = value;
+						break;
+					case "ISOEndTime":
+						inProgressEntry.ISOEndTime = value;
+						break;
+					case "startEndTimes":
+						inProgressEntry.ISOStartTime = value[0];
+						inProgressEntry.ISOEndTime = value[1];
+						break;
 					default:
 						bootbox.alert("Invalid time entry property: " + property);
 				}

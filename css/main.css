@@ -138,5 +138,11 @@ body {
     margin-left: 20px;
 }
 #time-entry-form-timer {
-    width: 120px;
+    width: 80px;
+    font-size: 19px;
+}
+#running-stopwatch-gif {
+    width: 20px;
+    display: inline-block;
+    margin-left: 20px;
 }

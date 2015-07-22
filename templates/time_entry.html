@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch">
+        <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && !showStartEndTimes">
             <div class="fieldtitle time-entry">Timer</div>
             <div class="time-entry-form">
                 <input class="time-entry-form-input" id="time-entry-form-timer" type="text" name="hours" ng-model="timerDisplay" ng-disabled="true">
@@ -87,7 +87,11 @@
 
     <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch">Stop/Save</button>
 
-    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="runningStopwatch || !showStartTimer && !abandonedStopwatch">Cancel</button>
+    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="runningStopwatch || !showStartTimer || showStartEndTimes && !abandonedStopwatch">Cancel</button>
+
+    <div id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes">
+        <img src="../img/Clock.gif" class="img-scaled">
+    </div>
 
     <div class="hidden" ng-controller="StopwatchController">
     </div>

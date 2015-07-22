@@ -11,6 +11,7 @@ var CHROME_LOCAL_STORAGE_VARS = [
 	'jobClientsByRecent',
 	'tasksByRecent',
 	'storedTimeEntries',
+	'stringJobClientsList'
 ];
 
 var CHROME_SYNC_STORAGE_VARS = [

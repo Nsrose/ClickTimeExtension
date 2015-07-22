@@ -146,5 +146,6 @@ myApp.service('CTService', function() {
         return nowString;
     }
 
+
    
 })

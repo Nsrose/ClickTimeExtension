@@ -147,5 +147,40 @@ myApp.service('CTService', function() {
     }
 
 
+    /** Return a string of the current number of logged hrs */
+    this.getLogMessage = function (hrs, min) {
+
+        if (!hrs || hrs == 0) {
+            if (min && min != 0) {
+                if (min > 1) {
+                    return min + " mins recorded today -";
+                } else {
+                    return min + " min recorded today -";
+                }
+            } else {
+                return "";
+            }
+        } else if (hrs > 1) {
+           if (min && min != 0) {
+                if (min > 1) {
+                    return hrs + " hrs and " + min + " mins recorded today -";
+                } else {
+                    return hrs + " hrs and " + min + " min recorded today -";
+                }
+            } else {
+                return hrs + " hrs recorded today -";
+            }
+        } else {
+            if (min && min != 0) {
+                if (min > 1) {
+                    return hrs + " hr and " + min + " mins recorded today -";
+                } else {
+                    return hrs + " hr and " + min + " min recorded today -";
+                }
+            } else {
+                return hrs + " hr recorded today -";
+            }
+        }
+    }
    
 })

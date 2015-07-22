@@ -450,7 +450,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 for (var i = 0; i < arrayLength; i++) {
                     totalHours += timeEntries[i].Hours;
                 }
-                $scope.totalHours = totalHours;
+                var splitHrs = (totalHours + '').split(".");
+                var hrs = parseInt(splitHrs[0]);
+                var min = null;
+                if (splitHrs.length == 2) {
+                    var min = parseFloat('0.' + splitHrs[1]);
+                    min = Math.floor(min * 60);
+                }
+                $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
             });
         })
         .catch(function (response) {
@@ -833,7 +840,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             for (var i = 0; i < arrayLength; i++) {
                 totalHours += timeEntries[i].Hours;
             }
-            $scope.totalHours = totalHours;
+            var splitHrs = (totalHours + '').split(".");
+            var hrs = parseInt(splitHrs[0]);
+            var min = null;
+            if (splitHrs.length == 2) {
+                var min = parseFloat('0.' + splitHrs[1]);
+                min = Math.floor(min * 60);
+            }
+            $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
         }
 
         var afterGetJobClients = function (jobClientsList) {

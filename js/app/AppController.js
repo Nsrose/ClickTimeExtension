@@ -7,8 +7,4 @@ myApp.controller("AppController", ['$scope', '$location', function ($scope, $loc
     $scope.$on('pageLoading', function() {
         $scope.pageReady = false;
     })
-  
-  	$scope.settingsPage = function () {
-  		$location.path("/settings");
-  	}
 }])

@@ -1,9 +1,10 @@
-myApp.controller('SettingsController', ['$scope', function ($scope) {
+myApp.controller('SettingsController', ['$scope', '$location', function ($scope, $location) {
+
+  $scope.timeEntryPage = function () {
+    $location.path("/time_entry");
+  }
 
   $(document).ready(function() {
-    // $(".btn-group > .btn").click(function(){
-    //   $(this).addClass("active").siblings().removeClass("active");
-    // });
 
     // gets initial allowReminders value to display
     chrome.storage.sync.get('allowReminders', function(items) {

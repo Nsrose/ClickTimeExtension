@@ -85,9 +85,11 @@ body {
     float: left;
 }
 
-#header-item-settings {
-    float: right;
+#header-item-button {
     cursor: pointer;
+    position: absolute;
+    top: 25px;
+    right: 35px;
 }
 .total-hours-log {
     float: right;

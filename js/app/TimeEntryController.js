@@ -13,6 +13,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$location
     $scope.runningStopwatch = false;
     $scope.abandonedStopwatch = false;
 
+    $scope.settingsPage = function () {
+        $location.path("/settings");
+    }
+
     //// Interface logic ////
 
     // Update in progress entry notes

@@ -116,8 +116,6 @@ body {
 .time-entry-item {
 }
 
-.time-entry-form {
-}
 
 .time-entry-form-input {
     width: 80px;
@@ -164,9 +162,41 @@ video {
 }
 
 .btn-custom:hover {
-    color: #FBDD40;
+    color: #FFF;
 }
 
 .btn-group>.btn.active {
-  box-shadow: inset 0 0 0 3px #7C6296,inset 0 5px 30px #7C6296;
+  background-color: #7C6296;
+  border-color: #7C6296;
+}
+
+.settings-column {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#settings-column-left {
+    margin-right: 25px;
+}
+
+.settings-btn {
+    display: block;
+    width: 250px;
+}
+
+.icon-group {
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+#settings-help {
+    margin-top: 36px;
+}
+
+.settings-width {
+    width: 235px;
+}
+
+.btn {
+    font-size: 12px;
 }

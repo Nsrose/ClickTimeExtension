@@ -1,30 +1,49 @@
-<h1>Login</h1>
-<div id="loading-mask" ng-show="rerouting">
-    <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
+<div class="login-screen-column" id="login-screen-left-column">
+    <h2 id="login-header-text">Sign in to your account</h2>
+    <div id="loading-mask" ng-show="rerouting">
+        <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
+    </div>
+
+    <form name="loginForm">
+        <p class="login-fields">Email<br>
+            <input type="email" name="email" ng-model="user.email" required><br>
+            
+        </p>
+
+        <div class="login-error-messaging-text">
+            <span ng-show="loginForm.email.$touched && loginForm.email.$invalid">
+                <span ng-show="loginForm.email.$error.required">Email required.</span>
+                <span ng-show="loginForm.email.$error.email">Oops! Please enter a valid email.</span>
+            </span>
+        </div>
+
+        <p class="login-fields">Password<br>
+            <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required id="password-input"><br>
+        </p>
+
+        <div class="login-error-messaging-text">
+            <span ng-show="loginForm.password.$touched && loginForm.password.$invalid">
+                <span ng-show="loginForm.password.$error.required">Password required.</span>
+                <span ng-show="loginForm.password.$error.minlength">Minimum password length is 3 characters.</span>
+                <span ng-show="loginForm.password.$error.maxlength">Maximum password length is 24 characters.</span>
+            </span>
+        </div>
+    </form>
+    
+    <button id="sign-in-button" ng-disabled="loginForm.email.$invalid || loginForm.password.$invalid" ng-click="login(user)">Sign In</button>
+    <span class="login-error-messaging-text" ng-show="loginError">    
+        <p>Sorry, the email address or password you entered is not recognized. Please check your Caps Lock key and try again.</p>
+    </span>
+
+    <div id="forgot-password-link">
+        <a href="http://login.clicktime.com/forms/forgot-password-form" target="_blank">Forgot your username or password?</a>
+    </div>
+
 </div>
 
-<form name="loginForm">
-    <p>Email:<br>
-        <input type="email" name="email" ng-model="user.email" required><br>
-        <span style="color:red" ng-show="loginForm.email.$touched && loginForm.email.$invalid">
-            <span ng-show="loginForm.email.$error.required">Email is required.</span>
-            <span ng-show="loginForm.email.$error.email">bad emails make cats sad.</span>
-        </span>
-    </p>
-
-    <p>Password:<br>
-        <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required id="password-input"><br>
-        <span style="color:red" ng-show="loginForm.password.$touched && loginForm.password.$invalid">
-            <span ng-show="loginForm.password.$error.required">no hacking please.</span>
-            <span ng-show="loginForm.password.$error.minlength">minimum is 3 characters.</span>
-            <span ng-show="loginForm.password.$error.maxlength">maximum is 24 characters.</span>
-        </span> 
-    </p>
-</form>
-<div id="no-account-message">
-    Don't have an account? <a href="http://www.clicktime.com/forms/free-trial" target="_blank">Sign up here.</a>
+<div class="login-screen-column" id="login-screen-right-column">
+    <div id="no-account-message">
+            <h2 id="new-user-messaging-header">New to ClickTime?</h2>
+            <p>Hello! Thanks for stopping by. Head over to our <a id="marketing-site-link"href="http://www.clicktime.com/forms/free-trial" target="_blank">website</a> to learn more and sign up for a free trial.</p>
+    </div>
 </div>
-<button ng-disabled="loginForm.email.$invalid || loginForm.password.$invalid" ng-click="login(user)">Sign in</button>
-<span style="color:red" ng-show="loginError">    
-    <p>Sorry, the email address or password you entered is not recognized. Please check your Caps Lock key and try again.</p>
-</span>

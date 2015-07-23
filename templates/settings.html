@@ -2,11 +2,11 @@
     Back to tracking time
 </button>
 
-<h3>Settings</h3>
+<h3 id="settings-title-text">Settings</h3>
 
 <div class="settings-column" id="settings-column-left">
     <div ng-hide="requireStartEndTime" class="btn-group icon-group">
-        <h5>Time Entry Method</h5>
+        <h5 id="entry-method-toggle-text">Time Entry Method</h5>
         <button id="duration" type="button" class="btn btn-custom">Duration</button>
         <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
     </div>
@@ -19,7 +19,7 @@
 
 
 
-    <input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders
+    <label><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
 
 </div>
 
@@ -28,7 +28,7 @@
     <button class="settings-width btn btn-custom settings-btn icon-group" id="settings-help"> <i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
     
     <a href="http://www.clicktime.com/company/contact" target="_blank">
-        <button class="settings-width btn btn-custom settings-btn icon-group"><i class="fa fa-phone"></i>&nbsp;
+        <button class="settings-width btn btn-custom settings-btn icon-group" id="contact-us"><i class="fa fa-phone"></i>&nbsp;
             Contact Us
         </button>
     </a>

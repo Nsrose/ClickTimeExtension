@@ -9,8 +9,22 @@ myApp.service('CTService', function() {
      */
     this.roundToNearest = function (time, timeIncrement) {
         if (time.indexOf(":") != -1) {
-        	return null;
+            return this.roundToNearestTime(time, timeIncrement);
+        } else {
+            var decimal = this.roundToNearestDecimal(time, timeIncrement);
+            return this.toHours(decimal);
         }
+       
+    }
+
+    /** Round to nearest for H:MM format */
+    this.roundToNearestTime = function (time, timeIncrement) {
+        var rounded = this.roundToNearestDecimal(this.toDecimal(time), timeIncrement);
+        return this.toHours(rounded);
+    }
+
+    /** Round to nearest for h.mm format */
+    this.roundToNearestDecimal = function (time, timeIncrement) {
         var precision;
         switch (timeIncrement) {
             case "1":
@@ -30,12 +44,61 @@ myApp.service('CTService', function() {
         var decpart = parseFloat(time - intpart);
         var howManyIncrements = Math.round(parseFloat(decpart / timeIncrement).toFixed(10));
         if (intpart == 0 && howManyIncrements == 0 && time > 0) howManyIncrements = 1;
-        return (intpart + howManyIncrements * timeIncrement).toFixed(precision);
+        return (intpart + howManyIncrements * timeIncrement).toFixed(precision); 
+    }
+
+    /** Return the h.mm representation of a hh:mm format. */
+    this.toDecimal = function(time) {
+        var splitTime = time.split(":");
+        if (splitTime.length != 1 && splitTime.length != 2 && splitTime.length != 3) {
+            console.log("Invalid time to convert to decimal: " + time);
+            return;
+        }
+        var hrs = parseInt(splitTime[0]);
+        var decMin = 0;
+        var decSec = 0;
+        if (splitTime.length == 2) {
+            var min = parseInt(splitTime[1]);
+            decMin = min / 60;
+        }
+        if (splitTime.length == 3) {
+            var sec = parseInt(splitTime[2]);
+            decSec = sec / 3600;
+        }
+        
+        var decimal = hrs + decMin + decSec;
+        return decimal;
+    }
+
+    /** Return the h:mm representation of a h.mm format. */
+    this.toHours = function(time) {
+        var splitTime = time.toString().split(".");
+        var splitHrs = splitTime[0];
+        if (splitTime.length == 1) {
+            return splitHrs + ":00";
+        } else if (splitTime.length == 2) {
+            var mm = (("." + splitTime[1]) * 60).toString();
+            if (mm.length == 1) {
+                var mm = mm + '0';
+            }
+            return splitHrs + ":" + mm;
+        } else {
+            console.log("Invalid time to convert to hours: " + time);
+            return;
+        }
     }
 
     /** Return true if a string is numeric. */
     this.isNumeric = function (n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
+        return this.isTime(n) || (!isNaN(parseFloat(n)) && isFinite(n));
+    }
+
+    /** Returns true if the string is an acceptable duration entry format. */
+    this.isTime = function (time) {
+        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-4]):[0-5][0-9]$/)) {
+            return true;
+        }
+        return false;
     }
 
     /** Returns a typical date string format for submitting a new time entry.*/
@@ -57,17 +120,67 @@ myApp.service('CTService', function() {
     	return result;
     }
 
-    /** Convert a stupid Angular ISO date to Clicktime's ISO time string */
-    this.convertISO = function (date) {
+    /** Convert a hh:mm format to Clicktime's ISO time string */
+    this.convertISO = function (time) {
     	// T splits date/time, . splits ms and the rest
-    	return date.toISOString().split('T')[1].split('.')[0];
+    	// return date.toISOString().split('T')[1].split('.')[0];
+        return time + ":00"; 
     }
 
     /** Compile hrs, min, and sec to a Clicktime Hour stamp */
-    this.compileHours = function (hrs, min, sec) {
+    this.compileHours = function (hrs, min, sec, timeIncrement) {
         var time = (hrs + min/60 + sec/3600) + '';
-        return this.roundToNearest(time, 0.25);
+        return this.roundToNearest(time, timeIncrement);
     }
 
+    /** Get a string representation of now's time.*/
+    this.getNowString = function() {
+        var now = new Date();
+        var min = null;
+        if ((now.getMinutes() + '').length == 1) {
+            min = "0" + now.getMinutes(); 
+        } else {
+            min = now.getMinutes();
+        }
+        var nowString = now.getHours() + ":" + min;
+        return nowString;
+    }
+
+
+    /** Return a string of the current number of logged hrs */
+    this.getLogMessage = function (hrs, min) {
+
+        if (!hrs || hrs == 0) {
+            if (min && min != 0) {
+                if (min > 1) {
+                    return min + " mins recorded today -";
+                } else {
+                    return min + " min recorded today -";
+                }
+            } else {
+                return "";
+            }
+        } else if (hrs > 1) {
+           if (min && min != 0) {
+                if (min > 1) {
+                    return hrs + " hrs and " + min + " mins recorded today -";
+                } else {
+                    return hrs + " hrs and " + min + " min recorded today -";
+                }
+            } else {
+                return hrs + " hrs recorded today -";
+            }
+        } else {
+            if (min && min != 0) {
+                if (min > 1) {
+                    return hrs + " hr and " + min + " mins recorded today -";
+                } else {
+                    return hrs + " hr and " + min + " min recorded today -";
+                }
+            } else {
+                return hrs + " hr recorded today -";
+            }
+        }
+    }
    
 })

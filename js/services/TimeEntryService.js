@@ -105,13 +105,19 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 
 				var dateString = CTService.getDateString();
         		var now = new Date();
+        		var min = null;
+		        if ((now.getMinutes() + '').length == 1) {
+		            min = "0" + now.getMinutes(); 
+		        } else {
+		            min = now.getMinutes();
+		        }
 				var newEntry = {
 		            "BreakTime":0.00,
 		            "Comment":"",
 		            "Date":dateString,
-		            "Hours":0.00,
-		            "ISOEndTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
-		            "ISOStartTime":new Date(1970, 0, 1, now.getHours(), now.getMinutes(), now.getSeconds()),
+		            "Hours":DEFAULT_EMPTY_HOURS,
+		            "ISOEndTime": null,
+		            "ISOStartTime": null,
 		            "JobID":"",
 		            "PhaseID":"",
 		            "SubPhaseID":null,
@@ -156,6 +162,16 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 						break;
 					case "inProgress":
 						inProgressEntry.inProgress = value;
+						break;
+					case "ISOStartTime":
+						inProgressEntry.ISOStartTime = value;
+						break;
+					case "ISOEndTime":
+						inProgressEntry.ISOEndTime = value;
+						break;
+					case "startEndTimes":
+						inProgressEntry.ISOStartTime = value[0];
+						inProgressEntry.ISOEndTime = value[1];
 						break;
 					default:
 						bootbox.alert("Invalid time entry property: " + property);

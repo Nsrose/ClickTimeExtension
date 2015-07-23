@@ -114,6 +114,8 @@ body {
 }
 
 .time-entry-item {
+    display: inline-block;
+    margin-left: 10px;
 }
 
 
@@ -121,9 +123,11 @@ body {
     width: 80px;
     height: 70px;
     font-size: 30px;
+    text-align: right;
 }
 .notes-field-container {
     display: inline-block;
+    margin-bottom: 10px;
 }
 .fieldtitle {
     margin-top: 10px;
@@ -136,10 +140,6 @@ body {
     max-width: 1000px;
     height: 22px;
     font-size: 11px;
-}
-
-video {
-      width: 250px;
 }
 
 #filler {
@@ -208,4 +208,25 @@ video {
 
 #refresh-button {
     text-align: left;
+
+.action-button {
+}
+
+.time-entry-item-clear {
+    text-decoration: underline;
+    cursor: pointer;
+}
+#stopwatch {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 20px;
+}
+#time-entry-form-timer {
+    width: 80px;
+    font-size: 19px;
+}
+#running-stopwatch-gif {
+    width: 20px;
+    display: inline-block;
+    margin-left: 20px;
 }

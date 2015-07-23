@@ -8,16 +8,15 @@
 
 <div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
 
-
-    <div class="total-hours-log">{{totalHours}} hours recorded today - <a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a></div>
+    <div class="total-hours-log">{{totalHoursLogMessage}} <a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a></div>
 
     <div class="clear"></div>
 
     <div class="fieldtitle">{{customTerms.clientTermSingHigh}}/{{customTerms.jobTermSingHigh}}:</div>
-    <div custom-select ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch"></div>
+    <div custom-select ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')"></div>
 
     <div class="fieldtitle">{{customTerms.taskTermSingHigh}}:</div>
-    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch">
+    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch" id="task-dropdown" ng-focus="clearError('task')">
     </div>
 
 
@@ -25,7 +24,7 @@
     <form name="entry" class="notes-field-container">
         <div class="fieldtitle">Notes:</div>
         <p ng-show="user.RequireComments" style="color: red">* required</p>
-        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('timeEntryErrorMissingNotes')" ng-blur="updateNotes()"></textarea><br> 
+        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="Notes" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('notes')" ng-blur="updateNotes()"></textarea><br> 
         <!-- <span ng-show="entry.text.$dirty && entry.text.$invalid"> 
             <span>Oops! Please limit your note to 4000 characters.</span>
         </span> -->
@@ -37,14 +36,39 @@
 
     <!-- Time entry form -->
     <div class="time-entry-container">
-        <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch">
+
+        <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
             <div class="fieldtitle time-entry">Hours</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
+                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-disabled="runningStopwatch" placeholder="0:00">
             </div>
-            <div class="time-entry-item-clear">Clear hours</div>
+            <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
+
+        <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
+            <div class="fieldtitle time-entry">Start</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')"  ng-disabled="runningStopwatch" placeholder="{{defaultStartEndTime}}">
+            </div>
+        </div>
+
+        <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
+            <div class="fieldtitle time-entry">End</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch" placeholder="{{defaultStartEndTime}}">
+            </div>
+        </div>
+
+        <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && !showStartEndTimes">
+            <div class="fieldtitle time-entry">Timer</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-timer" type="text" name="hours" ng-model="timerDisplay" ng-disabled="true">
+            </div>
+        </div>
+
     </div>
+
+    <div class="clear"></div>
 
 
     <span style="color:red" ng-show="generalError">
@@ -55,12 +79,20 @@
         <p>{{successMessage}}</p>
     </span>
 
-    <button id="save-time-entry" class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch">Save</button>
+    <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch || generalError" ng-hide="showStartTimer || runningStopwatch">Save</button>
 
-    <button id="start-stopwatch" class="btn btn-success" ng-click="start()" ng-hide="running">Start Timer</button>
+    <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError">Start Timer</button>
 
+    <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch">Stop/Save</button>
 
+    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="runningStopwatch || !showStartTimer || showStartEndTimes && !abandonedStopwatch">Cancel</button>
 
+    <div id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes">
+        <img src="../img/Clock.gif" class="img-scaled">
+    </div>
+
+    <div class="hidden" ng-controller="StopwatchController">
+    </div>
 
 
 </div>

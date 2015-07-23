@@ -10,7 +10,8 @@ var CHROME_LOCAL_STORAGE_VARS = [
 	'jobClientsList',
 	'jobClientsByRecent',
 	'tasksByRecent',
-	'storedTimeEntries'
+	'storedTimeEntries',
+	'stringJobClientsList'
 ];
 
 var CHROME_SYNC_STORAGE_VARS = [
@@ -27,6 +28,9 @@ var NUM_SCOPE_VARS = 6;
 
 // Time before user is automatically logged out
 var TOKEN_EXPIRE_HOURS = 24;
+
+// Default empty hour field
+var DEFAULT_EMPTY_HOURS = null;
 
 var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap']);
 

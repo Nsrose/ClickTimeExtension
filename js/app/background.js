@@ -125,7 +125,7 @@ var stopNotifications = function() {
 chrome.notifications.onButtonClicked.addListener(function (notificationId, buttonIndex) {
     // Go to time entry
     if (buttonIndex == 0) {
-        chrome.tabs.create({
+        chrome.app.window.create({
             url : "../../templates/main.html"
         })
     } else {

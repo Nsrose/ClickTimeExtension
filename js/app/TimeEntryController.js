@@ -349,24 +349,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     ////// Time entry ////// 
 
     // Time entry methods
-    $scope.timeEntryMethods = ['Hours', 'Start/End Times', 'Stopwatch'];
+    $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
     $scope.changeTimeEntryMethod = function (timeEntryMethod) {
     	switch (timeEntryMethod) {
-    		case "Hours":
+    		case "duration":
     			$scope.showHourEntryField = true;
     			$scope.showStopwatch = false;
     			$scope.showStartEndTimes = false;
     			break;
-    		case "Start/End Times":
+    		case "start-end":
     			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = true;
     			$scope.showStopwatch = false;
-    			break;
-    		case "Stopwatch":
-    			$scope.showHourEntryField = false;
-    			$scope.showStartEndTimes = false;
-    			$scope.showStopwatch = true;
     			break;
     		default:
     			bootbox.alert("Invalid time entry method");
@@ -380,108 +375,106 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             return;
         }
 
-        $scope.refresh();
-        // when array length = 4, execute callback
-        $scope.$watchCollection($scope.doneRefresh, function() {
-            if ($scope.doneRefresh.length == 4) {
-                //done
-                $scope.clearAllErrors();
-                var clickTimeEntry = {
-                    "BreakTime" : timeEntry.BreakTime,
-                    "Comment" : timeEntry.Comment,
-                    "Date" : timeEntry.Date,
-                    "JobID" : timeEntry.JobID,
-                    "PhaseID" : timeEntry.PhaseID,
-                    "SubPhaseID" : timeEntry.SubPhaseID,
-                    "TaskID" : timeEntry.TaskID,
-                    "job" : timeEntry.job,
-                    "task" : timeEntry.task,
-                    "client" : timeEntry.client
-                }
-              
-                if ($scope.showHourEntryField && !$scope.saveFromTimer) {
-                    if (!timeEntry.Hours) {
-                        $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
-                        return;
-                    }
-                    clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
-                }
+        $scope.refresh().then(function() {
+            $scope.clearAllErrors();
 
-                if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
-                    if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
-                        $scope.timeEntryErrorStartEndTimesInvalid = true;
-                        return;
-                    }
-                    var startTimeDecimal = CTService.toDecimal(timeEntry.ISOStartTime);
-                    var endTimeDecimal = CTService.toDecimal(timeEntry.ISOEndTime);
-                    var hourDiff = (endTimeDecimal - startTimeDecimal);
-                    clickTimeEntry.Hours = hourDiff;
-                    timeEntry.Hours = hourDiff;
-                    var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
-                    var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
-                    clickTimeEntry.ISOStartTime = ISOStartTime;
-                    clickTimeEntry.ISOEndTime = ISOEndTime;
-                }
-
-                if ($scope.saveFromTimer && !$scope.showStartEndTimes || $scope.showStopwatch && !$scope.abandonedStopwatch) {
-                    var hrs = $scope.elapsedHrs;
-                    var min = $scope.elapsedMin;
-                    var sec = $scope.elapsedSec;
-                    var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
-                    clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
-                    timeEntry.Hours = compiledHours;
-                }
-                
-                if (!validateTimeEntry(timeEntry)) {
-                    console.log(timeEntry);
-                    $scope.$broadcast("timeEntryError");
+            var clickTimeEntry = {
+                "BreakTime" : timeEntry.BreakTime,
+                "Comment" : timeEntry.Comment,
+                "Date" : timeEntry.Date,
+                "JobID" : timeEntry.JobID,
+                "PhaseID" : timeEntry.PhaseID,
+                "SubPhaseID" : timeEntry.SubPhaseID,
+                "TaskID" : timeEntry.TaskID,
+                "job" : timeEntry.job,
+                "task" : timeEntry.task,
+                "client" : timeEntry.client
+            }
+          
+            if ($scope.showHourEntryField && !$scope.saveFromTimer) {
+                if (!timeEntry.Hours) {
+                    $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                     return;
                 }
+                clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
+            }
 
-                $scope.pageReady = false;
-                TimeEntryService.saveTimeEntry(session, clickTimeEntry)
-                .then(function (response) {
-                    var d = new Date();
-                    TimeEntryService.removeInProgressEntry();
-                    $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
-                    $scope.generalSuccess = true;
-                    $scope.$broadcast("timeEntrySuccess");
-                    EntityService.updateRecentEntities(timeEntry);
-                    EntityService.getTimeEntries($scope.Session, function (timeEntries) {
-                        var totalHours = 0;
-                        var timeEntries = timeEntries[0].TimeEntries;
-                        var arrayLength = timeEntries.length;
-                        for (var i = 0; i < arrayLength; i++) {
-                            totalHours += timeEntries[i].Hours;
-                        }
-                        var splitHrs = (totalHours + '').split(".");
-                        var hrs = parseInt(splitHrs[0]);
-                        var min = null;
-                        if (splitHrs.length == 2) {
-                            var min = parseFloat('0.' + splitHrs[1]);
-                            min = Math.floor(min * 60);
-                        }
-                        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-                    });
-                })
-                .catch(function (response) {
-                    if (response.data == null) {
-                        var d = new Date();
-                        $scope.$broadcast("timeEntryError");
-                        TimeEntryService.removeInProgressEntry();
-                        TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
-                        })
-                    } else {
-                        $scope.setError(null, "An unknown error occurred.");
-                        if (!$scope.abandonedStopwatch) {
-                            $scope.$broadcast("timeEntryError");
-                        }
+            if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
+                if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
+                    $scope.timeEntryErrorStartEndTimesInvalid = true;
+                    return;
+                }
+                var startTimeDecimal = CTService.toDecimal(timeEntry.ISOStartTime);
+                var endTimeDecimal = CTService.toDecimal(timeEntry.ISOEndTime);
+                var hourDiff = (endTimeDecimal - startTimeDecimal);
+                clickTimeEntry.Hours = hourDiff;
+                timeEntry.Hours = hourDiff;
+                var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                clickTimeEntry.ISOStartTime = ISOStartTime;
+                clickTimeEntry.ISOEndTime = ISOEndTime;
+            }
+
+            if ($scope.saveFromTimer && !$scope.showStartEndTimes || $scope.showStopwatch && !$scope.abandonedStopwatch) {
+                var hrs = $scope.elapsedHrs;
+                var min = $scope.elapsedMin;
+                var sec = $scope.elapsedSec;
+                var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
+                clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
+                timeEntry.Hours = compiledHours;
+            }
+            
+            if (!validateTimeEntry(timeEntry)) {
+                console.log(timeEntry);
+                $scope.$broadcast("timeEntryError");
+                return;
+            }
+
+            // console.log(clickTimeEntry);
+            // return;
+
+            $scope.pageReady = false;
+            TimeEntryService.saveTimeEntry(session, clickTimeEntry)
+            .then(function (response) {
+                var d = new Date();
+                TimeEntryService.removeInProgressEntry();
+                $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
+                $scope.generalSuccess = true;
+                $scope.$broadcast("timeEntrySuccess");
+                EntityService.updateRecentEntities(timeEntry);
+                EntityService.getTimeEntries($scope.Session, function (timeEntries) {
+                    var totalHours = 0;
+                    var timeEntries = timeEntries[0].TimeEntries;
+                    var arrayLength = timeEntries.length;
+                    for (var i = 0; i < arrayLength; i++) {
+                        totalHours += timeEntries[i].Hours;
                     }
-
-                    $scope.pageReady = true;
+                    var splitHrs = (totalHours + '').split(".");
+                    var hrs = parseInt(splitHrs[0]);
+                    var min = null;
+                    if (splitHrs.length == 2) {
+                        var min = parseFloat('0.' + splitHrs[1]);
+                        min = Math.floor(min * 60);
+                    }
+                    $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
                 });
-            }   
+            })
+            .catch(function (response) {
+                if (response.data == null) {
+                    var d = new Date();
+                    $scope.$broadcast("timeEntryError");
+                    TimeEntryService.removeInProgressEntry();
+                    TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
+                        $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                    })
+                } else {
+                    $scope.setError(null, "An unknown error occurred.");
+                    if (!$scope.abandonedStopwatch) {
+                        $scope.$broadcast("timeEntryError");
+                    }   
+                }
+                $scope.pageReady = true;
+            });         
         })       
     }
     
@@ -628,13 +621,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
-
+        var deferred = $q.defer();
         if ($location.url() == '/settings') {
             $scope.$emit("refresh");
-            console.log("correct refresh")
         }
-
-        console.log("Fetching the most recent data from Clicktime");
+        
         $scope.HasEmptyEntities = false;
 
         $scope.clearAllErrors();
@@ -659,6 +650,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             $scope.doneRefresh.push("jobClients");
+            if ($scope.doneRefresh.length >= 4) {
+                deferred.resolve();
+            }
             $scope.$apply();
 
         }
@@ -671,6 +665,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.task = tasksList[0];
             $scope.timeEntry.task = $scope.task;
             $scope.doneRefresh.push("tasks");
+            if ($scope.doneRefresh.length >= 4) {
+                deferred.resolve();
+            }
             if ($scope.task) {
                 $scope.timeEntry.TaskID = $scope.task.TaskID;
             }
@@ -680,6 +677,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         var afterGetUser = function (user) {
             $scope.user = user;
             $scope.doneRefresh.push("user");
+            if ($scope.doneRefresh.length >= 4) {
+                deferred.resolve();
+            }
             $scope.$apply();
         }
 
@@ -700,16 +700,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
             }
             $scope.doneRefresh.push("company");
+            if ($scope.doneRefresh.length >= 4) {
+                deferred.resolve();
+            }
             $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }
-
-
        
         EntityService.getJobClients($scope.Session, false, afterGetJobClients);
         EntityService.getTasks($scope.Session, false, afterGetTasks);
         EntityService.getUser($scope.Session, false, afterGetUser);
         EntityService.getCompany($scope.Session, false, afterGetCompany);
+
+        return deferred.promise;
     }
 
   
@@ -790,11 +793,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.$apply();
 
              // Set the default time entry method
-            chrome.storage.sync.get(['defaultTimeEntryMethod', 'stopwatch'], function (items) {
-                if ('defaultTimeEntryMethod' in items) {
-                    $scope.timeEntryMethod = items.defaultTimeEntryMethod;
-                    $scope.changeTimeEntryMethod(items.defaultTimeEntryMethod);
-                    if ($scope.timeEntryMethod == "Hours") {
+            chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
+                if ('timeEntryMethod' in items) {
+                    $scope.timeEntryMethod = items.timeEntryMethod.method;
+                    $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
+                    if ($scope.timeEntryMethod == "duration") {
                         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
                             $scope.timeEntry.Hours = inProgressEntry.Hours;
                         })

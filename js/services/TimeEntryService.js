@@ -191,6 +191,4 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 	this.removeInProgressEntry = function() {
 		chrome.storage.sync.remove('inProgressEntry');
 	}
-
-
 })

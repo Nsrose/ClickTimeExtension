@@ -10,7 +10,7 @@
             
         </p>
 
-        <div class="login-error-messaging-text">
+        <div class="login-error-messaging-text" id="email-error">
             <span ng-show="loginForm.email.$touched && loginForm.email.$invalid">
                 <span ng-show="loginForm.email.$error.required">Email required.</span>
                 <span ng-show="loginForm.email.$error.email">Oops! Please enter a valid email.</span>
@@ -21,7 +21,7 @@
             <input type="password" name="password" ng-model="user.password" ng-minlength="3" ng-maxlength="23" maxlength="24" required id="password-input"><br>
         </p>
 
-        <div class="login-error-messaging-text">
+        <div class="login-error-messaging-text" id="password-error">
             <span ng-show="loginForm.password.$touched && loginForm.password.$invalid">
                 <span ng-show="loginForm.password.$error.required">Password required.</span>
                 <span ng-show="loginForm.password.$error.minlength">Minimum password length is 3 characters.</span>

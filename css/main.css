@@ -224,7 +224,7 @@ input, textarea {
     margin-left: 18px;
 }
 
-#time-entry-field-hours-title {
+#time-entry-field-hours-title, #field-title-timer {
     margin-left: 0px;
 }
 
@@ -313,12 +313,24 @@ input, textarea {
     text-align: center;
 }
 
+#save-time-entry:active, #start-stopwatch:active, #stop-stopwatch:active {
+    background: #38aa67 !important;
+    border: 1px solid #339d5e !important;
+    background-color: #38aa67 !important;
+}
+
+#save-time-entry:focus, #start-stopwatch:focus, #stop-stopwatch:focus {
+    background: #38aa67 !important;
+    border: 1px solid #339d5e !important;
+    background-color: #38aa67 !important;
+}
+
 .btn-custom {
     height: 28px;
     color: #444444;
     background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);
     border: 1px solid #bcbcbc !important;
-    border-radius: 3px !important;
+    border-radius: 3px;
     text-align: center;
     line-height: 12px;
     font-size: 12px;
@@ -326,11 +338,18 @@ input, textarea {
 
 #duration {
     width: 70px;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
 }
 
 #start-end {
     width: 120px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
 }
+
 
 #tooltip {
     background-color: #444444;
@@ -550,10 +569,10 @@ input[type="email"], input[type="password"] {
     margin-top: 32px;
 }
 
-.login-error-messaging-text span{
+.login-error-messaging-text {
+    position: absolute;
     color: #ff0000;
     padding: 0;
-    margin-top: -20px;
     margin-bottom: 0px;
 }
 

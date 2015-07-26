@@ -143,6 +143,11 @@ a.dropdown-toggle.ng-scope {
     color: #444444;
 }
 
+a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
+    border: 2px solid #A5C7FE !important;
+    border-radius: 2px;
+}
+
 .custom-select > .dropdown-menu {
     width: 520px;
     max-width: 520px;
@@ -300,7 +305,7 @@ input, textarea {
     width: 235px;
 }
 
-.btn {
+.btn, .btn-primary, .btn-primary:focus, .btn-primary:hover, .btn-primary:active {
     height: 42px;
     width: 116px;
     font-size: 16px;
@@ -311,6 +316,10 @@ input, textarea {
     border-radius: 2px;
     margin-left: 18px;
     text-align: center;
+}
+
+.btn-primary, .btn-primary:focus, .btn-primary:hover, .btn-primary:active {
+    background: #38aa67 !important;
 }
 
 #save-time-entry:active, #start-stopwatch:active, #stop-stopwatch:active {
@@ -388,7 +397,7 @@ label {
     font-weight: 400;
 }
 
-#refresh-button, #settings-help, #contact-us, #sign-out {
+#refresh-button, #settings-help, #contact-us, #contact-us-link, #sign-out {
     width: 216px;
     text-align: left;
 }

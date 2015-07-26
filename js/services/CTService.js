@@ -158,7 +158,7 @@ myApp.service('CTService', function() {
                     return min + " min recorded today -";
                 }
             } else {
-                return "";
+                return "No time recorded yet today. Let's track some time!";
             }
         } else if (hrs > 1) {
            if (min && min != 0) {

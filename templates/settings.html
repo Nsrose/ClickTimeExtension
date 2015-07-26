@@ -27,11 +27,12 @@
 <div class="settings-column">
     <button class="settings-width btn btn-custom settings-btn icon-group" id="settings-help"> <i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
     
-    <a href="http://www.clicktime.com/company/contact" target="_blank">
+    <a id="contact-us-link" href="http://www.clicktime.com/company/contact" target="_blank">
         <button class="settings-width btn btn-custom settings-btn icon-group" id="contact-us"><i class="fa fa-phone"></i>&nbsp;
             Contact Us
         </button>
     </a>
+
 
     <button id="sign-out" class="settings-width icon-group btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
         Sign out of ClickTime

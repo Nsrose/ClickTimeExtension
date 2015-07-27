@@ -397,7 +397,7 @@ label {
     font-weight: 400;
 }
 
-#refresh-button, #settings-help, #contact-us, #contact-us-link, #sign-out {
+#refresh-button, #settings-help, #contact-us, #sign-out {
     width: 216px;
     text-align: left;
 }

@@ -36,6 +36,6 @@
     "templates/*"
   ],
   
-  "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications", "fullscreen", "alwaysOnTopWindows" ]
+  "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications"]
 
 }

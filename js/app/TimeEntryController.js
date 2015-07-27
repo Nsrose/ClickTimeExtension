@@ -7,6 +7,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //Company custom terms
     $scope.customTerms = {};
 
+    // True iff saving is in progress
+    $scope.saving = false;
+
+    // Client, job, or task is empty in db
     $scope.HasEmptyEntities = false;
     // if true, indicate to user that they can set default time entry method in extension options
     $scope.showOptionsMessage = false;
@@ -250,6 +254,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearError("startTime");
         $scope.clearError("endTime");
         $scope.clearError("startEndTimes");
+        $scope.clearError("jobClient");
+        $scope.clearError("task");
     }
 
     $scope.clearError = function (errorField) {
@@ -271,10 +277,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $("#time-entry-form-end").css("border", "1px solid grey");
                 break;
             case "jobClient":
-                $("#jobClient-dropdown").css("border", "1px solid grey");
+                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid #bcbcbc");
                 break;
             case "task":
-                $("#task-dropdown").css("border", "1px solid grey");
+                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid #bcbcbc");
                 break;
             case "activeStopwatch":
                 $scope.timeEntryErrorActiveStopwatch = false;
@@ -284,7 +290,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
-    // Display an error messagen and highlight the specified field in red.
+    // Display an error message and highlight the specified field in red.
     $scope.setError = function (errorField, errorMessage) {
         $scope.errorMessage = errorMessage;
         $scope.generalError = true;
@@ -311,12 +317,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "task":
                 $("#task-dropdown").css("border", "1px solid red");
                 break;
+            case "jobConflict":
+                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                break;
+            case "clientConflict":
+                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                break;
+            case "taskConflict":
+                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                break;
             default:
                 break;
         }
     }  
 
     $scope.$on("timeEntryError", function() {
+        $scope.saving = false;
         $scope.clearStopwatch();
     })
 
@@ -328,6 +344,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.timeEntry.ISOEndTime = null;
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
+        $scope.saving = false;
         $scope.abandonedStopwatch = false;
         $scope.pageReady = true;
     })
@@ -376,9 +393,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.timeEntryErrorActiveStopwatch = true;
             return;
         }
-
+        $scope.saving = true;
+        $scope.clearAllErrors();
         $scope.refresh().then(function() {
-            $scope.clearAllErrors();
+            
 
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
@@ -425,15 +443,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
                 timeEntry.Hours = compiledHours;
             }
+
             
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");
                 return;
             }
-
-            // console.log(clickTimeEntry);
-            // return;
 
             $scope.pageReady = false;
             TimeEntryService.saveTimeEntry(session, clickTimeEntry)
@@ -484,18 +500,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
                     })
                 } else {
-                    $scope.setError(null, "An unknown error occurred.");
+                    $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
                     if (!$scope.abandonedStopwatch) {
                         $scope.$broadcast("timeEntryError");
-                    }   
+                    }
                 }
                 $scope.pageReady = true;
-            });         
-        })       
+            });
+        })
     }
     
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
+        if ($scope.generalError) {
+            return false;
+        }
         if (timeEntry.JobID == undefined || timeEntry.TaskID == undefined) {
             $scope.setError("jobClient", "Job or task cannot be empty.");
             return false;
@@ -646,23 +665,47 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         $scope.clearAllErrors();
         $scope.$parent.$broadcast("pageLoading");
-
-        TimeEntryService.removeInProgressEntry();
+        if (!$scope.saving) {
+            TimeEntryService.removeInProgressEntry();
+        }
+       
 
         $scope.removeLocalStorageVars();
 
         var afterGetJobClients = function (jobClientsList) {
-            $scope.jobClients = jobClientsList;
-            $scope.jobClient = jobClientsList[0];
-            if (!$scope.jobClient) {
-                $scope.timeEntry.job = null;
-                $scope.timeEntry.JobID = null;
-                $scope.timeEntry.client = null;
-                $scope.HasEmptyEntities = true;
+
+            var currentJobClient = {
+                'job' : $scope.timeEntry.job,
+                'client' : $scope.timeEntry.client,
+                'DisplayName' :  $scope.timeEntry.client.DisplayName + " - " 
+                                + $scope.timeEntry.job.DisplayName 
+            }
+            if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
+                $scope.setError("jobClientConflict", "We're sorry but the "
+                            + $scope.customTerms.clientTermSingLow + "/"
+                            + $scope.customTerms.jobTermSingLow + " "
+                            + currentJobClient.DisplayName + " you've chosen is no longer available. "
+                            + "Please choose a different "
+                            + $scope.customTerms.clientTermSingLow + "/"
+                            + $scope.customTerms.jobTermSingLow
+                            + " or contact your company's ClickTime administrator for more details.");
+                $scope.jobClients = jobClientsList;
+                $scope.jobClient = jobClientsList[0];
+                if ($scope.jobClient) {
+                    $scope.timeEntry.job = $scope.jobClient.job;
+                    $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
+                    $scope.timeEntry.client = $scope.jobClient.client;
+                }
+                TimeEntryService.updateInProgressEntry("job", $scope.timeEntry.job, function() {
+                    TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client);
+                })
             } else {
-                $scope.timeEntry.job = $scope.jobClient.job;
-                $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
-                $scope.timeEntry.client = $scope.jobClient.client;
+                $scope.jobClients = jobClientsList;
+                $scope.jobClient = currentJobClient;
+            }
+
+            if (jobClientsList.length == 0) {
+                $scope.HasEmptyEntities = true;
             }
 
             $scope.doneRefresh.push("jobClients");
@@ -674,23 +717,48 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         var afterGetTasks = function (tasksList) {
-            $scope.tasks = tasksList;
+            var currentTask = $scope.timeEntry.task;
+            if (!EntityService.hasTask(tasksList, currentTask)) {
+                $scope.setError("taskConflict", "We're sorry but the "
+                            + $scope.customTerms.taskTermSingLow + " "
+                            + currentTask.DisplayName + " you've chosen is no longer available. "
+                            + "Please choose a different "
+                            + $scope.customTerms.taskTermSingLow
+                            + " or contact your company's ClickTime administrator for more details.");
+                $scope.tasks = tasksList;
+                $scope.task = tasksList[0];
+                if ($scope.task) {
+                    $scope.timeEntry.task = $scope.task;
+                    $scope.timeEntry.TaskID = $scope.task.TaskID;
+                }
+                TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+            } else {
+                $scope.tasks = tasksList;
+                $scope.task = currentTask;
+            }
+
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-            $scope.task = tasksList[0];
-            $scope.timeEntry.task = $scope.task;
+
             $scope.doneRefresh.push("tasks");
             if ($scope.doneRefresh.length >= 4) {
                 deferred.resolve();
             }
-            if ($scope.task) {
-                $scope.timeEntry.TaskID = $scope.task.TaskID;
-            }
+
             $scope.$apply();
         }
 
         var afterGetUser = function (user) {
+            var currentUser = $scope.user;
+            if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
+                $scope.setError("userConflict", "We're sorry but the "
+                            + "entry method" + " "
+                            + " you've chosen is no longer available. "
+                            + "Please choose a different "
+                            + "entry method in the settings"
+                            + " or contact your company's ClickTime administrator for more details.");
+            }
             $scope.user = user;
             $scope.doneRefresh.push("user");
             if ($scope.doneRefresh.length >= 4) {

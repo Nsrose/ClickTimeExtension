@@ -536,4 +536,13 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
        
     }
 
+    // Utils for entity lists to expose to TimeENtry controller
+    this.hasJobClient = function (list, jobClient) {
+        return containsJobClient(list, jobClient);
+    }
+
+    this.hasTask = function (list, task) {
+        return containsTask(list, task);
+    }
+
 })

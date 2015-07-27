@@ -136,6 +136,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.clearStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
+        $scope.timerDisplay = "00:00:00";
         $interval.cancel($scope.endTimePromise);
     }
 

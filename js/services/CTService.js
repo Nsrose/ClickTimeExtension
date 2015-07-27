@@ -159,14 +159,14 @@ myApp.service('CTService', function() {
 
         if (parseInt(hoursFormatted) < 1) {
 
-            returnString = minutesFormatted + " minutes";
+            returnString = minutesFormatted + " mins";
 
             return returnString;
         }
 
         if (parseInt(hoursFormatted) >= 1) {
 
-            returnString = returnString + hoursFormatted + " hour";
+            returnString = returnString + hoursFormatted + " hr";
         }
 
         if (parseInt(hoursFormatted) >= 2) {
@@ -176,12 +176,12 @@ myApp.service('CTService', function() {
 
         if (parseInt(minutesFormatted.slice(0,1)) == 0 && parseInt(minutesFormatted.slice(1,2)) > 0) {
 
-           returnString =  returnString + " and " + minutesFormatted.slice(1,2) + " minutes";
+           returnString =  returnString + " and " + minutesFormatted.slice(1,2) + " mins";
         }
 
         else if (parseInt(minutesFormatted.slice(0,1)) > 0 && parseInt(minutesFormatted.slice(1,2)) >= 0) {
 
-            returnString = returnString + " and " + minutesFormatted + " minutes";
+            returnString = returnString + " and " + minutesFormatted + " mins";
         }
 
         return returnString;

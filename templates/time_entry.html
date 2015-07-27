@@ -40,7 +40,7 @@
         <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-disabled="runningStopwatch" placeholder="0:00">
+                <input class="time-entry-form-input" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-disabled="runningStopwatch" maxlength="5" placeholder="0:00">
             </div>
             <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
@@ -48,14 +48,14 @@
         <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry">Start Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')"  ng-disabled="runningStopwatch" placeholder="{{defaultStartEndTime}}">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')"  ng-disabled="runningStopwatch" maxlength="5" placeholder="{{defaultStartEndTime}}">
             </div>
         </div>
 
         <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch" placeholder="{{defaultStartEndTime}}">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch" maxlength="5" placeholder="{{defaultStartEndTime}}">
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-// Functions for common Clicktime specific operations
+// Functions for common ClickTime specific operations
 myApp.service('CTService', function() {
 	  /**
      * Converts a true time value to a rounded time value according to the rounding scheme
@@ -146,6 +146,48 @@ myApp.service('CTService', function() {
         return nowString;
     }
 
+    //ALEX JONES
+
+    // Get a string in plain english of a successfully saved entry's hours nad minutes
+    this.getSuccessTotalFormatted = function (successMessageTotalRaw) {
+
+        var returnString = "";
+        var unsplitTotal = successMessageTotalRaw;
+        var splitTotal = unsplitTotal.split(":");
+        var hoursFormatted = splitTotal[0];
+        var minutesFormatted = splitTotal[1];
+
+        if (parseInt(hoursFormatted) < 1) {
+
+            returnString = minutesFormatted + " minutes";
+
+            return returnString;
+        }
+
+        if (parseInt(hoursFormatted) >= 1) {
+
+            returnString = returnString + hoursFormatted + " hour";
+        }
+
+        if (parseInt(hoursFormatted) >= 2) {
+
+            returnString = returnString + "s";
+        }
+
+        if (parseInt(minutesFormatted.slice(0,1)) == 0 && parseInt(minutesFormatted.slice(1,2)) > 0) {
+
+           returnString =  returnString + " and " + minutesFormatted.slice(1,2) + " minutes";
+        }
+
+        else if (parseInt(minutesFormatted.slice(0,1)) > 0 && parseInt(minutesFormatted.slice(1,2)) >= 0) {
+
+            returnString = returnString + " and " + minutesFormatted + " minutes";
+        }
+
+        return returnString;
+    }
+
+    //ALEX JONES
 
     /** Return a string of the current number of logged hrs */
     this.getLogMessage = function (hrs, min) {

@@ -438,7 +438,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             .then(function (response) {
                 var d = new Date();
                 TimeEntryService.removeInProgressEntry();
-                $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
+
+                //ALEX
+
+                var successMessageTotalRaw = clickTimeEntry.Hours;
+                console.log(successMessageTotalRaw);
+
+
+                var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
+                var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
+
+                $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
+
+                //ALEX
+
+                // $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
                 $scope.generalSuccess = true;
                 $scope.$broadcast("timeEntrySuccess");
                 EntityService.updateRecentEntities(timeEntry);

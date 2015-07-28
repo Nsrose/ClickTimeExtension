@@ -4,7 +4,7 @@ import zipfile
 import sys
 import stat
 import errno
-from shutil import copyfile, move, copytree, rmtree
+from shutil import copyfile, move, copytree, rmtree, ignore_patterns
 
 
 # Live API base url
@@ -22,11 +22,10 @@ API_LINKED_FILES = {EXT_FOLDER_NAME + "/js/app/app.js",  EXT_FOLDER_NAME + "/js/
 def create_chrome_ext():
     '''Makes a zipped folder of the chrome extension, ready for upload.'''
 
-    copytree("../ClickTimeExtension", EXT_FOLDER_NAME);
+    copytree("../ClickTimeExtension", EXT_FOLDER_NAME, ignore=ignore_patterns(".git"));
 
     update_api_links()
 
-    remove_git(EXT_FOLDER_NAME)
     zipped = zipfile.ZipFile(EXT_FOLDER_NAME + ".zip", "w");
     for dirname, subdirs, files in os.walk(EXT_FOLDER_NAME):
         zipped.write(dirname)
@@ -56,17 +55,6 @@ def update_api_links():
         write_file.close()
 
         move(filename + "-new", filename)
-
-def remove_git(ext_folder):
-    def handleRemoveReadonly(func, path, exc):
-        excvalue = exc[1]
-        if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
-            os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
-            func(path)
-        else:
-            raise
-
-    rmtree(ext_folder + "/.git", ignore_errors=False, onerror=handleRemoveReadonly)
 
 
 if __name__ == "__main__":

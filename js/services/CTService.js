@@ -238,8 +238,6 @@ myApp.service('CTService', function() {
 
     //ALEX JONES
     this.getZeroHoursMessage = function(hrs, min) {
-
-        console.log("TESTING");
         
         if ((!hrs || hrs == 0) && (!min || min == 0)) {
 

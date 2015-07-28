@@ -43,6 +43,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         if (e.which == 13) {
             if ($scope.showStartTimer && !$scope.runningStopwatch) {
                 $("#start-stopwatch").click();
+            } else if ($scope.runningStopwatch) {
+                $scope.stopStopwatch();
             }
         }
     })
@@ -132,6 +134,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.$broadcast("stopStopwatch");
         $scope.showStartTimer = true;
         $scope.noValidateStartEndTimes = false;
+        $scope.saveTimeEntry($scope.Session, $scope.timeEntry);
     }
 
     $scope.clearStopwatch = function() {
@@ -178,7 +181,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             return;
         }
         if (time) {
-            debugger;
             var decimalHrs = time;
             if ((decimalHrs + '').indexOf(":") != -1) {
                 // HH:MM format
@@ -391,10 +393,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     $scope.saveTimeEntry = function (session, timeEntry) {
-        if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
-            $scope.timeEntryErrorActiveStopwatch = true;
-            return;
-        }
+        // if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
+        //     $scope.timeEntryErrorActiveStopwatch = true;
+        //     return;
+        // }
         $scope.saving = true;
         $scope.clearAllErrors();
         $scope.refresh().then(function() {

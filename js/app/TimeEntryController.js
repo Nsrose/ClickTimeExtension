@@ -178,6 +178,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             return;
         }
         if (time) {
+            debugger;
             var decimalHrs = time;
             if ((decimalHrs + '').indexOf(":") != -1) {
                 // HH:MM format

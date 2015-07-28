@@ -19,12 +19,20 @@ myApp.service('CTService', function() {
 
     /** Round to nearest for H:MM format */
     this.roundToNearestTime = function (time, timeIncrement) {
+        if (time.startsWith(":")) {
+            time = "0" + time;
+        }
         var rounded = this.roundToNearestDecimal(this.toDecimal(time), timeIncrement);
         return this.toHours(rounded);
     }
 
     /** Round to nearest for h.mm format */
     this.roundToNearestDecimal = function (time, timeIncrement) {
+        var timeStr = time + '';
+        if (timeStr.startsWith('.')) {
+            timeStr = "0" + timeStr;
+        }
+        var time = parseFloat(timeStr);
         var precision;
         switch (timeIncrement) {
             case "1":
@@ -49,6 +57,9 @@ myApp.service('CTService', function() {
 
     /** Return the h.mm representation of a hh:mm format. */
     this.toDecimal = function(time) {
+        if (time.startsWith(":")) {
+            time = "0" + time;
+        }
         var splitTime = time.split(":");
         if (splitTime.length != 1 && splitTime.length != 2 && splitTime.length != 3) {
             console.log("Invalid time to convert to decimal: " + time);
@@ -95,7 +106,7 @@ myApp.service('CTService', function() {
 
     /** Returns true if the string is an acceptable duration entry format. */
     this.isTime = function (time) {
-        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-4]):[0-5][0-9]$/)) {
+        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-4])?:[0-5][0-9]$/)) {
             return true;
         }
         return false;

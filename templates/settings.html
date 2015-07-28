@@ -11,7 +11,7 @@
         <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
     </div>
 
-    <div class="settings-controls icon-group" ng-controller="TimeEntryController">
+    <div class="settings-controls icon-group" ng-controller="TimeEntryController" id="refresh-container">
         <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button"> <i class="fa fa-refresh"></i>&nbsp; Refresh Lists</button>
         <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span>
         <div id="refresh-status"></div>
@@ -19,7 +19,7 @@
 
 
 
-    <label><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
+    <label id='reminder-toggle-text'><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
 
 </div>
 
@@ -27,7 +27,7 @@
 <div class="settings-column">
     <button class="settings-width btn btn-custom settings-btn icon-group" id="settings-help"> <i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
     
-    <a id="contact-us-link" href="http://www.clicktime.com/company/contact" target="_blank">
+    <a id="contact-us-link" tabIndex="-1" href="http://www.clicktime.com/company/contact" target="_blank">
         <button class="settings-width btn btn-custom settings-btn icon-group" id="contact-us"><i class="fa fa-phone"></i>&nbsp;
             Contact Us
         </button>

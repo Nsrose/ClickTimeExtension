@@ -110,7 +110,7 @@ a {
     line-height: 12px;
     font-size: 12px;
     margin-left: 0px;
-    margin-right: 12px;
+    margin-right: 10px;
     background: white;
 }
 
@@ -154,6 +154,10 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     min-width: 520px;
     margin-left: 18px;
     margin-top: -32px;
+}
+
+.custom-select > .dropdown-menu > ul > li > a:hover {
+    background: #337ab7;
 }
 
 .dropdown-menu.ng-scope {
@@ -386,13 +390,13 @@ input, textarea {
     padding: 0;
     position: relative;
     overflow: hidden;
-
 }
 
-label {
+#reminder-toggle-text {
+    font-size: 12px;
     display: block;
     padding-left: 15px;
-    padding-top: 4px;
+    padding-top: 6px;
     text-indent: -15px;
     font-weight: 400;
 }
@@ -464,7 +468,7 @@ label {
 
 .success-messaging-container {
     display: inline-block;
-    width: 390px;
+    width: 386px;
     height: 42px;
     background-color: #eef5ed;
     border: 1px solid #8EBC89;

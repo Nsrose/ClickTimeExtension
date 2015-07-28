@@ -206,34 +206,47 @@ myApp.service('CTService', function() {
         if (!hrs || hrs == 0) {
             if (min && min != 0) {
                 if (min > 1) {
-                    return min + " mins recorded today -";
+                    return min + " mins recorded today";
                 } else {
-                    return min + " min recorded today -";
+                    return min + " min recorded today";
                 }
             } else {
-                return "No time recorded yet today. Let's track some time!";
+                return "No time recorded yet today";
             }
         } else if (hrs > 1) {
            if (min && min != 0) {
                 if (min > 1) {
-                    return hrs + " hrs and " + min + " mins recorded today -";
+                    return hrs + " hrs and " + min + " mins recorded today";
                 } else {
-                    return hrs + " hrs and " + min + " min recorded today -";
+                    return hrs + " hrs and " + min + " min recorded today";
                 }
             } else {
-                return hrs + " hrs recorded today -";
+                return hrs + " hrs recorded today";
             }
         } else {
             if (min && min != 0) {
                 if (min > 1) {
-                    return hrs + " hr and " + min + " mins recorded today -";
+                    return hrs + " hr and " + min + " mins recorded today";
                 } else {
-                    return hrs + " hr and " + min + " min recorded today -";
+                    return hrs + " hr and " + min + " min recorded today";
                 }
             } else {
-                return hrs + " hr recorded today -";
+                return hrs + " hr recorded today";
             }
         }
     }
+
+    //ALEX JONES
+    this.getZeroHoursMessage = function(hrs, min) {
+
+        console.log("TESTING");
+        
+        if ((!hrs || hrs == 0) && (!min || min == 0)) {
+
+            return " - Let's track some time!";
+        }
+    }
+
+    //ALEX JONES
    
 })

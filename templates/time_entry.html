@@ -8,7 +8,7 @@
 
 <div ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
 
-    <div class="total-hours-log">{{totalHoursLogMessage}} <a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">My Timesheet</a></div>
+    <div class="total-hours-log"><a href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
 
     <div class="clear"></div>
 

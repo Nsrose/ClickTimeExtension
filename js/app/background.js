@@ -1,5 +1,5 @@
 // Constants
-var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
+var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
 var NOTIFICATION_POLL_PERIOD = 14400000; 
 // Delayed if User says "remind me later"

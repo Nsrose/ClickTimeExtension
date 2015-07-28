@@ -491,6 +491,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         min = Math.floor(min * 60);
                     }
                     $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
+                    
+                    //ALEX JONES
+                    $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+                    //ALEX JONES
                 });
             })
             .catch(function (response) {
@@ -948,6 +952,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 min = Math.floor(min * 60);
             }
             $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
+
+            //ALEX JONES
+            $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+            //ALEX JONES
         }
 
         var afterGetJobClients = function (jobClientsList) {

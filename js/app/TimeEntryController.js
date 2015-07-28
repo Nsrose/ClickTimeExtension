@@ -459,9 +459,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var d = new Date();
                 TimeEntryService.removeInProgressEntry();
 
-                //ALEX
+                //ALEX JONES
+                console.log(clickTimeEntry.Hours);
+                console.log($scope.company.MinTimeIncrement);
 
-                var successMessageTotalRaw = clickTimeEntry.Hours;
+                var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
                 console.log(successMessageTotalRaw);
 
 
@@ -470,7 +472,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
                 $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
 
-                //ALEX
+                //ALEX JONES
 
                 // $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
                 $scope.generalSuccess = true;

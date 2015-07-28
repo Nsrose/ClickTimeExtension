@@ -165,6 +165,7 @@ myApp.service('CTService', function() {
         var returnString = "";
         var unsplitTotal = successMessageTotalRaw;
         var splitTotal = unsplitTotal.split(":");
+        console.log(splitTotal);
         var hoursFormatted = splitTotal[0];
         var minutesFormatted = splitTotal[1];
 

@@ -9,38 +9,62 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
     // requestMethod - GET or POST
     // data - data for POST requests
     this.apiCall = function (requestURL, email, password, requestMethod, data) {
-        return logAPIInteraction(requestURL, email, requestMethod, data)
-        .then(function (logID) {
-            var credentials = btoa(email + ":" + password);
+        var credentials = btoa(email + ":" + password);
 
-            var request = {
-                method: requestMethod,
-                url: requestURL,
-                headers: {
-                    'Authorization' : 'Basic ' + credentials
-                },
-                data: data,
-                timeout: TIMEOUT
-            };
+        var request = {
+            method: requestMethod,
+            url: requestURL,
+            headers: {
+                'Authorization' : 'Basic ' + credentials
+            },
+            data: data,
+            timeout: TIMEOUT
+        };
 
 
-            return $http(request)
-            .success(function(data, status, headers, config) {
-                updateAPIInteraction(logID, true, data);
-                return data;
-            }).
-            error(function(data, status, headers, config) {
-                updateAPIInteraction(logID, false, data);
-                 if (data == null) {
-                    console.log("timeout");
-                    return null;
-                }
-                bootbox.alert(data);
-                return data;
-            });
+        return $http(request)
+        .success(function(data, status, headers, config) {
+            return data;
+        }).
+        error(function(data, status, headers, config) {
+            var errorObj = {
+                'Message' : 'Error from ClickTime Extension',
+                'DeviceName' : 'Chrome Extension',
+                'DevicePlatform' : 'Google Chrome'
+            }
+            this.reportError(email, password, errorObj);
+            if (data == null) {
+                console.log("timeout");
+                return null;
+            }
+            bootbox.alert(data);
+            return data;
         });
-
        
+    }
+
+    // Report an error to the api
+    this.reportError = function (email, token, errorObj) {
+        var credentials = btoa(email + ":" + token);
+        var requestURL = API_BASE + "errors";
+
+        var request = {
+            method: 'POST',
+            url: requestURL,
+            headers: {
+                'Authorization' : 'Basic ' + credentials
+            },
+            data: errorObj,
+            timeout: TIMEOUT
+        };
+
+        return $http(request)
+        .success(function(data, status, headers, config) {
+            return data;
+        })
+        .error(function(data, status, headers, config) {
+            return data;
+        })
     }
 
 

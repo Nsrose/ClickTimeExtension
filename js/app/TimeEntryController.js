@@ -22,6 +22,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $location.path("/settings");
     }
 
+    $scope.testError = function() {
+        APIService.reportError($scope.Session.UserEmail,
+            $scope.Session.Token,
+            {'Message' : 'Hey there I am an error',
+                'DeviceName' : 'Chrome Ext',
+                'DevicePlatform': 'GOogle chrome'
+            });
+    }
+
     //// Interface logic ////
     //Default start end time display
 

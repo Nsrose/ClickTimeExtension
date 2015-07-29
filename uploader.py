@@ -44,7 +44,7 @@ def update_api_links():
         read_file.close()
         for i in range(len(lines)):
             line = lines[i]
-            if "API_BASE" in line and ("session" not in line):
+            if "API_BASE" in line and ("session" not in line) and ("requestURL" not in line):
                 splitline = line.split('"')
                 splitline[1] = LIVE_API_URL
                 joinedline = ('').join(splitline)

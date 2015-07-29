@@ -70,8 +70,9 @@
             <p class="error-messaging-text">{{errorMessage}}</p>
         </span>
     </div>
-
-
+<!-- 
+    <button class="btn btn-danger" ng-click="testError()">Error</button>
+ -->
     <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch || generalError" ng-hide="showStartTimer || runningStopwatch">Save</button>
 
     <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError">Start Timer</button>

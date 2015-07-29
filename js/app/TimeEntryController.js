@@ -654,10 +654,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Logout function
     $scope.logout = function() {
-        $scope.removeLocalStorageVars();
-        $scope.removeSyncStorageVars();
-        bootbox.alert("Logged out.");
-        $location.path("/login");
+        chrome.storage.sync.get('stopwatch', function (items) {
+            if ('stopwatch' in items && items.stopwatch.running) {
+                bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
+                    if (result) {
+                        $scope.removeLocalStorageVars();
+                        $scope.removeSyncStorageVars();
+                        $location.path("/login");
+                    }
+                })
+            } else {
+                $scope.removeLocalStorageVars();
+                $scope.removeSyncStorageVars();
+                $location.path("/login");
+            }
+        })
+        
     }
 
     $scope.removeLocalStorageVars = function() {

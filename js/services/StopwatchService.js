@@ -20,6 +20,25 @@ myApp.service("StopwatchService", function() {
 		})
 	}
 
+	// Return the start time in HH:MM format string
+	this.getStartTime = function (callback) {
+		chrome.storage.sync.get('stopwatch', function (items) {
+			if ('stopwatch' in items) {
+				var stopwatch = items.stopwatch;
+				var hrs = stopwatch.startHrs + '';
+				if (hrs.length == 1) {
+					hrs = "0" + hrs;
+				}
+				var min = stopwatch.startMin + '';
+				if (min.length == 1) {
+					min = "0" + min;
+				}
+				var startTime = hrs + ":" + min;
+				callback(startTime);
+			}
+		})
+	}
+
 	// Get the elapsed time of the stopwatch. 
 	// If no running stopwatches, then this will be 0.
 	// Return an object with elapsed hours, minutes, and seconds.

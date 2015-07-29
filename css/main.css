@@ -424,6 +424,15 @@ input, textarea {
     /*background: -webkit-linear-gradient(top, #fafafa 0%,#ebebeb 100%) !important;*/
 }
 
+#cancel-abandoned-stopwatch {
+    margin-left: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #444444;
+    border: 1px solid #bcbcbc !important;
+    background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);
+}
+
 #refresh-status {
     color: #009900;
     font-size: 12px;
@@ -597,5 +606,13 @@ input[type="text"] {
 input[type="text"]:disabled {
     background-color: #ffffff !important;
     border: 1px solid #bcbcbc !important;
+}
+
+.system-message {
+    margin-left: 18px;
+}
+
+#abandoned-stopwatch-message {
+    color: red;
 }
 

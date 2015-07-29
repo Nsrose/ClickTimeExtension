@@ -1,5 +1,5 @@
-myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', '$http', 
-  function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, $http) {
+myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http', 
+                                function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
@@ -152,6 +152,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $interval.cancel($scope.endTimePromise);
     }
 
+    $scope.saveAbandonedStopwatch = function() {
+        $scope.saveTimeEntry($scope.Session, $scope.timeEntry);
+    }
+
     $scope.$on("stoppedStopwatch", function() {
         $scope.clearError('activeStopwatch');
     })
@@ -221,7 +225,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Validate start end times on blur.
     $scope.validateStartEndTimes = function(startTime, endTime) {
-        console.log($scope.noValidateStartEndTimes);
         if ($scope.noValidateStartEndTimes) {
             // don't validate if saving from timer
             return;
@@ -410,7 +413,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearAllErrors();
         $scope.refresh().then(function() {
             
-
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,
@@ -424,7 +426,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 "client" : timeEntry.client
             }
           
-            if ($scope.showHourEntryField && !$scope.saveFromTimer) {
+            if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
                 if (!timeEntry.Hours) {
                     $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                     return;
@@ -595,10 +597,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.cancelAbandonedStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
-        chrome.storage.sync.remove('inProgressEntry', function () {
-            $scope.abandonedStopwatch = false;
-            $scope.$apply();
-        })
+        $scope.clearTimeEntry();
+        TimeEntryService.removeInProgressEntry();
+        $scope.abandonedStopwatch = false;
     }
 
 
@@ -931,8 +932,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         if (now.getDate() - stopwatch.startDay > 0) {
                             if (now.getMonth() - stopwatch.startMonth == 0 
                                 || now.getFullYear() - stopwatch.startYear == 0) {
+                                StopwatchService.getStartTime(function (startTime) {
+                                    $scope.timeEntry.ISOStartTime = startTime;
+                                    $scope.timeEntry.ISOEndTime = "23:59";
+                                    TimeEntryService.updateInProgressEntry('ISOStartTime', startTime, function() {
+                                        TimeEntryService.updateInProgressEntry('ISOEndTime', '23:59');
+                                    })
+                                })
                                 $scope.abandonedStopwatch = true;
                                 $scope.runningStopwatch = false;
+
+                                $('#notes-field').css({'width': '276px', 'max-width': '276px'});
                             }
                         }
                     }

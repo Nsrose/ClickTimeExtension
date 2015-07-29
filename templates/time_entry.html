@@ -12,6 +12,8 @@
 
     <div class="clear"></div>
 
+    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch">You have an abandoned stopwatch. Please enter a new start and end time, or cancel the stopwatch entry.</div>
+
     <div class="fieldtitle">{{customTerms.clientTermSingHigh}} / {{customTerms.jobTermSingHigh}}</div>
     <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')"></div>
 
@@ -29,7 +31,7 @@
 
 
     <!-- Time entry form -->
-    <div class="time-entry-container">
+    <div class="time-entry-container" ng-show="!abandonedStopwatch">
 
         <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
@@ -62,6 +64,26 @@
 
     </div>
 
+
+
+    <div class="time-entry-container" ng-show="abandonedStopwatch">
+        
+        <div class="time-entry-item" id="time-entry-item-start">
+            <div class="fieldtitle time-entry">Start Time</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" maxlength="5" placeholder="{{defaultStartEndTime}}">
+            </div>
+        </div>
+
+        <div class="time-entry-item" id="time-entry-item-end">
+            <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
+            <div class="time-entry-form">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" maxlength="5" placeholder="{{defaultStartEndTime}}">
+            </div>
+        </div>
+
+    </div>
+
     <div class="clear"></div>
 
 
@@ -70,16 +92,24 @@
             <p class="error-messaging-text">{{errorMessage}}</p>
         </span>
     </div>
-<!-- 
-    <button class="btn btn-danger" ng-click="testError()">Error</button>
- -->
+
+
+
     <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch || generalError" ng-hide="showStartTimer || runningStopwatch">Save</button>
 
     <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError">Start Timer</button>
 
-    <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch">Stop &amp; Save</button>
+    <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch && !abandonedStopwatch">Stop &amp; Save</button>
 
-    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="runningStopwatch || !showStartTimer || showStartEndTimes && !abandonedStopwatch">Cancel</button>
+
+    <!-- Abandoned Stopwatch actions -->
+    <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveAbandonedStopwatch()" ng-show="abandonedStopwatch">Accept Timer</button>
+
+    <button id="cancel-abandoned-stopwatch" class="btn btn-default action-button" ng-click="cancelAbandonedStopwatch()" ng-show="abandonedStopwatch">Cancel</button>
+
+    <!-- -->
+
+    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer || showStartEndTimes) && !abandonedStopwatch">Cancel</button>
 
 
     <div id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes">
@@ -87,9 +117,6 @@
     </div>
 
     <div class="success-messaging-container" ng-show="generalSuccess">
-        <!-- <span ng-show="generalSuccess">
-            <p>{{successMessage}}</p>
-        </span> -->
 
         <img src="../img/success_check.png" id="success-check">
         <span>

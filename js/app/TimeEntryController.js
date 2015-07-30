@@ -246,8 +246,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (roundedDecHrs > 24) {
                 $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
             } else {
-                $scope.generalError = false;
-                $scope.showStartTimer = false; 
+                $scope.clearError('startEndTimes');
+                $scope.showStartTimer = false;
+                TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
             }
         }
     }

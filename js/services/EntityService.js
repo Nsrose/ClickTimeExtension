@@ -65,6 +65,10 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
             url = API_BASE + "Companies/" + CompanyID;
         }
 
+        if (entity == 'Job') {
+            url += "?withChildIDs=true";
+        }
+
 
         return APIService.apiCall(url, email, token, method)
             .then(function (response) {

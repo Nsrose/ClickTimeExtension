@@ -2,6 +2,8 @@
 // The apiCall function is intended to be used with promises, not callbacks.
 
 myApp.service('APIService', ['$http', '$q', function ($http, $q) {
+    var me = this;
+
     // Standard API call method. Params:
     // requestURL - URL to make a reques to.
     // email - user email
@@ -32,7 +34,7 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
                 'DeviceName' : 'Chrome Extension',
                 'DevicePlatform' : 'Google Chrome'
             }
-            this.reportError(email, password, errorObj);
+            me.reportError(email, password, errorObj);
             if (data == null) {
                 console.log("timeout");
                 return null;
@@ -67,51 +69,5 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
         })
     }
 
-
-    // Log an API interaction to local storage
-    var logAPIInteraction = function(requestURL, email, requestMethod, data) {
-        var deferred = $q.defer();
-        chrome.storage.local.get('APIInteractions', function (items) {
-            var APIInteractions = [];
-            if ('APIInteractions' in items) {
-                APIInteractions = items.APIInteractions;
-            }
-            var logID = APIInteractions.length;
-            var interaction = {
-                'logID' : logID,
-                'time' : (new Date()).toString(),
-                'requestURL' : requestURL,
-                'email' : email,
-                'requestMethod' : requestMethod,
-                'data' : data
-            }
-            APIInteractions.push(interaction);
-            chrome.storage.local.set({
-                'APIInteractions' : APIInteractions
-            }, function() {
-                deferred.resolve(logID);
-            });
-        })
-        return deferred.promise;
-    }
-
-    // Update an API interaction with either success or failure
-    var updateAPIInteraction = function (logID, success, data) {
-        chrome.storage.local.get('APIInteractions', function (items) {
-            if ('APIInteractions' in items) {
-                var APIInteractions = items.APIInteractions;
-                var interaction = APIInteractions[logID];
-                interaction['result'] = {
-                    'success' : success,
-                    'data' : data
-                };
-                chrome.storage.local.set({
-                    'APIInteractions' : APIInteractions
-                });
-            }
-        })
-    }
 }])
-
-
 

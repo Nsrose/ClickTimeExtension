@@ -466,6 +466,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 return;
             }
 
+            // console.log(clickTimeEntry);
+            // return;
+
             $scope.pageReady = false;
             TimeEntryService.saveTimeEntry(session, clickTimeEntry)
             .then(function (response) {

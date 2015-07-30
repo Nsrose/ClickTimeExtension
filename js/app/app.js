@@ -1,7 +1,5 @@
 // Constants
 
-// API base url
-var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
 var REQUEST_ERROR_MESSAGE = "We're sorry, there was an error processing your request.";
 var CHROME_LOCAL_STORAGE_VARS = [
 	'user',
@@ -32,7 +30,16 @@ var TOKEN_EXPIRE_HOURS = 24;
 // Default empty hour field
 var DEFAULT_EMPTY_HOURS = null;
 
-var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap']);
+var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap'])
+	.constant("$apiBases", {
+		dev99: "https://dev99.clicktime.com:8443/api/1.3/",
+		live: "https://app.clicktime.com/api/1.3/",
+		stage: 'https://appstage.clicktime.com/api/1.3/',
+		qa: 'https://apptest1.clicktime.com/api/1.3/'
+	})
+	.constant("$apiBase", {
+		url: "https://app.clicktime.com/api/1.3/"
+	})
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);

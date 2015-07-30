@@ -1,6 +1,6 @@
 // Services for entering time.
 
-myApp.service('TimeEntryService', function ($http, APIService, CTService) {
+myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBase) {
 
 
 	// Function for making async API calls.
@@ -28,7 +28,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 						callback(timeEntries);
 					}
 				} else {
-					var url = API_BASE + "Companies/" + session.CompanyID + "/Users/" + session.UserID
+					var url = $apiBase.url + "Companies/" + session.CompanyID + "/Users/" + session.UserID
 						 + "/TimeEntries";
 					api(url, session.UserEmail, session.Token, 'GET')
 					.then(function (response) {
@@ -43,7 +43,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 				}
 			})
 		} else {
-			var url = API_BASE + "Companies/" + session.CompanyID + "/Users/" + session.UserID
+			var url = $apiBase.url + "Companies/" + session.CompanyID + "/Users/" + session.UserID
 				 + "/TimeEntries";
 			api(url, session.UserEmail, session.Token, 'GET')
 			.then(function (response) {
@@ -62,7 +62,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService) {
 	// This does NO checks on the validity of a time entry! By this point, the time entry object is assumed
 	// to be 100% valid for which user and company it is being saved for.
 	this.saveTimeEntry = function (session, clickTimeEntry) {
-		var url = API_BASE + "Companies/" + session.CompanyID + "/Users/" + session.UserID + "/TimeEntries";
+		var url = $apiBase.url + "Companies/" + session.CompanyID + "/Users/" + session.UserID + "/TimeEntries";
 		return api(url, session.UserEmail, session.Token, "POST", clickTimeEntry)
 	}
 

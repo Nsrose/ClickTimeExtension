@@ -1,5 +1,14 @@
-var API_BASE = "https://dev99.clicktime.com:8443/api/1.3/";
+var API_BASE = "https://app.clicktime.com/api/1.3/";
 var TIMEOUT = 10000;
+
+// Listen for API url change:
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        if (request.changeUrl) {
+            API_BASE = request.url
+        }
+    }
+)
 
 // Try to send locally stored time entries
 chrome.storage.local.get('storedTimeEntries', function (items) {

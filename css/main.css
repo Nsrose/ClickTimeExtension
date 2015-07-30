@@ -615,4 +615,18 @@ input[type="text"]:disabled {
 #abandoned-stopwatch-message {
     color: red;
 }
+#environment-options {
+    margin-left: -10px;
+}
+#environment-options a.dropdown-toggle {
+    width: 100px;
+}
 
+#environment-button {
+    width: 30px;
+    height: 30px;
+    opacity: 0;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}

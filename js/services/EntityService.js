@@ -1,6 +1,6 @@
 // Services for accessing entities
 // These will only work once the session is open
-myApp.service('EntityService', function ($http, APIService, CTService) {
+myApp.service('EntityService', function ($http, APIService, CTService, $apiBase) {
     // The users session
     var Session = null;
     var UserName = null;
@@ -29,7 +29,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
 	                UserEmail = session.UserEmail;
 	                Token = session.Token;
 	                SecurityLevel = session.SecurityLevel;
-                    baseURL = API_BASE + "Companies/" + CompanyID + "/Users/" + UserID;
+                    baseURL = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID;
 
 	                callback(session);
 
@@ -62,7 +62,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         }
 
         if (entity == 'Company') {
-            url = API_BASE + "Companies/" + CompanyID;
+            url = $apiBase.url + "Companies/" + CompanyID;
         }
 
         if (entity == 'Job') {
@@ -101,7 +101,7 @@ myApp.service('EntityService', function ($http, APIService, CTService) {
         CompanyID = session.CompanyID;
         UserID = session.UserID;
         isodate = getIsoDate();
-        url = API_BASE + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
+        url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
         APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
             .then(function (response) {
                 callback(response.data);

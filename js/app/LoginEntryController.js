@@ -1,4 +1,5 @@
-myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', function ($scope, APIService, $http, $location) {
+myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', '$apiBase',
+                                function ($scope, APIService, $http, $location, $apiBase) {
     $scope.rerouting = false;
     // Get the session, if it exists, go to popup. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {
@@ -28,6 +29,19 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         }
     })
 
+    // Secret options menu
+    $scope.environmentOptions = ['dev99', 'qa', 'stage', 'live'];
+
+    $scope.changeEnvironment = function (environment) {
+        $scope.$emit('environmentChange', environment);
+    }
+
+    $("#email-input").keypress(function(e) {
+        if (e.which == 13) {
+            $scope.login($scope.user);
+        }
+    })
+
     $("#password-input").keypress(function(e) {
         if (e.which == 13) {
             $scope.login($scope.user);
@@ -48,8 +62,16 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     }
 
     $scope.login = function(user) {
+        if (!user) {
+            $scope.loginError = true;
+            return;
+        }
+        if (!user.email || !user.password) {
+            $scope.loginError = true;
+            return;
+        }
         $scope.rerouting = true;
-        var sessionURL = API_BASE + "Session";
+        var sessionURL = $apiBase.url + "Session";
         // Get the session for the user. If it exists, store it in local storage.
         APIService.apiCall(sessionURL, user.email, user.password, 'GET').then(
          function (session) {

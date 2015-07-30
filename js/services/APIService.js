@@ -1,7 +1,7 @@
 // All services for making API requests. All of these require user to be logged in.
 // The apiCall function is intended to be used with promises, not callbacks.
 
-myApp.service('APIService', ['$http', '$q', function ($http, $q) {
+myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $apiBase) {
     var me = this;
 
     // Standard API call method. Params:
@@ -48,7 +48,7 @@ myApp.service('APIService', ['$http', '$q', function ($http, $q) {
     // Report an error to the api
     this.reportError = function (email, token, errorObj) {
         var credentials = btoa(email + ":" + token);
-        var requestURL = API_BASE + "errors";
+        var requestURL = $apiBase.url + "errors";
 
         var request = {
             method: 'POST',

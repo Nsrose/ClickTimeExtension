@@ -24,7 +24,7 @@ def create_chrome_ext():
 
     copytree("../ClickTimeExtension", EXT_FOLDER_NAME, ignore=ignore_patterns(".git"));
 
-    update_api_links()
+    # update_api_links()
 
     zipped = zipfile.ZipFile(EXT_FOLDER_NAME + ".zip", "w");
     for dirname, subdirs, files in os.walk(EXT_FOLDER_NAME):

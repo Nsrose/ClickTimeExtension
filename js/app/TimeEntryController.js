@@ -84,7 +84,25 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Update in progress entry notes
     $scope.updateNotes = function() {
-        TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
+        if ($scope.timeEntry.Comment && $scope.timeEntry.Comment != "") {
+            $scope.clearError("notes");
+            TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
+        }
+        
+    }
+
+    // Focus on notes
+    $scope.focusNotes = function() {
+        $scope.clearError("notes");
+        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+            if (!inProgressEntry.Hours) {
+                $scope.showStartTimer = true;
+                $scope.$apply();
+            } else {
+                $scope.showStartTimer = false;
+                $scope.$apply();
+            }
+        })
     }
 
     // Swap action button from start timer to save and vice versa.
@@ -127,6 +145,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.startStopwatch = function () {
         $scope.showStartTimer = false;
+        // if ($scope.user.RequireComments
+        //     && (!$scope.timeEntry.Comment
+        //         || $scope.timeEntry.Comment == "")) {
+        //     $scope.setError("notes", "Oops! Please enter some notes in order to start this timer.")
+        //     return;
+        // }
         if ($scope.showHourEntryField) {
             $scope.$broadcast("startStopwatch");
         } else {
@@ -285,26 +309,27 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     $scope.clearError = function (errorField) {
+        $scope.generalError = false;
         switch (errorField) {
             case "hours":
-                $("#time-entry-form-hours").css("border", "1px solid grey");
+                $("#time-entry-form-hours").css("border", "1px solid #bcbcbc");
                 $("#time-entry-field-hours-title").css("color", "black");
                 break;
             case "notes":
-                $("#notes-field").css("border", "1px solid grey");
+                $("#notes-field").css("border", "1px solid #bcbcbc");
                 $("#fieldtitle-notes").css("color", "black");
                 break;
             case "startTime":
-                $("#time-entry-form-start").css("border", "1px solid grey");
+                $("#time-entry-form-start").css("border", "1px solid #bcbcbc");
                 $("#time-entry-form-start-title").css("color", "black");
                 break;
             case "endTime":
-                $("#time-entry-form-end").css("border", "1px solid grey");
+                $("#time-entry-form-end").css("border", "1px solid #bcbcbc");
                 $("#time-entry-form-end-title").css("color", "black");
                 break;
             case "startEndTimes":
-                $("#time-entry-form-start").css("border", "1px solid grey");
-                $("#time-entry-form-end").css("border", "1px solid grey");
+                $("#time-entry-form-start").css("border", "1px solid #bcbcbc");
+                $("#time-entry-form-end").css("border", "1px solid #bcbcbc");
                 $("#time-entry-form-end-title").css("color", "black");
                 $("#time-entry-form-start-title").css("color", "black");
                 break;
@@ -437,7 +462,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.saving = true;
         $scope.clearAllErrors();
         $scope.refresh().then(function() {
-
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,
@@ -460,8 +484,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
-                if (!timeEntry.ISOStartTime || !timeEntry.ISOEndTime) {
-                    $scope.timeEntryErrorStartEndTimesInvalid = true;
+                if (!timeEntry.ISOStartTime && !timeEntry.ISOEndTime) {
+                    $scope.setError("startEndTimes", "Oops! Please enter a start and end time to save this entry.");
+                    return;
+                }
+                if (!timeEntry.ISOStartTime) {
+                    $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
+                    return;
+                }
+                if (!timeEntry.ISOEndTime) {
+                    $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                     return;
                 }
                 var startTimeDecimal = CTService.toDecimal(timeEntry.ISOStartTime);
@@ -579,11 +611,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         
         if ($scope.showStartEndTimes || $scope.abandonedStopwatch) {
-            if (timeEntry.ISOStartTime == null) {
+            if (!timeEntry.ISOStartTime) {
                 $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
                 return false;
             }
-            if (timeEntry.ISOEndTime == null) {
+            if (!timeEntry.ISOEndTime) {
                 $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                 return false;
             }

@@ -25,8 +25,7 @@
     <!-- Notes field -->
     <form name="entry" class="notes-field-container">
         <div class="fieldtitle" id="fieldtitle-notes">Note</div>
-        <!-- <p ng-show="user.RequireComments">(required)</p> -->
-        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="clearError('notes')" ng-blur="updateNotes()"></textarea><br> 
+        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()"></textarea><br> 
     </form>
 
 
@@ -130,62 +129,6 @@
 
 
 </div>
-
-
-
-
-<!-- <div class="time-entry-container">
-        <form name="time-entry-form" novalidate>
-        <div id="time-entry-options" ng-show="showOptionsMessage">You can set a default time entry method in the extension <a href="options.html" target="_blank">options.</a></div>
-
-        <label ng-show="showHourEntryField && !abandonedStopwatch">
-            Hours:
-            <input type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="clearError('hours')">
-            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Oops! Please log some time in order to save this entry.</p></span>
-            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
-            <span style="color:red" ng-show="timeEntryErrorHoursNumeral"><p>Please enter time using only numerals and decimals.</p></span>
-        </label>
-
-
-        <p ng-show="abandonedStopwatch" style="color:red">You have an abandoned stopwatch. Please enter a new start and end time, or cancel the stopwatch entry.</p>
-        <label ng-show="showStartEndTimes || abandonedStopwatch">
-            Start time:
-            <input type="time" placeholder="HH:mm:ss" ng-model="timeEntry.ISOStartTime" ng-focus="clearError('startEndTimes')" required>
-            End time:
-            <input type="time" placeholder="HH:mm:ss" ng-model="timeEntry.ISOEndTime" ng-focus="clearError('startEndTimes')" required>
-            <span style="color:red" ng-show="timeEntryErrorStartEndTimesInvalid">    
-			    <p>Please make sure your daily hourly total is less than 24 hours.</p>
-			</span>
-            <span style="color:red" ng-show="timeEntryErrorStartEndTimesNegative">    
-                <p>Please enter an end time later than your start time.</p>
-            </span>
-
-        </label>
-        <div id="abandoned-stopwatch-confirm" ng-show="abandonedStopwatch">
-            <button class="btn btn-success" ng-click="saveTimeEntry(Session, timeEntry)">Save Time</button>
-            <button class="btn btn-danger" ng-click="cancelAbandonedStopwatch()">Cancel</button>
-        </div>
-
-        <label ng-show="showStopwatch && !abandonedStopwatch">
-            Timer:
-            <div id="stopwatch" ng-controller="StopwatchController">
-                <div id='elapsed-time'>
-                    <div class='elapsed-time-unit' id='hrs'>{{elapsedHrs}}</div>
-                    <div class='elapsed-time-unit'>:</div>
-                    <div class='elapsed-time-unit' id='min'>{{elapsedMin}}</div>
-                    <div class='elapsed-time-unit'>:</div>
-                    <div class='elapsed-time-unit' id='sec'>{{elapsedSec}}</div>
-
-                </div>
-
-                <button id="start" class="btn btn-success" ng-click="start()" ng-hide="running">Start</button>
-                <button id="stop" class="btn btn-danger" ng-click="stop()" ng-hide="!running">Stop/Save</button>
-            </div>
-            <span style="color:red" ng-show="timeEntryErrorHoursZero"><p>Oops! Please log some time in order to save this entry.</p></span>
-            <span style="color:red" ng-show="timeEntryErrorHoursInvalid"><p>Please make sure your daily hourly total is less than 24 hours.</p></span>
-        </label>
-    </form>
-</div> -->
 
 <br>
 <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>

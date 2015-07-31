@@ -176,7 +176,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-left: 18px;
     margin-top: 0px;
     margin-right: 16px;
-    border: 1px solid #bcbcbc !important;
+    border: 1px solid #bcbcbc;
 }
 
 .time-entry-item {
@@ -195,18 +195,21 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     text-align: right;
     float: left;
     clear: both;
+    border: 1px solid #bcbcbc;
 }
 
 #time-entry-form-start {
     margin-left: 18px;
     width: 96px !important;
     font-size: 24px;
+    border:  1px solid #bcbcbc;
 }
 
 #time-entry-form-end {
     margin-left: 8px;
     width: 96px !important;
     font-size: 24px;
+    border: 1px solid #bcbcbc;
 }
 
 
@@ -606,7 +609,6 @@ input[type="email"], input[type="password"] {
 }
 
 input[type="text"] {
-    border: 1px solid #bcbcbc !important;
 }
 
 input[type="text"]:disabled {

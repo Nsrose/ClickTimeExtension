@@ -100,13 +100,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             // Cannot swap action if user has entered hours
             return;
         }
-        if (
-            ( $scope.showStartEndTimes &&
-            ( !$scope.timeEntry.ISOStartTime
-            || !$scope.timeEntry.ISOEndTime))) {
-            // cannot swap action with empty fields
+        if ($scope.showStartEndTimes) {
+            if ($scope.showStartTimer) {
+                $scope.showStartTimer = false;
+                return;
+            }
             return;
         }
+        // if (
+        //     ( $scope.showStartEndTimes &&
+        //     ( !$scope.timeEntry.ISOStartTime
+        //     || !$scope.timeEntry.ISOEndTime))) {
+        //     // cannot swap action with empty fields
+        //     return;
+        // }
         if ($scope.showStartTimer) {
             $scope.showStartTimer = false;
         } else {
@@ -279,25 +286,33 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         switch (errorField) {
             case "hours":
                 $("#time-entry-form-hours").css("border", "1px solid grey");
+                $("#time-entry-field-hours-title").css("color", "black");
                 break;
             case "notes":
                 $("#notes-field").css("border", "1px solid grey");
+                $("#fieldtitle-notes").css("color", "black");
                 break;
             case "startTime":
                 $("#time-entry-form-start").css("border", "1px solid grey");
+                $("#time-entry-form-start-title").css("color", "black");
                 break;
             case "endTime":
                 $("#time-entry-form-end").css("border", "1px solid grey");
+                $("#time-entry-form-end-title").css("color", "black");
                 break;
             case "startEndTimes":
                 $("#time-entry-form-start").css("border", "1px solid grey");
                 $("#time-entry-form-end").css("border", "1px solid grey");
+                $("#time-entry-form-end-title").css("color", "black");
+                $("#time-entry-form-start-title").css("color", "black");
                 break;
             case "jobClient":
                 $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid #bcbcbc");
+                $("#fieldtitle-jobclient").css("color", "black");
                 break;
             case "task":
                 $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid #bcbcbc");
+                $("#fieldtitle-task").css("color", "black");
                 break;
             case "activeStopwatch":
                 $scope.timeEntryErrorActiveStopwatch = false;
@@ -314,34 +329,42 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         switch (errorField) {
             case "hours":
                 $("#time-entry-form-hours").css("border", "1px solid red");
+                $("#time-entry-field-hours-title").css("color", "red");
                 break;
             case "notes":
                 $("#notes-field").css("border", "1px solid red");
+                $("#fieldtitle-notes").css("color", "red");
                 break;
             case "startTime":
                 $("#time-entry-form-start").css("border", "1px solid red");
+                $("#time-entry-form-start-title").css("color", "red");
                 break;
             case "endTime":
                 $("#time-entry-form-end").css("border", "1px solid red");
+                $("#time-entry-form-end-title").css("color", "red");
                 break;
             case "startEndTimes":
                 $("#time-entry-form-start").css("border", "1px solid red");
                 $("#time-entry-form-end").css("border", "1px solid red");
+                $("#time-entry-form-start-title").css("color", "red");
+                $("#time-entry-form-end-title").css("color", "red");
                 break;
             case "jobClient":
-                $("#jobClient-dropdown").css("border", "1px solid red");
+                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                $("#fieldtitle-jobclient").css("color", "red");
                 break;
             case "task":
-                $("#task-dropdown").css("border", "1px solid red");
+                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                $("#fieldtitle-task").css("color", "red");
                 break;
             case "jobConflict":
-                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                $scope.setError('jobClient', errorMessage);
                 break;
             case "clientConflict":
-                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                $scope.setError('jobClient', errorMessage);
                 break;
             case "taskConflict":
-                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
+                $scope.setError('task', errorMessage);
                 break;
             default:
                 break;

@@ -434,7 +434,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.saving = true;
         $scope.clearAllErrors();
         $scope.refresh().then(function() {
-            
+
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,

@@ -101,8 +101,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                     $interval.cancel(timerPromise);
                     timerPromise = undefined;
                     $scope.$apply();
-                    chrome.extension.getBackgroundPage().stopBadge();                
-                    $("#save-time-entry").click();
+                    chrome.extension.getBackgroundPage().stopBadge();
                     chrome.browserAction.setBadgeText({text: ""});
                 })
             }

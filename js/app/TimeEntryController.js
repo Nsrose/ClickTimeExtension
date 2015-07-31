@@ -401,7 +401,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
         $scope.clearStopwatch();
     }
-
     
     //////////////////////////////////////////////////////////////////
 
@@ -655,7 +654,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Returns true iff the stopwatch should be shown for this user.
     var showStopwatch = function () {
         if ($scope.user != null) {
-            return $scope.user.RequireStopwatch;    
+            return $scope.user.RequireStopwatch;
         }
         bootbox.alert("Need to get user before calling showStopwatch");
     }
@@ -760,7 +759,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             } else {
                 $scope.jobClients = jobClientsList;
-                $scope.jobClient = currentJobClient;
+                var index = EntityService.indexJobClient(jobClientsList, currentJobClient);
+                $scope.jobClient = jobClientsList[index];
             }
 
             if (jobClientsList.length == 0) {
@@ -793,7 +793,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
             } else {
                 $scope.tasks = tasksList;
-                $scope.task = currentTask;
+                var index = EntityService.indexTask(tasksList, currentTask);
+                $scope.task = tasksList[index];
             }
 
             if (tasksList.length == 0) {

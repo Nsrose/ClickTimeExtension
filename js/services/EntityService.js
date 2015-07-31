@@ -549,4 +549,12 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
         return containsTask(list, task);
     }
 
+    this.indexJobClient = function (list, jobClient) {
+        return indexOfJobClient(list, jobClient);
+    }
+
+    this.indexTask = function (list, task) {
+        return indexOfTask(list, task);
+    }
+
 })

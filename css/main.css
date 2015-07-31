@@ -291,6 +291,7 @@ input, textarea {
 .settings-column {
     display: inline-block;
     vertical-align: top;
+    width: 220px;
 }
 
 #settings-column-left {
@@ -637,4 +638,9 @@ input[type="text"]:disabled {
     position: fixed;
     bottom: 0;
     right: 0;
+}
+
+#warning {
+    font-size: 9px;
+    margin-left: 20px;
 }

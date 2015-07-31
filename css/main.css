@@ -470,9 +470,15 @@ input, textarea {
 }
 
 #running-stopwatch-gif {
-    width: 20px;
     display: inline-block;
-    margin-left: 20px;
+    /* margin-left: 20px; */
+    float: right;
+    margin-right: 20px;
+    font-size: 24px;
+    background-color: lightgrey;
+    padding: 5px;
+    padding-left: 55px;
+    padding-right: 55px;
 }
 
 .success-messaging-container {

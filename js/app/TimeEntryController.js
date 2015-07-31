@@ -175,9 +175,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
    
 
     $scope.$on("updateStopwatch", function() {
-        if ($scope.showHourEntryField) {
-            $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
-        }
+        $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
     })
 
 

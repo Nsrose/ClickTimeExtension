@@ -1,7 +1,7 @@
 {
   "manifest_version" : 2,
   "name": "Clicktime Extension",
-  "version":"0.75.8",
+  "version":"0.75.9",
 
   "description" : "Clicktime extension",
 

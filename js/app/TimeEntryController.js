@@ -234,6 +234,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             // don't validate if saving from timer
             return;
         }
+        if (!startTime && !endTime) {
+            $scope.showStartTimer = true;
+            return;
+        }
         if (!startTime || !endTime) {
             return;
         }
@@ -486,73 +490,70 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");
                 return;
-            }
-
-            // console.log(clickTimeEntry);
-            // return;
-
-            $scope.pageReady = false;
-            TimeEntryService.saveTimeEntry(session, clickTimeEntry)
-            .then(function (response) {
-                var d = new Date();
-                TimeEntryService.removeInProgressEntry();
-
-                //ALEX JONES
-                console.log(clickTimeEntry.Hours);
-                console.log($scope.company.MinTimeIncrement);
-
-                var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                console.log(successMessageTotalRaw);
-
-
-                var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
-                var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
-
-                $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
-
-                //ALEX JONES
-
-                // $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
-                $scope.generalSuccess = true;
-                $scope.$broadcast("timeEntrySuccess");
-                EntityService.updateRecentEntities(timeEntry);
-                EntityService.getTimeEntries($scope.Session, function (timeEntries) {
-                    var totalHours = 0;
-                    var timeEntries = timeEntries[0].TimeEntries;
-                    var arrayLength = timeEntries.length;
-                    for (var i = 0; i < arrayLength; i++) {
-                        totalHours += timeEntries[i].Hours;
-                    }
-                    var splitHrs = (totalHours + '').split(".");
-                    var hrs = parseInt(splitHrs[0]);
-                    var min = null;
-                    if (splitHrs.length == 2) {
-                        var min = parseFloat('0.' + splitHrs[1]);
-                        min = Math.floor(min * 60);
-                    }
-                    $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-                    
-                    //ALEX JONES
-                    $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-                    //ALEX JONES
-                });
-            })
-            .catch(function (response) {
-                if (response.data == null) {
+            } else {
+                $scope.pageReady = false;
+                TimeEntryService.saveTimeEntry(session, clickTimeEntry)
+                .then(function (response) {
                     var d = new Date();
-                    $scope.$broadcast("timeEntryError");
                     TimeEntryService.removeInProgressEntry();
-                    TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                        $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
-                    })
-                } else {
-                    $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
-                    if (!$scope.abandonedStopwatch) {
+
+                    //ALEX JONES
+                    console.log(clickTimeEntry.Hours);
+                    console.log($scope.company.MinTimeIncrement);
+
+                    var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
+                    console.log(successMessageTotalRaw);
+
+
+                    var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
+                    var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
+
+                    $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
+
+                    //ALEX JONES
+
+                    // $scope.successMessage = "Entry successfully uploaded at " + d.toTimeString() + ".";
+                    $scope.generalSuccess = true;
+                    $scope.$broadcast("timeEntrySuccess");
+                    EntityService.updateRecentEntities(timeEntry);
+                    EntityService.getTimeEntries($scope.Session, function (timeEntries) {
+                        var totalHours = 0;
+                        var timeEntries = timeEntries[0].TimeEntries;
+                        var arrayLength = timeEntries.length;
+                        for (var i = 0; i < arrayLength; i++) {
+                            totalHours += timeEntries[i].Hours;
+                        }
+                        var splitHrs = (totalHours + '').split(".");
+                        var hrs = parseInt(splitHrs[0]);
+                        var min = null;
+                        if (splitHrs.length == 2) {
+                            var min = parseFloat('0.' + splitHrs[1]);
+                            min = Math.floor(min * 60);
+                        }
+                        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
+                        
+                        //ALEX JONES
+                        $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+                        //ALEX JONES
+                    });
+                })
+                .catch(function (response) {
+                    if (response.data == null) {
+                        var d = new Date();
                         $scope.$broadcast("timeEntryError");
+                        TimeEntryService.removeInProgressEntry();
+                        TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
+                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                        })
+                    } else {
+                        $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
+                        if (!$scope.abandonedStopwatch) {
+                            $scope.$broadcast("timeEntryError");
+                        }
                     }
-                }
-                $scope.pageReady = true;
-            });
+                    $scope.pageReady = true;
+                });
+            }  
         })
     }
     

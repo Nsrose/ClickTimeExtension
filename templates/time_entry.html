@@ -109,7 +109,7 @@
 
     <!-- -->
 
-    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer || showStartEndTimes) && !abandonedStopwatch">Cancel</button>
+    <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer) && !abandonedStopwatch">Cancel</button>
 
 
     <div ng-model="timerDisplay" id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes">{{timerDisplay}}</div>

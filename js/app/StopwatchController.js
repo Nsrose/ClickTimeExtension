@@ -74,37 +74,32 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     }
 
     $scope.start = function () {
-            if (!timerPromise) {
-                StopwatchService.markStartTime(function (start) {
-                    startTime = start;
-                    $scope.running = true;
-                    $scope.$parent.runningStopwatch = true;
-                    chrome.extension.getBackgroundPage().updateBadge(StopwatchService);
-                    timerPromise = $interval(function() {
-                        $scope.getElapsedTime();
-                    }, 31);
-                })
-            }
+        if (!timerPromise) {
+            StopwatchService.markStartTime(function (start) {
+                startTime = start;
+                $scope.running = true;
+                $scope.$parent.runningStopwatch = true;
+                chrome.extension.getBackgroundPage().updateBadge(StopwatchService);
+                timerPromise = $interval(function() {
+                    $scope.getElapsedTime();
+                }, 31);
+            })
+        }
     }
 
     $scope.stop = function() {        
-	if (timerPromise) {
-            if ($scope.$parent.user.RequireComments && ($scope.$parent.timeEntry.Comment == undefined || 
-	            $scope.$parent.timeEntry.Comment == "")) {
-	            $scope.$parent.timeEntryErrorMissingNotes = true;
-	            return;
-            }
-                $scope.$parent.$broadcast("stoppedStopwatch");
-                StopwatchService.markEndTime (function () {
-                    $scope.running = false;
-                    $scope.$parent.runningStopwatch  = false;
-                    $interval.cancel(timerPromise);
-                    timerPromise = undefined;
-                    $scope.$apply();
-                    chrome.extension.getBackgroundPage().stopBadge();
-                    chrome.browserAction.setBadgeText({text: ""});
-                })
-            }
+    	if (timerPromise) {
+            $scope.$parent.$broadcast("stoppedStopwatch");
+            StopwatchService.markEndTime (function () {
+                $scope.running = false;
+                $scope.$parent.runningStopwatch  = false;
+                $interval.cancel(timerPromise);
+                timerPromise = undefined;
+                $scope.$apply();
+                chrome.extension.getBackgroundPage().stopBadge();
+                chrome.browserAction.setBadgeText({text: ""});
+            })
+        }
     }
 
     $scope.getElapsedTime = function () {

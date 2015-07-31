@@ -691,9 +691,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     }
                 })
             } else {
+                $location.path("/login");
                 $scope.removeLocalStorageVars();
                 $scope.removeSyncStorageVars();
-                $location.path("/login");
+                $scope.$apply();
             }
         })
         

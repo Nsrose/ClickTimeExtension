@@ -749,17 +749,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {
-        console.log(newJobClient);
-        var tasksList = $scope.allTasks;
-        var permittedTaskIDs = newJobClient.job.PermittedTasks.split(",");
-        var permittedTasks = [];
-        for (i in tasksList) {
-            var t = tasksList[i];
-            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                permittedTasks.push(t);
+        if (newJobClient) {
+            var tasksList = $scope.allTasks;
+            var permittedTaskIDs = newJobClient.job.PermittedTasks.split(",");
+            var permittedTasks = [];
+            for (i in tasksList) {
+                var t = tasksList[i];
+                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                    permittedTasks.push(t);
+                }
             }
+            if (permittedTasks.length > 0) {
+                $scope.task = permittedTasks[0];
+            }
+            $scope.tasks = permittedTasks;
         }
-        $scope.tasks = permittedTasks;
+        
     })
 
     // Refresh function
@@ -827,6 +832,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         var afterGetTasks = function (tasksList) {
+            $scope.allTasks = tasksList;
+            if ($scope.jobClient) {
+                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                var permittedTasks = [];
+                for (i in tasksList) {
+                    var t = tasksList[i];
+                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                        permittedTasks.push(t);
+                    }
+                }
+                $scope.tasks = permittedTasks;
+            } else {
+                $scope.tasks = tasksList;    
+            }
             var currentTask = $scope.timeEntry.task;
             if (!EntityService.hasTask(tasksList, currentTask)) {
                 $scope.setError("taskConflict", "We're sorry but the "

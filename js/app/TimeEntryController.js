@@ -218,7 +218,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Validate and round hour input field on blur.
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
-        if (time == null) {
+        if (time == null || time == "") {
             $scope.showStartTimer = true;
             return;
         }

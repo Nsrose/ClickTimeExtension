@@ -590,6 +590,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
+
         if ($scope.generalError) {
             return false;
         }
@@ -641,14 +642,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return false;
             }
-            if (timeEntry.Hours > 24.00 || timeEntry.Hours < 0) {
+            if (timeEntry.Hours > 24.00) {
                 $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
+                return false;
+            }
+
+            else if (timeEntry.Hours < 0) {
+                $scope.setError("hours", "Please make sure your time entry is greater than 0.");
+                return false;
+            }
+
+            else if (!CTService.isNumeric(timeEntry.Hours)) {
+                $scope.setError("hours", "Please enter time using a valid format.");
                 return false;
             }
         }
 
-
-        
         return true;
     }
 

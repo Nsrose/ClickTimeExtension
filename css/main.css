@@ -648,3 +648,7 @@ input[type="text"]:disabled {
     font-size: 9px;
     margin-left: 20px;
 }
+#dcaa-sub-job-error-text {
+    bottom: 0;
+    right: 0;
+}

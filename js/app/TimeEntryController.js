@@ -7,6 +7,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //Company custom terms
     $scope.customTerms = {};
 
+    // All tasks for a company. Used to filter by permitted Task ID.
+    $scope.allTasks = [];
+
     // True iff saving is in progress
     $scope.saving = false;
 
@@ -474,7 +477,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 "task" : timeEntry.task,
                 "client" : timeEntry.client
             }
-          
+           
+            // check for changed time entry methods
+            chrome.storage.sync.get('timeEntryMethod', function(items) {
+              if ('timeEntryMethod' in items) {
+                if (items.timeEntryMethod.method == 'duration' && ($scope.runningStopwatch || $scope.showStartEndTimes)) {
+                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
+                  return;
+                } else if (items.timeEntryMethod.method == 'start-end' && $scope.showHourEntryField) {
+                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
+                  return;
+                }   
+              }   
+            })   
+
             if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
                 if (!timeEntry.Hours) {
                     $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
@@ -574,7 +590,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.$broadcast("timeEntryError");
                         TimeEntryService.removeInProgressEntry();
                         TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + 
+                            d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
                         })
                     } else {
                         $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
@@ -752,6 +769,26 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.doneRefresh = [];
 
+
+    // Check for update to jobClient and reset permitted task list.
+    $scope.$watch('jobClient', function (newJobClient) {
+        if (newJobClient) {
+            var tasksList = $scope.allTasks;
+            var permittedTaskIDs = newJobClient.job.PermittedTasks.split(",");
+            var permittedTasks = [];
+            for (i in tasksList) {
+                var t = tasksList[i];
+                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                    permittedTasks.push(t);
+                }
+            }
+            if (permittedTasks.length > 0) {
+                $scope.task = permittedTasks[0];
+            }
+            $scope.tasks = permittedTasks;
+        }
+    })
+
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
@@ -817,6 +854,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         var afterGetTasks = function (tasksList) {
+            $scope.allTasks = tasksList;
+            if ($scope.jobClient) {
+                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                var permittedTasks = [];
+                for (i in tasksList) {
+                    var t = tasksList[i];
+                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                        permittedTasks.push(t);
+                    }
+                }
+                $scope.tasks = permittedTasks;
+            } else {
+                $scope.tasks = tasksList;    
+            }
             var currentTask = $scope.timeEntry.task;
             if (!EntityService.hasTask(tasksList, currentTask)) {
                 $scope.setError("taskConflict", "We're sorry but the "
@@ -870,6 +921,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
+                $scope.$parent.DCAASubJobError = true;
+                $scope.logout();
+            }
             $scope.customTerms = {
                 'clientTermSingLow' : company.ClientTermSingular,
                 'clientTermPlurLow' : company.ClientTermPlural,
@@ -942,7 +997,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.HasEmptyEntities = false;
 
         var afterGetTasks = function (tasksList) {
-            $scope.tasks = tasksList;
+            $scope.allTasks = tasksList;
+            if ($scope.jobClient) {
+                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                var permittedTasks = [];
+                for (i in tasksList) {
+                    var t = tasksList[i];
+                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                        permittedTasks.push(t);
+                    }
+                }
+                $scope.tasks = permittedTasks;
+            } else {
+                $scope.tasks = tasksList;    
+            }
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
                 return;
@@ -1020,6 +1088,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
         
         var afterGetCompany = function (company) {
+            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
+                $scope.$parent.DCAASubJobError = true;
+                $scope.logout();
+            }
             $scope.company = company;
             $scope.customTerms = {
                 'clientTermSingLow' : company.ClientTermSingular,

@@ -12,7 +12,7 @@
 
     <div class="clear"></div>
 
-    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch">You have an abandoned stopwatch. Please enter a new start and end time, or cancel the stopwatch entry.</div>
+    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch">You have an abandoned stopwatch. Please save, edit, or cancel the stopwatch entry.</div>
 
     <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}} / {{customTerms.jobTermSingHigh}}</div>
     <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')"></div>
@@ -102,7 +102,7 @@
 
 
     <!-- Abandoned Stopwatch actions -->
-    <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveAbandonedStopwatch()" ng-show="abandonedStopwatch">Accept Timer</button>
+    <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveAbandonedStopwatch()" ng-show="abandonedStopwatch">Save</button>
 
     <button id="cancel-abandoned-stopwatch" class="btn btn-default action-button" ng-click="cancelAbandonedStopwatch()" ng-show="abandonedStopwatch">Cancel</button>
 

@@ -861,6 +861,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetCompany = function (company) {
             $scope.company = company;
+            if (company.data.DCAALoggingEnabled || company.data.HasModuleSubJob) {
+                $scope.$parent.DCAASubJobError = true;
+                $scope.logout();
+            }
             $scope.customTerms = {
                 'clientTermSingLow' : company.ClientTermSingular,
                 'clientTermPlurLow' : company.ClientTermPlural,
@@ -1011,6 +1015,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
         
         var afterGetCompany = function (company) {
+            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
+                $scope.$parent.DCAASubJobError = true;
+                $scope.logout();
+            }
             $scope.company = company;
             $scope.customTerms = {
                 'clientTermSingLow' : company.ClientTermSingular,

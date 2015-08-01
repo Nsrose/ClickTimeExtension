@@ -778,7 +778,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.tasks = permittedTasks;
         }
-        
     })
 
     // Refresh function

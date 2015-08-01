@@ -65,7 +65,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
             url = $apiBase.url + "Companies/" + CompanyID;
         }
 
-        if (entity == 'Job') {
+        if (entity == 'Jobs') {
             url += "?withChildIDs=true";
         }
 
@@ -547,6 +547,16 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
 
     this.hasTask = function (list, task) {
         return containsTask(list, task);
+    }
+
+    this.hasTaskID = function (listIDs, taskID) {
+        for (i in listIDs) {
+            var id = listIDs[i];
+            if (taskID == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     this.indexJobClient = function (list, jobClient) {

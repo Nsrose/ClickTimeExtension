@@ -7,6 +7,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //Company custom terms
     $scope.customTerms = {};
 
+    // All tasks for a company. Used to filter by permitted Task ID.
+    $scope.allTasks = [];
+
     // True iff saving is in progress
     $scope.saving = false;
 
@@ -743,6 +746,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.doneRefresh = [];
 
+
+    // Check for update to jobClient and reset permitted task list.
+    $scope.$watch('jobClient', function (newJobClient) {
+        console.log(newJobClient);
+        var tasksList = $scope.allTasks;
+        var permittedTaskIDs = newJobClient.job.PermittedTasks.split(",");
+        var permittedTasks = [];
+        for (i in tasksList) {
+            var t = tasksList[i];
+            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                permittedTasks.push(t);
+            }
+        }
+        $scope.tasks = permittedTasks;
+    })
+
     // Refresh function
     // This forces an API call for the jobs, clients, and tasks dropdown menus
     $scope.refresh = function() {
@@ -861,7 +880,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetCompany = function (company) {
             $scope.company = company;
-            if (company.data.DCAALoggingEnabled || company.data.HasModuleSubJob) {
+            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
                 $scope.$parent.DCAASubJobError = true;
                 $scope.logout();
             }
@@ -937,7 +956,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.HasEmptyEntities = false;
 
         var afterGetTasks = function (tasksList) {
-            $scope.tasks = tasksList;
+            $scope.allTasks = tasksList;
+            if ($scope.jobClient) {
+                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                var permittedTasks = [];
+                for (i in tasksList) {
+                    var t = tasksList[i];
+                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                        permittedTasks.push(t);
+                    }
+                }
+                $scope.tasks = permittedTasks;
+            } else {
+                $scope.tasks = tasksList;    
+            }
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
                 return;

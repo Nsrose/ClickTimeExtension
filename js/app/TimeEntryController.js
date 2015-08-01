@@ -20,6 +20,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.runningStopwatch = false;
     $scope.abandonedStopwatch = false;
+    $scope.abandonedEntry = false;
 
     $scope.settingsPage = function () {
         $location.path("/settings");
@@ -416,12 +417,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.saveFromTimer = false;
         $scope.saving = false;
         $scope.abandonedStopwatch = false;
+        $scope.abandonedEntry = false;
         $scope.pageReady = true;
     })
 
 
     // Clear an in progress entry and remove display fields
     $scope.clearTimeEntry = function() {
+        $scope.abandonedEntry = false;
         if ($scope.showStartEndTimes) {
             $scope.clearStartEndTimes();
         } else if ($scope.showHourEntryField) {
@@ -786,6 +789,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.task = permittedTasks[0];
             }
             $scope.tasks = permittedTasks;
+            TimeEntryService.updateInProgressEntry('task', $scope.task);
+            $scope.timeEntry.task = $scope.task;
+            $scope.timeEntry.TaskID = $scope.task.TaskID;
         }
     })
 
@@ -1038,7 +1044,23 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+            if (inProgressEntry.Date) {
+                var yearStr = inProgressEntry.Date.substring(0, 4);
+                var monthStr = inProgressEntry.Date.substring(4, 6);
+                var monthCorrected = (parseInt(monthStr) - 1) + '';
+                var dayStr = inProgressEntry.Date.substring(6, 8);
+                var then = new Date(yearStr, monthCorrected, dayStr);
+                var now = new Date();
+                var msDay = 60*60*24*1000;
+                var dayDiff = Math.floor((now - then) / msDay);
+                if (dayDiff >= 1 && !$scope.abandonedStopwatch) {
+                    $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
+                    $scope.abandonedEntry = true;
+                }
+            }
+
             $scope.timeEntry.Comment = inProgressEntry.Comment;
+            $scope.timeEntry.Date = inProgressEntry.Date;
             if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
@@ -1046,7 +1068,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.timeEntry.ISOStartTime = inProgressEntry.ISOStartTime;
                 $scope.timeEntry.ISOEndTime = CTService.getNowString();
             }
-            TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);
         })
        
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'

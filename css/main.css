@@ -295,7 +295,7 @@ input, textarea {
 }
 
 #settings-column-left {
-    margin-right: 25px;
+    margin-right: 37px;
 }
 
 .settings-btn {
@@ -445,6 +445,10 @@ input, textarea {
 
 .settings-column a {
     text-decoration: none;
+}
+
+#time-entry-method-container {
+    margin-bottom: 17px;
 }
 
 #refresh-button {

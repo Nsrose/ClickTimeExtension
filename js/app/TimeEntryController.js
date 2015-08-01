@@ -477,7 +477,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 "task" : timeEntry.task,
                 "client" : timeEntry.client
             }
-          
+           
+            // check for changed time entry methods
+            chrome.storage.sync.get('timeEntryMethod', function(items) {
+              if ('timeEntryMethod' in items) {
+                if (items.timeEntryMethod.method == 'duration' && ($scope.runningStopwatch || $scope.showStartEndTimes)) {
+                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
+                  return;
+                } else if (items.timeEntryMethod.method == 'start-end' && $scope.showHourEntryField) {
+                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
+                  return;
+                }   
+              }   
+            })   
+
             if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
                 if (!timeEntry.Hours) {
                     $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
@@ -577,7 +590,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.$broadcast("timeEntryError");
                         TimeEntryService.removeInProgressEntry();
                         TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                            $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + 
+                            d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
                         })
                     } else {
                         $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
@@ -593,6 +607,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     
     // True iff time entry is valid. Will also throw red error messages.
     var validateTimeEntry = function (timeEntry) {
+
         if ($scope.generalError) {
             return false;
         }
@@ -644,14 +659,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return false;
             }
-            if (timeEntry.Hours > 24.00 || timeEntry.Hours < 0) {
+            if (timeEntry.Hours > 24.00) {
                 $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
+                return false;
+            }
+
+            else if (timeEntry.Hours < 0) {
+                $scope.setError("hours", "Please make sure your time entry is greater than 0.");
+                return false;
+            }
+
+            else if (!CTService.isNumeric(timeEntry.Hours)) {
+                $scope.setError("hours", "Please enter time using a valid format.");
                 return false;
             }
         }
 
-
-        
         return true;
     }
 
@@ -764,7 +787,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.tasks = permittedTasks;
         }
-        
     })
 
     // Refresh function

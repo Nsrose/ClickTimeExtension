@@ -29,6 +29,8 @@ var updateBadge = function(StopwatchService) {
             badgeMin = elapsedObj.elapsedMin % 60;
             badgeHrs = elapsedObj.elapsedHrs;
 
+            console.log(badgeMin);
+
             if (badgeHrs > 9) {
                 chrome.browserAction.setBadgeText({text: badgeHrs + "+"});
                 stopBadge();

@@ -146,7 +146,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
-    $scope.showStartTimer = true;
+    if (($scope.showHourEntryField && !$scope.timeEntry.Hours)
+        || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOEndTime || !$scope.timeEntry.ISOStartTime))) {
+        $scope.showStartTimer = true;    
+    }
+    
      // For the stopwatch display on start/end times:
     $scope.endTimePromise = undefined;
 
@@ -259,7 +263,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
            
             var hrs = CTService.roundToNearest(time, timeToIncrement);
             $scope.timeEntry.Hours = hrs;
-            if ($scope.timeEntry.Hours != DEFAULT_EMPTY_HOURS) {
+
+            if ($scope.timeEntry.Hours) {
                 clearSuccessMessage();
                 $scope.showStartTimer = false;
             }
@@ -272,37 +277,40 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Validate start end times on blur.
     $scope.validateStartEndTimes = function(startTime, endTime) {
-        if ($scope.noValidateStartEndTimes) {
-            // don't validate if saving from timer
-            return;
-        }
-        if (!startTime && !endTime) {
-            $scope.showStartTimer = true;
-            return;
-        }
-        if (!startTime || !endTime) {
-            return;
-        }
-        if (!CTService.isTime(startTime)) {
-            $scope.setError("startTime", "Please enter time using a valid format.");
-        } else if (!CTService.isTime(endTime)) {
-            $scope.setError("endTime", "Please enter time using a valid format.");
-        } else if (CTService.toDecimal(startTime) >= CTService.toDecimal(endTime)) {
-            $scope.setError("startEndTimes", "Oops! Please enter a start time later than the end time.");
-        } else {
-            var startTimeDecimal = CTService.toDecimal(startTime);
-            var endTimeDecimal = CTService.toDecimal(endTime);
-            var hourDiff = (endTimeDecimal - startTimeDecimal);
-            var roundedDecHrs = CTService.roundToNearestDecimal(hourDiff, $scope.company.MinTimeIncrement);
-            if (roundedDecHrs > 24) {
-                $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
+        if (!$scope.showStartEndTimes) {
+            if ($scope.noValidateStartEndTimes) {
+                // don't validate if saving from timer
+                return;
+            }
+            if ($scope.showStartEndTimes && (!startTime && !endTime)) {
+                $scope.showStartTimer = true;
+                return;
+            }
+            if (!startTime || !endTime) {
+                return;
+            }
+            if (!CTService.isTime(startTime)) {
+                $scope.setError("startTime", "Please enter time using a valid format.");
+            } else if (!CTService.isTime(endTime)) {
+                $scope.setError("endTime", "Please enter time using a valid format.");
+            } else if (CTService.toDecimal(startTime) >= CTService.toDecimal(endTime)) {
+                $scope.setError("startEndTimes", "Oops! Please enter a start time later than the end time.");
             } else {
-                $scope.clearError('startEndTimes');
-                clearSuccessMessage();
-                $scope.showStartTimer = false;
-                TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
+                var startTimeDecimal = CTService.toDecimal(startTime);
+                var endTimeDecimal = CTService.toDecimal(endTime);
+                var hourDiff = (endTimeDecimal - startTimeDecimal);
+                var roundedDecHrs = CTService.roundToNearestDecimal(hourDiff, $scope.company.MinTimeIncrement);
+                if (roundedDecHrs > 24) {
+                    $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
+                } else {
+                    $scope.clearError('startEndTimes');
+                    clearSuccessMessage();
+                    $scope.showStartTimer = false;
+                    TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
+                }
             }
         }
+        
     }
 
 
@@ -557,7 +565,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
                 timeEntry.Hours = compiledHours;
             }
-
             
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
@@ -1084,7 +1091,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
             $scope.timeEntry.Comment = inProgressEntry.Comment;
             $scope.timeEntry.Date = inProgressEntry.Date;
-            if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
+
+            if (inProgressEntry.Hours) {
                 clearSuccessMessage();
                 $scope.showStartTimer = false;
             }

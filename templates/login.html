@@ -30,7 +30,7 @@
         </div>
     </form>
     
-    <button id="sign-in-button" ng-disabled="loginForm.email.$invalid || loginForm.password.$invalid" ng-click="login(user)">Sign In</button>
+    <button id="sign-in-button" ng-click="login(user)">Sign In</button>
     <span class="login-error-messaging-text" ng-show="loginError">    
         <p id="invalid-login">Sorry, the email address or password you entered is not recognized. Please try again.</p>
     </span>

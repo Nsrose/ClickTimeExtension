@@ -25,14 +25,14 @@
             <span ng-show="loginForm.password.$touched && loginForm.password.$invalid">
                 <span ng-show="loginForm.password.$error.required">Password required.</span>
                 <span ng-show="loginForm.password.$error.minlength">Minimum password length is 3 characters.</span>
-                <span ng-show="loginForm.password.$error.maxlength">Maximum password length is 24 characters.</span>
+                <span ng-show="loginForm.password.$error.maxlength"><!-- Maximum password length is 24 characters. --></span>
             </span>
         </div>
     </form>
     
     <button id="sign-in-button" ng-disabled="loginForm.email.$invalid || loginForm.password.$invalid" ng-click="login(user)">Sign In</button>
     <span class="login-error-messaging-text" ng-show="loginError">    
-        <p>Sorry, the email address or password you entered is not recognized. Please check your Caps Lock key and try again.</p>
+        <p id="invalid-login">Sorry, the email address or password you entered is not recognized. Please try again.</p>
     </span>
 
      <span class="login-error-messaging-text" id="dcaa-sub-job-error-text" ng-show="DCAASubJobError">We're sorry, but ClickTime for Chrome does not currently support companies that use Sub-Jobs or require DCAA compliance. Please contact your company's ClickTime administrator for further information.</span>

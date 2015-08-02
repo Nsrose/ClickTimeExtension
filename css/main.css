@@ -659,3 +659,7 @@ input[type="text"]:disabled {
     bottom: 0;
     right: 0;
 }
+.feedback-container {
+    margin-left: 20px;
+    margin-top: 20px;
+}

@@ -63,7 +63,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 		$scope.elapsedHrs = "00";
     	$scope.running = false;
     	$scope.$parent.runningStopwatch = false;
-        $scope.$parent.showStartTimer = true;
+        // $scope.$parent.showStartTimer = true;
     	$interval.cancel(timerPromise);
     	timerPromise = undefined;
     	StopwatchService.clear(function() {
@@ -76,6 +76,10 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     $scope.start = function () {
         if (!timerPromise) {
             StopwatchService.markStartTime(function (start) {
+                //make sure to erase any existing success messaging
+                $scope.generalSuccess = false;
+                $scope.$apply();
+                //
                 startTime = start;
                 $scope.running = true;
                 $scope.$parent.runningStopwatch = true;

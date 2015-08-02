@@ -295,7 +295,7 @@ input, textarea {
 }
 
 #settings-column-left {
-    margin-right: 25px;
+    margin-right: 37px;
 }
 
 .settings-btn {
@@ -445,6 +445,10 @@ input, textarea {
 
 .settings-column a {
     text-decoration: none;
+}
+
+#time-entry-method-container {
+    margin-bottom: 17px;
 }
 
 #refresh-button {
@@ -609,6 +613,12 @@ input[type="email"], input[type="password"] {
     margin-bottom: 0px;
 }
 
+#invalid-login {
+    width: 400px;
+    margin-top: 29px;
+    margin-left: 20px;
+}
+
 input[type="text"] {
 }
 
@@ -619,6 +629,7 @@ input[type="text"]:disabled {
 
 .system-message {
     margin-left: 18px;
+    color: red;
 }
 
 #abandoned-stopwatch-message {

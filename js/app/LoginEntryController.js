@@ -29,6 +29,35 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         }
     })
 
+    $scope.focusedEmail = false;
+    $scope.focusedPassword = false;
+
+    $scope.unfocus = function (model) {
+        switch (model) {
+            case "email":
+                $scope.focusedEmail = false;
+                break;
+            case "password":
+                $scope.focusedPassword = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    $scope.clearError = function (model) {
+        switch (model) {
+            case "email":
+                $scope.focusedEmail = true;
+                break;
+            case "password":
+                $scope.focusedPassword = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     // Secret options menu
     $scope.environmentOptions = ['dev99', 'qa', 'stage', 'live'];
 
@@ -37,13 +66,19 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     }
 
     $("#email-input").keypress(function(e) {
-        if (e.which == 13) {
+        console.log(typeof this.value);
+        console.log(typeof $('#password-input').value);
+
+        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
         }
     })
 
     $("#password-input").keypress(function(e) {
-        if (e.which == 13) {
+        console.log(typeof this.value);
+        console.log(typeof $('#email-input').value);
+
+        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
         }
     })

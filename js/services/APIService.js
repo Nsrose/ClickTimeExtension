@@ -3,6 +3,8 @@
 
 myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $apiBase) {
     var me = this;
+    var manifest = chrome.runtime.getManifest();
+    var version = manifest.version;
 
     // Standard API call method. Params:
     // requestURL - URL to make a reques to.
@@ -13,11 +15,17 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
     this.apiCall = function (requestURL, email, password, requestMethod, data) {
         var credentials = btoa(email + ":" + password);
 
+        console.log(version);
+        
         var request = {
             method: requestMethod,
             url: requestURL,
             headers: {
-                'Authorization' : 'Basic ' + credentials
+                'Authorization' : 'Basic ' + credentials,
+                'Client': {
+                    'appname': 'chromeExtension',
+                    'version': version
+                }
             },
             data: data,
             timeout: TIMEOUT

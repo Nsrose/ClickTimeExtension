@@ -103,6 +103,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.showStartTimer = true;
                 $scope.$apply();
             } else {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
                 $scope.$apply();
             }
@@ -124,6 +125,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
         if ($scope.showStartEndTimes) {
             if ($scope.showStartTimer) {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
                 return;
             }
@@ -137,6 +139,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         //     return;
         // }
         if ($scope.showStartTimer) {
+            clearSuccessMessage();
             $scope.showStartTimer = false;
         } else {
             $scope.showStartTimer = true;
@@ -147,6 +150,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.endTimePromise = undefined;
 
     $scope.startStopwatch = function () {
+        clearSuccessMessage();
         $scope.showStartTimer = false;
         // if ($scope.user.RequireComments
         //     && (!$scope.timeEntry.Comment
@@ -170,6 +174,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }, 60000);
         }
        
+    }
+
+    var clearSuccessMessage = function() {
+
+        if ($scope.generalSuccess == true) {
+            $scope.generalSuccess = false;
+            $scope.$apply();
+        }
+
     }
 
     $scope.stopStopwatch = function() {
@@ -245,7 +258,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
            
             var hrs = CTService.roundToNearest(time, timeToIncrement);
             $scope.timeEntry.Hours = hrs;
-            if (!$scope.timeEntry.Hours) {
+
+            if ($scope.timeEntry.Hours) {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
             }
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
@@ -284,6 +299,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
                 } else {
                     $scope.clearError('startEndTimes');
+                    clearSuccessMessage();
                     $scope.showStartTimer = false;
                     TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
                 }
@@ -461,6 +477,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     			break;
     	}
     }
+
+    $('#main').on('click', function() {
+        console.log($scope.generalSuccess);
+        if ($scope.generalSuccess == true) {
+            $scope.generalSuccess = false;
+            $scope.$apply();
+        }
+    })
 
     $scope.saveTimeEntry = function (session, timeEntry) {
         // if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
@@ -1061,14 +1085,18 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.timeEntry.Comment = inProgressEntry.Comment;
             $scope.timeEntry.Date = inProgressEntry.Date;
+
             if (inProgressEntry.Hours) {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
             }
             if (inProgressEntry.ISOStartTime) {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
                 $scope.timeEntry.ISOStartTime = inProgressEntry.ISOStartTime;
             }
             if (inProgressEntry.ISOEndTime) {
+                clearSuccessMessage();
                 $scope.showStartTimer = false;
                 $scope.timeEntry.ISOEndTime = inProgressEntry.ISOEndTime;
             } else {

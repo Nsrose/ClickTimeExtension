@@ -76,6 +76,10 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     $scope.start = function () {
         if (!timerPromise) {
             StopwatchService.markStartTime(function (start) {
+                //make sure to erase any existing success messaging
+                $scope.generalSuccess = false;
+                $scope.$apply();
+                //
                 startTime = start;
                 $scope.running = true;
                 $scope.$parent.runningStopwatch = true;

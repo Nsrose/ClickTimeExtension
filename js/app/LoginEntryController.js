@@ -83,47 +83,9 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             data.lastLoginHrs = d.getHours();
             data.lastLoginMin = d.getMinutes();
             data.lastLoginSec = d.getSeconds();
-
-            // timeEntryMethod and allowReminders will stay forever in the sync storage
-            // it is updated if a different user is logged in, or if it has never been set before
-            chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-                if (('timeEntryMethod' in items) || ('allowReminders' in items)) {
-                    // not same user
-                    if (session.data.UserID != items.timeEntryMethod.UserID) {
-                        chrome.storage.sync.set({
-                            'timeEntryMethod' : {
-                                'method' : 'duration',
-                                'UserID' : session.data.UserID
-                            }
-                        })
-                    }
-                    if (session.data.UserID != items.allowReminders.UserID) {
-                        chrome.storage.sync.set({
-                            'allowReminders' : {
-                                'permission' : true,
-                                'UserID' : session.data.UserID
-                            }
-                        })
-                    } 
-                    // regardless of same user, set session id
-                    chrome.storage.sync.set({
-                        'session' : session
-                    }, loginHelper);
-                } else {
-                    // have never installed chrome extension before
-                    chrome.storage.sync.set({
-                        'session' : session,
-                        'allowReminders' : {
-                            'permission' : true,
-                            'UserID' : session.data.UserID
-                        },
-                        'timeEntryMethod' : {
-                            'method' : 'duration',
-                            'UserID' : session.data.UserID
-                        }
-                    }, loginHelper);
-                }
-            })
+            chrome.storage.sync.set({
+                'session' : session
+            }, loginHelper);
         })
         .catch(function (error) {
             $scope.loginError = true;

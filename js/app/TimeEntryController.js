@@ -438,6 +438,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
     $scope.changeTimeEntryMethod = function (timeEntryMethod) {
+      $scope.timeEntryMethod = timeEntryMethod;
     	switch (timeEntryMethod) {
     		case "duration":
     			$scope.showHourEntryField = true;
@@ -477,20 +478,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 "task" : timeEntry.task,
                 "client" : timeEntry.client
             }
-           
-            // check for changed time entry methods
-            chrome.storage.sync.get('timeEntryMethod', function(items) {
-              if ('timeEntryMethod' in items) {
-                if (items.timeEntryMethod.method == 'duration' && ($scope.runningStopwatch || $scope.showStartEndTimes)) {
-                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
-                  return;
-                } else if (items.timeEntryMethod.method == 'start-end' && $scope.showHourEntryField) {
-                  $scope.setError(null, "We're sorry, you're not longer allowed to enter time using this method. Please contact your ClickTime administrator for further information");
-                  return;
-                }   
-              }   
-            })   
-
             if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
                 if (!timeEntry.Hours) {
                     $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
@@ -901,9 +888,29 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             + "Please choose a different "
                             + "entry method in the settings"
                             + " or contact your company's ClickTime administrator for more details.");
+                if (user.RequireStartEndTime) {
+                  $scope.changeTimeEntryMethod("start-end");
+                  chrome.storage.sync.set({
+                    'timeEntryMethod' : {
+                      UserID: user.UserID,
+                      method: 'start-end'
+                    }
+                  })
+                } else {
+                  $scope.changeTimeEntryMethod("duration");
+                  chrome.storage.sync.set({ 
+                    'timeEntryMethod' : {
+                      UserID: user.UserID,
+                      method: 'duration'
+                    }
+                  })
+                }
+              $scope.$apply();
+              return;
             }
             $scope.user = user;
             $scope.doneRefresh.push("user");
+
             if ($scope.doneRefresh.length >= 4) {
                 deferred.resolve();
             }
@@ -1031,15 +1038,74 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             })
         }
 
+        function updateTimeEntryMethodInStorage() {
+           var UserID, RequireStopwatch, RequireStartEndTime, method;
+
+            // retrieve user object, so we may get the user id
+            chrome.storage.local.get('user', function(items) {
+              if ('user' in items) {
+                UserID = items.user.data.UserID;
+                RequireStopwatch = items.user.data.RequireStopwatch;
+                RequireStartEndTime = items.user.data.RequireStartEndTime;
+              }
+
+              if (RequireStartEndTime || RequireStopwatch) {
+                method = 'start-end'
+              } else {
+                method = 'duration'
+              }
+            })
+
+            // timeEntryMethod and allowReminders will stay forever in the sync storage
+            // it is updated if a different user is logged in, or if it has never been set before
+            chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
+                // some user has used this chrome extension before
+                if (('timeEntryMethod' in items) || ('allowReminders' in items)) {
+                    // if it is the same user, we do not set their permissions at all because the permissions are still in chrome storage
+                    // if not same user, we do the following
+                    if (UserID != items.timeEntryMethod.UserID) {
+                        chrome.storage.sync.set({
+                            'timeEntryMethod' : {
+                                'method' : method,
+                                'UserID' : UserID
+                            }
+                        })
+                    }
+                    if (UserID != items.allowReminders.UserID) {
+                        chrome.storage.sync.set({
+                            'allowReminders' : {
+                                'permission' : true,
+                                'UserID' : UserID 
+                            }
+                        })
+                    }
+                } else {
+                    // have never installed chrome extension before
+                    // default time entry method will be taken from their settings
+                    chrome.storage.sync.set({
+                        'allowReminders' : {
+                            'permission' : true,
+                            'UserID' : UserID
+                        },
+                        'timeEntryMethod' : {
+                            'method' : method,
+                            'UserID' : UserID
+                        }
+                    });
+                }
+            })
+        }
+
         var afterGetUser = function (user) {
             $scope.user = user;
             $scope.variables.push('user');
             $scope.$apply();
-
+            
+            updateTimeEntryMethodInStorage();
+        
              // Set the default time entry method
             chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
                 if ('timeEntryMethod' in items) {
-                    $scope.timeEntryMethod = items.timeEntryMethod.method;
                     $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
                     if ($scope.timeEntryMethod == "duration") {
                         TimeEntryService.getInProgressEntry(function (inProgressEntry) {

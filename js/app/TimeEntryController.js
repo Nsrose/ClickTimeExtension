@@ -1064,8 +1064,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
-            if (inProgressEntry.ISOStartTime && inProgressEntry.ISOEndTime) {
+            if (inProgressEntry.ISOStartTime) {
+                $scope.showStartTimer = false;
                 $scope.timeEntry.ISOStartTime = inProgressEntry.ISOStartTime;
+            }
+            if (inProgressEntry.ISOEndTime) {
+                $scope.showStartTimer = false;
+                $scope.timeEntry.ISOEndTime = inProgressEntry.ISOEndTime;
+            } else {
                 $scope.timeEntry.ISOEndTime = CTService.getNowString();
             }
         })

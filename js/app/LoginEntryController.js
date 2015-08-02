@@ -37,13 +37,19 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     }
 
     $("#email-input").keypress(function(e) {
-        if (e.which == 13) {
+        console.log(typeof this.value);
+        console.log(typeof $('#password-input').value);
+
+        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
         }
     })
 
     $("#password-input").keypress(function(e) {
-        if (e.which == 13) {
+        console.log(typeof this.value);
+        console.log(typeof $('#email-input').value);
+
+        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
         }
     })

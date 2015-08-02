@@ -613,6 +613,12 @@ input[type="email"], input[type="password"] {
     margin-bottom: 0px;
 }
 
+#invalid-login {
+    width: 400px;
+    margin-top: 29px;
+    margin-left: 20px;
+}
+
 input[type="text"] {
 }
 

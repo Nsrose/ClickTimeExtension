@@ -1159,7 +1159,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.$apply();
             })
         }
-
+        
+        // upon log in, sets the time entry method according to user's permissions
         function updateTimeEntryMethodInStorage() {
            var UserID, RequireStopwatch, RequireStartEndTime, method;
 

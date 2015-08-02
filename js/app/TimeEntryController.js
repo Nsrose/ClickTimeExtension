@@ -142,11 +142,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.showStartTimer = true;
         }
     }
-
-    if (($scope.showHourEntryField && !$scope.timeEntry.Hours)
-        || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOEndTime || !$scope.timeEntry.ISOStartTime))) {
-        $scope.showStartTimer = true;    
-    }
     
      // For the stopwatch display on start/end times:
     $scope.endTimePromise = undefined;
@@ -1040,7 +1035,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             "BreakTime":0.00,
             "Comment":"",
             "Date":dateString,
-            "Hours":DEFAULT_EMPTY_HOURS,
+            "Hours":null,
             "ISOEndTime":null,
             "ISOStartTime":null,
             "JobID":"",
@@ -1064,7 +1059,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     $scope.abandonedEntry = true;
                 }
             }
-
             $scope.timeEntry.Comment = inProgressEntry.Comment;
             $scope.timeEntry.Date = inProgressEntry.Date;
             if (inProgressEntry.Hours) {
@@ -1139,13 +1133,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
              // Set the default time entry method
             chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
                 if ('timeEntryMethod' in items) {
-                    $scope.timeEntryMethod = items.timeEntryMethod.method;
-                    $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
+                    var timeEntryMethod = items.timeEntryMethod.method;
+                    $scope.timeEntryMethod = timeEntryMethod;
+                    $scope.changeTimeEntryMethod(timeEntryMethod);
                     if ($scope.timeEntryMethod == "duration") {
                         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
                             $scope.timeEntry.Hours = inProgressEntry.Hours;
+                            if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
+                                || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
+                                $scope.showStartTimer = true;    
+                            }
                         })
                     }
+                    
                     $scope.$apply();
                 } else {
                     $scope.showOptionsMessage = true;

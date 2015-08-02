@@ -433,6 +433,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.timeEntry.ISOEndTime = null;
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
+        $scope.showStartTimer = true;
         $scope.saving = false;
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
@@ -812,11 +813,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             if (permittedTasks.length > 0) {
                 $scope.task = permittedTasks[0];
+            } else {
+                $scope.task = undefined;
             }
             $scope.tasks = permittedTasks;
+            if ($scope.task) {
+                $scope.timeEntry.task = $scope.task;
+                $scope.timeEntry.TaskID = $scope.task.TaskID;    
+            }
             TimeEntryService.updateInProgressEntry('task', $scope.task);
-            $scope.timeEntry.task = $scope.task;
-            $scope.timeEntry.TaskID = $scope.task.TaskID;
         }
     })
 
@@ -886,50 +891,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetTasks = function (tasksList) {
             var currentTask = $scope.timeEntry.task;
-            if (!EntityService.hasTask(tasksList, currentTask)) {
-                $scope.setError("taskConflict", "We're sorry but the "
-                            + $scope.customTerms.taskTermSingLow + " "
-                            + currentTask.DisplayName + " you've chosen is no longer available. "
-                            + "Please choose a different "
-                            + $scope.customTerms.taskTermSingLow
-                            + " or contact your company's ClickTime administrator for more details.");
-                $scope.allTasks = tasksList;
-                if ($scope.jobClient) {
-                    var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                    var permittedTasks = [];
-                    for (i in tasksList) {
-                        var t = tasksList[i];
-                        if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                            permittedTasks.push(t);
-                        }
-                    }
-                    $scope.tasks = permittedTasks;
-                } else {
-                    $scope.tasks = tasksList;    
-                }
-                if ($scope.tasks.length > 0) {
-                    $scope.task = $scope.tasks[0];
-                }
-                if ($scope.task) {
-                    $scope.timeEntry.task = $scope.task;
-                    $scope.timeEntry.TaskID = $scope.task.TaskID;
-                }
-                TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                $scope.doneRefresh.push("tasks");
-                if ($scope.doneRefresh.length >= 4) {
-                    deferred.resolve();
-                }
-                $scope.$apply();
-            } else {
-                var currentJob = $scope.timeEntry.job;
-                var permittedTaskIDs = currentJob.PermittedTasks.split(",");
-                if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
+            if (currentTask) {
+                if (!EntityService.hasTask(tasksList, currentTask)) {
                     $scope.setError("taskConflict", "We're sorry but the "
-                            + $scope.customTerms.taskTermSingLow + " "
-                            + currentTask.DisplayName + " you've chosen is no longer available. "
-                            + "Please choose a different "
-                            + $scope.customTerms.taskTermSingLow
-                            + " or contact your company's ClickTime administrator for more details.");
+                                + $scope.customTerms.taskTermSingLow + " "
+                                + currentTask.DisplayName + " you've chosen is no longer available. "
+                                + "Please choose a different "
+                                + $scope.customTerms.taskTermSingLow
+                                + " or contact your company's ClickTime administrator for more details.");
                     $scope.allTasks = tasksList;
                     if ($scope.jobClient) {
                         var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
@@ -958,36 +927,75 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     }
                     $scope.$apply();
                 } else {
-                    $scope.allTasks = tasksList;
-                    if ($scope.jobClient) {
-                        var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                        var permittedTasks = [];
-                        for (i in tasksList) {
-                            var t = tasksList[i];
-                            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                                permittedTasks.push(t);
+                    var currentJob = $scope.timeEntry.job;
+                    var permittedTaskIDs = currentJob.PermittedTasks.split(",");
+                    if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
+                        $scope.setError("taskConflict", "We're sorry but the "
+                                + $scope.customTerms.taskTermSingLow + " "
+                                + currentTask.DisplayName + " you've chosen is no longer available. "
+                                + "Please choose a different "
+                                + $scope.customTerms.taskTermSingLow
+                                + " or contact your company's ClickTime administrator for more details.");
+                        $scope.allTasks = tasksList;
+                        if ($scope.jobClient) {
+                            var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                            var permittedTasks = [];
+                            for (i in tasksList) {
+                                var t = tasksList[i];
+                                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                                    permittedTasks.push(t);
+                                }
                             }
+                            $scope.tasks = permittedTasks;
+                        } else {
+                            $scope.tasks = tasksList;    
                         }
-                        $scope.tasks = permittedTasks;
+                        if ($scope.tasks.length > 0) {
+                            $scope.task = $scope.tasks[0];
+                        }
+                        if ($scope.task) {
+                            $scope.timeEntry.task = $scope.task;
+                            $scope.timeEntry.TaskID = $scope.task.TaskID;
+                        }
+                        TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+                        $scope.doneRefresh.push("tasks");
+                        if ($scope.doneRefresh.length >= 4) {
+                            deferred.resolve();
+                        }
+                        $scope.$apply();
                     } else {
-                        $scope.tasks = tasksList;    
+                        $scope.allTasks = tasksList;
+                        if ($scope.jobClient) {
+                            var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                            var permittedTasks = [];
+                            for (i in tasksList) {
+                                var t = tasksList[i];
+                                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                                    permittedTasks.push(t);
+                                }
+                            }
+                            $scope.tasks = permittedTasks;
+                        } else {
+                            $scope.tasks = tasksList;    
+                        }
+                        if ($scope.tasks.length > 0) {
+                            $scope.task = $scope.tasks[0];
+                        }
+                        if ($scope.task) {
+                            $scope.timeEntry.task = $scope.task;
+                            $scope.timeEntry.TaskID = $scope.task.TaskID;
+                        }
+                        TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+                        $scope.doneRefresh.push("tasks");
+                        if ($scope.doneRefresh.length >= 4) {
+                            deferred.resolve();
+                        }
+                        $scope.$apply();
                     }
-                    if ($scope.tasks.length > 0) {
-                        $scope.task = $scope.tasks[0];
-                    }
-                    if ($scope.task) {
-                        $scope.timeEntry.task = $scope.task;
-                        $scope.timeEntry.TaskID = $scope.task.TaskID;
-                    }
-                    TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                    $scope.doneRefresh.push("tasks");
-                    if ($scope.doneRefresh.length >= 4) {
-                        deferred.resolve();
-                    }
-                    $scope.$apply();
-                }
 
+                }
             }
+            
         }
 
         var afterGetUser = function (user) {
@@ -1145,8 +1153,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
                 // No in progress entity
                 $scope.task = tasksList[0];
-                $scope.timeEntry.task = $scope.task;
-                $scope.timeEntry.TaskID = $scope.task.TaskID;
+                if ($scope.task) {
+                    $scope.timeEntry.task = $scope.task;
+                    $scope.timeEntry.TaskID = $scope.task.TaskID;
+                }
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
                 $scope.variables.push('tasks');
                 $scope.$apply();

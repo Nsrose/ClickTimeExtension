@@ -95,7 +95,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 			if ('inProgressEntry' in items) {
 				var inProgressEntry = items.inProgressEntry;
 				// var dateString = CTService.getDateString();
-    //     		inProgressEntry.Date = dateString;
+                // inProgressEntry.Date = dateString;
         		chrome.storage.sync.set({
         			'inProgressEntry' : inProgressEntry
         		}, function() {
@@ -158,7 +158,11 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 						break;
 					case "task":
 						inProgressEntry.task = value;
-						inProgressEntry.TaskID = value.TaskID;
+						if (value) {
+							inProgressEntry.TaskID = value.TaskID;	
+						} else {
+							inProgressEntry.TaskID = null;
+						}
 						break;
 					case "inProgress":
 						inProgressEntry.inProgress = value;

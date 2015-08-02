@@ -20,6 +20,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     $scope.runningStopwatch = false;
     $scope.abandonedStopwatch = false;
+    $scope.abandonedEntry = false;
 
     $scope.settingsPage = function () {
         $location.path("/settings");
@@ -217,7 +218,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Validate and round hour input field on blur.
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
-        if (time == null) {
+        if (time == null || time == "") {
             $scope.showStartTimer = true;
             return;
         }
@@ -416,12 +417,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.saveFromTimer = false;
         $scope.saving = false;
         $scope.abandonedStopwatch = false;
+        $scope.abandonedEntry = false;
         $scope.pageReady = true;
     })
 
 
     // Clear an in progress entry and remove display fields
     $scope.clearTimeEntry = function() {
+        $scope.abandonedEntry = false;
         if ($scope.showStartEndTimes) {
             $scope.clearStartEndTimes();
         } else if ($scope.showHourEntryField) {
@@ -786,6 +789,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.task = permittedTasks[0];
             }
             $scope.tasks = permittedTasks;
+            TimeEntryService.updateInProgressEntry('task', $scope.task);
+            $scope.timeEntry.task = $scope.task;
+            $scope.timeEntry.TaskID = $scope.task.TaskID;
         }
     })
 
@@ -854,20 +860,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         var afterGetTasks = function (tasksList) {
-            $scope.allTasks = tasksList;
-            if ($scope.jobClient) {
-                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                var permittedTasks = [];
-                for (i in tasksList) {
-                    var t = tasksList[i];
-                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                        permittedTasks.push(t);
-                    }
-                }
-                $scope.tasks = permittedTasks;
-            } else {
-                $scope.tasks = tasksList;    
-            }
             var currentTask = $scope.timeEntry.task;
             if (!EntityService.hasTask(tasksList, currentTask)) {
                 $scope.setError("taskConflict", "We're sorry but the "
@@ -876,29 +868,101 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             + "Please choose a different "
                             + $scope.customTerms.taskTermSingLow
                             + " or contact your company's ClickTime administrator for more details.");
-                $scope.tasks = tasksList;
-                $scope.task = tasksList[0];
+                $scope.allTasks = tasksList;
+                if ($scope.jobClient) {
+                    var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                    var permittedTasks = [];
+                    for (i in tasksList) {
+                        var t = tasksList[i];
+                        if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                            permittedTasks.push(t);
+                        }
+                    }
+                    $scope.tasks = permittedTasks;
+                } else {
+                    $scope.tasks = tasksList;    
+                }
+                if ($scope.tasks.length > 0) {
+                    $scope.task = $scope.tasks[0];
+                }
                 if ($scope.task) {
                     $scope.timeEntry.task = $scope.task;
                     $scope.timeEntry.TaskID = $scope.task.TaskID;
                 }
                 TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+                $scope.doneRefresh.push("tasks");
+                if ($scope.doneRefresh.length >= 4) {
+                    deferred.resolve();
+                }
+                $scope.$apply();
             } else {
-                $scope.tasks = tasksList;
-                var index = EntityService.indexTask(tasksList, currentTask);
-                $scope.task = tasksList[index];
-            }
+                var currentJob = $scope.timeEntry.job;
+                var permittedTaskIDs = currentJob.PermittedTasks.split(",");
+                if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
+                    $scope.setError("taskConflict", "We're sorry but the "
+                            + $scope.customTerms.taskTermSingLow + " "
+                            + currentTask.DisplayName + " you've chosen is no longer available. "
+                            + "Please choose a different "
+                            + $scope.customTerms.taskTermSingLow
+                            + " or contact your company's ClickTime administrator for more details.");
+                    $scope.allTasks = tasksList;
+                    if ($scope.jobClient) {
+                        var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                        var permittedTasks = [];
+                        for (i in tasksList) {
+                            var t = tasksList[i];
+                            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                                permittedTasks.push(t);
+                            }
+                        }
+                        $scope.tasks = permittedTasks;
+                    } else {
+                        $scope.tasks = tasksList;    
+                    }
+                    if ($scope.tasks.length > 0) {
+                        $scope.task = $scope.tasks[0];
+                    }
+                    if ($scope.task) {
+                        $scope.timeEntry.task = $scope.task;
+                        $scope.timeEntry.TaskID = $scope.task.TaskID;
+                    }
+                    TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+                    $scope.doneRefresh.push("tasks");
+                    if ($scope.doneRefresh.length >= 4) {
+                        deferred.resolve();
+                    }
+                    $scope.$apply();
+                } else {
+                    $scope.allTasks = tasksList;
+                    if ($scope.jobClient) {
+                        var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+                        var permittedTasks = [];
+                        for (i in tasksList) {
+                            var t = tasksList[i];
+                            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                                permittedTasks.push(t);
+                            }
+                        }
+                        $scope.tasks = permittedTasks;
+                    } else {
+                        $scope.tasks = tasksList;    
+                    }
+                    if ($scope.tasks.length > 0) {
+                        $scope.task = $scope.tasks[0];
+                    }
+                    if ($scope.task) {
+                        $scope.timeEntry.task = $scope.task;
+                        $scope.timeEntry.TaskID = $scope.task.TaskID;
+                    }
+                    TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
+                    $scope.doneRefresh.push("tasks");
+                    if ($scope.doneRefresh.length >= 4) {
+                        deferred.resolve();
+                    }
+                    $scope.$apply();
+                }
 
-            if (tasksList.length == 0) {
-                $scope.HasEmptyEntities = true;
             }
-
-            $scope.doneRefresh.push("tasks");
-            if ($scope.doneRefresh.length >= 4) {
-                deferred.resolve();
-            }
-
-            $scope.$apply();
         }
 
         var afterGetUser = function (user) {
@@ -980,15 +1044,36 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+            if (inProgressEntry.Date) {
+                var yearStr = inProgressEntry.Date.substring(0, 4);
+                var monthStr = inProgressEntry.Date.substring(4, 6);
+                var monthCorrected = (parseInt(monthStr) - 1) + '';
+                var dayStr = inProgressEntry.Date.substring(6, 8);
+                var then = new Date(yearStr, monthCorrected, dayStr);
+                var now = new Date();
+                var msDay = 60*60*24*1000;
+                var dayDiff = Math.floor((now - then) / msDay);
+                if (dayDiff >= 1 && !$scope.abandonedStopwatch) {
+                    $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
+                    $scope.abandonedEntry = true;
+                }
+            }
+
             $scope.timeEntry.Comment = inProgressEntry.Comment;
+            $scope.timeEntry.Date = inProgressEntry.Date;
             if (inProgressEntry.Hours != DEFAULT_EMPTY_HOURS) {
                 $scope.showStartTimer = false;
             }
-            if (inProgressEntry.ISOStartTime && inProgressEntry.ISOEndTime) {
+            if (inProgressEntry.ISOStartTime) {
+                $scope.showStartTimer = false;
                 $scope.timeEntry.ISOStartTime = inProgressEntry.ISOStartTime;
+            }
+            if (inProgressEntry.ISOEndTime) {
+                $scope.showStartTimer = false;
+                $scope.timeEntry.ISOEndTime = inProgressEntry.ISOEndTime;
+            } else {
                 $scope.timeEntry.ISOEndTime = CTService.getNowString();
             }
-            TimeEntryService.updateInProgressEntry('Date', $scope.timeEntry.Date);
         })
        
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'

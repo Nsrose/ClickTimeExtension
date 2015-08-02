@@ -94,8 +94,8 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 		chrome.storage.sync.get('inProgressEntry', function (items) {
 			if ('inProgressEntry' in items) {
 				var inProgressEntry = items.inProgressEntry;
-				var dateString = CTService.getDateString();
-        		inProgressEntry.Date = dateString;
+				// var dateString = CTService.getDateString();
+    //     		inProgressEntry.Date = dateString;
         		chrome.storage.sync.set({
         			'inProgressEntry' : inProgressEntry
         		}, function() {

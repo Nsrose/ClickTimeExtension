@@ -629,6 +629,7 @@ input[type="text"]:disabled {
 
 .system-message {
     margin-left: 18px;
+    color: red;
 }
 
 #abandoned-stopwatch-message {

@@ -22,7 +22,7 @@ API_LINKED_FILES = {EXT_FOLDER_NAME + "/js/app/app.js",  EXT_FOLDER_NAME + "/js/
 def create_chrome_ext():
     '''Makes a zipped folder of the chrome extension, ready for upload.'''
 
-    copytree("../ClickTimeExtension", EXT_FOLDER_NAME, ignore=ignore_patterns(".git"));
+    copytree("../ClickTimeExtension", EXT_FOLDER_NAME, ignore=ignore_patterns(".git", "destruct", "chrome-ext-destruct.zip", "*.py"));
 
     # update_api_links()
 

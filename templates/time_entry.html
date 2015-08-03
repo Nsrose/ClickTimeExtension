@@ -42,17 +42,20 @@
             <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
 
+        <!-- Start time -->
         <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-form-start-title">Start Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')"  ng-disabled="runningStopwatch" maxlength="5" placeholder="{{defaultStartEndTime}}">
+               <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-disabled="runningStopwatch" required="required">
+
             </div>
         </div>
 
+        <!-- End time -->
         <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch" maxlength="5" placeholder="{{defaultStartEndTime}}">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch" required="required">
             </div>
         </div>
 

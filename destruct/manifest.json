@@ -1,0 +1,15 @@
+{
+  "manifest_version" : 2,
+  "name": "Clicktime Extension OutDated",
+  "version":"1",
+
+  "description" : "Clicktime extension is outdated",
+
+  "browser_action" : {
+    "default_title" : "ClickTime",
+    "default_popup" : "destruct.html"
+   },
+  
+  "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications"]
+
+}

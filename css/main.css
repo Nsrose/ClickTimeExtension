@@ -189,7 +189,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 }
 
 .time-entry-form-input {
-    width: 110px;
+    /* width: 110px; */
     height: 65px;
     font-size: 38px;
     text-align: right;
@@ -199,16 +199,17 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 }
 
 #time-entry-form-start {
-    margin-left: 18px;
-    width: 96px !important;
-    font-size: 24px;
+    /* margin-left: 18px; */
+    /* width: 96px !important; */
+    font-size: 23px;
     border:  1px solid #bcbcbc;
+    padding: 0;
 }
 
 #time-entry-form-end {
-    margin-left: 8px;
-    width: 96px !important;
-    font-size: 24px;
+    /* margin-left: 8px; */
+    /* width: 96px !important; */
+    font-size: 23px;
     border: 1px solid #bcbcbc;
 }
 
@@ -662,4 +663,12 @@ input[type="text"]:disabled {
 .feedback-container {
     margin-left: 20px;
     margin-top: 20px;
+}
+input[type="time"] {
+    -webkit-appearance: none;
+    -webkit-box-sizing: border-box;
+}
+input[type=time]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    display: none;
 }

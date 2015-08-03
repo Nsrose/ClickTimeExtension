@@ -20,20 +20,18 @@ myApp.service("StopwatchService", function() {
 		})
 	}
 
-	// Return the start time in HH:MM format string
+	// Return the start time as a Date object
 	this.getStartTime = function (callback) {
 		chrome.storage.sync.get('stopwatch', function (items) {
 			if ('stopwatch' in items) {
 				var stopwatch = items.stopwatch;
-				var hrs = stopwatch.startHrs + '';
-				if (hrs.length == 1) {
-					hrs = "0" + hrs;
-				}
-				var min = stopwatch.startMin + '';
-				if (min.length == 1) {
-					min = "0" + min;
-				}
-				var startTime = hrs + ":" + min;
+				var year = stopwatch.startYear;
+				var month = stopwatch.startMonth;
+				var day = stopwatch.startDay;
+				var hrs = stopwatch.startHrs;
+				var min = stopwatch.startMin;
+				var sec = stopwatch.startSec;
+				var startTime = new Date(year, month, day, hrs, min, sec);
 				callback(startTime);
 			}
 		})

@@ -1,5 +1,7 @@
 // Functions for common ClickTime specific operations
 myApp.service('CTService', function() {
+    var me = this;
+
 	  /**
      * Converts a true time value to a rounded time value according to the rounding scheme
      * @param  time             Precise time
@@ -132,10 +134,10 @@ myApp.service('CTService', function() {
     }
 
     /** Convert a hh:mm format to Clicktime's ISO time string */
-    this.convertISO = function (time) {
+    this.convertISO = function (date) {
     	// T splits date/time, . splits ms and the rest
-    	// return date.toISOString().split('T')[1].split('.')[0];
-        return time + ":00"; 
+    	return date.toISOString().split('T')[1].split('.')[0];
+        //return time + ":00"; 
     }
 
     /** Compile hrs, min, and sec to a Clicktime Hour stamp */
@@ -155,6 +157,24 @@ myApp.service('CTService', function() {
         }
         var nowString = now.getHours() + ":" + min;
         return nowString;
+    }
+
+    /** Get the default start/end time */
+    this.getDefaultStartEndTime = function() {
+        var now = new Date();
+        return now;
+    }
+
+    /** Get the numeric difference in hours, rounded, between two dates.*/
+    this.difference = function (endTime, startTime, timeIncrement) {
+        var endTimeFix = new Date(2015, 0, 1, endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
+        var startTimeFix = new Date(2015, 0, 1, startTime.getHours(), startTime.getMinutes(), startTime.getSeconds());
+        var exactHrs = (endTimeFix - startTimeFix) / 36e5;
+        if (exactHrs < 0) {
+            return -1;
+        }
+        var roundedHrs = me.roundToNearestDecimal(exactHrs, timeIncrement);
+        return parseFloat(roundedHrs);
     }
 
     //ALEX JONES

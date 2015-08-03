@@ -94,15 +94,18 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 		chrome.storage.sync.get('inProgressEntry', function (items) {
 			if ('inProgressEntry' in items) {
 				var inProgressEntry = items.inProgressEntry;
-				// var dateString = CTService.getDateString();
-                // inProgressEntry.Date = dateString;
-        		chrome.storage.sync.set({
-        			'inProgressEntry' : inProgressEntry
-        		}, function() {
-        			callback(inProgressEntry);
-        		})
+				var stringStartTime = inProgressEntry.ISOStartTime;
+				var stringEndTime = inProgressEntry.ISOEndTime;
+				inProgressEntry.ISOStartTime = new Date(JSON.parse(stringStartTime));
+				inProgressEntry.ISOEndTime = new Date(JSON.parse(stringEndTime));
+				if (stringEndTime == null) {
+					inProgressEntry.ISOEndTime = null;
+				}
+				if (stringStartTime == null) {
+					inProgressEntry.ISOStartTime = null;
+				}
+				callback(inProgressEntry);
 			} else {
-
 				var dateString = CTService.getDateString();
         		var now = new Date();
         		var min = null;
@@ -168,14 +171,18 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 						inProgressEntry.inProgress = value;
 						break;
 					case "ISOStartTime":
-						inProgressEntry.ISOStartTime = value;
+						var stringStartTime = JSON.stringify(value);
+						inProgressEntry.ISOStartTime = stringStartTime;
 						break;
 					case "ISOEndTime":
-						inProgressEntry.ISOEndTime = value;
+						var stringEndTime = JSON.stringify(value);
+						inProgressEntry.ISOEndTime = stringEndTime;
 						break;
 					case "startEndTimes":
-						inProgressEntry.ISOStartTime = value[0];
-						inProgressEntry.ISOEndTime = value[1];
+						var stringStartTime = JSON.stringify(value[0]);
+						var stringEndTime = JSON.stringify(value[1]);
+						inProgressEntry.ISOStartTime = stringStartTime;
+						inProgressEntry.ISOEndTime = stringEndTime;
 						break;
 					default:
 						bootbox.alert("Invalid time entry property: " + property);

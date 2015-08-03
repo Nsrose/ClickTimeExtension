@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
-var NOTIFICATION_POLL_PERIOD = 14400000; 
+var NOTIFICATION_POLL_PERIOD = 1000; 
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
@@ -28,9 +28,6 @@ var updateBadge = function(StopwatchService) {
             badgeSec = elapsedObj.elapsedSec % 60;
             badgeMin = elapsedObj.elapsedMin % 60;
             badgeHrs = elapsedObj.elapsedHrs;
-
-            console.log(badgeMin);
-
             if (badgeHrs > 9) {
                 chrome.browserAction.setBadgeText({text: badgeHrs + "+"});
                 stopBadge();
@@ -98,14 +95,6 @@ var options = {
     title: "Clicktime Extension",
     message: "Let's track your time!",
     iconUrl: "../../img/clicktime128x128.png",
-    buttons: [
-        {
-            "title" : "Enter time"
-        },
-        {
-            "title" : "Remind me later"
-        }
-    ]
 }
 
 //notifications function (declared here to avoid hoisting confusion)
@@ -113,13 +102,14 @@ var notificationInterval;
 
 /* create notifications if user allowed it */
 var createNotifications = function(poll_period) {
-    chrome.storage.sync.get('allowReminders', function(items) {
-        if (('allowReminders' in items) && (items.allowReminders.permission)) {
+   // console.log('create notifications called');
+    chrome.storage.sync.get(['session', 'allowReminders'], function(items) {
+        if (('allowReminders' in items) && (items.allowReminders.permission) && ('session' in items)) {
             //reminders are allowed. poll the user every x mins to enter time
             notificationInterval = setInterval(function() {
                 chrome.storage.sync.get('stopwatch', function (items) {
                     if (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running))) {                         
-                        chrome.notifications.create(options);
+                        chrome.notifications.create("enterTimeNotification", options);
                     }
                 })
             }, poll_period)
@@ -129,22 +119,31 @@ var createNotifications = function(poll_period) {
 
 
 var stopNotifications = function() {
+//    console.log("stop notification called");
     clearInterval(notificationInterval);
 }
 
-// Button actions
-chrome.notifications.onButtonClicked.addListener(function (notificationId, buttonIndex) {
-    // Go to time entry
-    if (buttonIndex == 0) {
-        chrome.app.window.create({
-            url : "../../templates/main.html"
-        })
-    } else {
-        // Remind me later
-        stopNotifications();
-        createNotifications(DELAYED_NOTIFICATION_POLL_PERIOD);
-    }    
-})
+// clicking on the body of the message will open the webapp
+chrome.notifications.onClicked.addListener(function (notificationId) {
+    chrome.tabs.create({
+            url: chrome.extension.getURL('../templates/main.html'),
+            active: false
+        }, function(tab) {
+            // After the tab has been created, open a window to inject the tab
+            chrome.windows.create({
+                tabId: tab.id,
+                type: 'popup',
+                focused: true,
+                width: 580,
+                height: 430
+            });
+        });
+});
+
+chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
+    stopNotifications();    
+    createNotifications(DELAYED_NOTIFICATION_POLL_PERIOD);
+});
 
 ////////////////////////////////////////////////////////////////////
 

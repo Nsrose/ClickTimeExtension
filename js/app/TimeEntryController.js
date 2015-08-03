@@ -757,20 +757,18 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         chrome.storage.sync.get('stopwatch', function (items) {
             if ('stopwatch' in items && items.stopwatch.running) {
                 bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
-                    if (result) {
-                        $scope.removeLocalStorageVars();
-                        $scope.removeSyncStorageVars();
-                        $location.path("/login");
+                    if (!result) {
+                        return;
                     }
                 })
-            } else {
-                $location.path("/login");
-                $scope.removeLocalStorageVars();
-                $scope.removeSyncStorageVars();
-                $scope.$apply();
             }
+            $location.path("/login");
+            $scope.removeLocalStorageVars();
+            $scope.removeSyncStorageVars();
+            chrome.extension.getBackgroundPage().stopNotifications(); // stop generation of new notifications
+            chrome.notifications.clear('enterTimeNotification'); // clear any notifications in tray
+            $scope.$apply();
         })
-        
     }
 
     $scope.removeLocalStorageVars = function() {

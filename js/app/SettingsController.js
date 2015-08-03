@@ -43,8 +43,9 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
                 UserID: userID, 
                 permission: false
               }
+            }, function () {
+              chrome.extension.getBackgroundPage().stopNotifications();
             });
-            chrome.extension.getBackgroundPage().stopNotifications();
           }
         }
       })

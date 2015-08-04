@@ -150,16 +150,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Focus on notes
     $scope.focusNotes = function() {
         $scope.clearError("notes");
-        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-            if (!inProgressEntry.Hours) {
-                $scope.showStartTimer = true;
-                $scope.$apply();
-            } else {
-                clearSuccessMessage();
-                $scope.showStartTimer = false;
-                $scope.$apply();
-            }
-        })
+        if (!$scope.timeEntry.Hours) {
+            $scope.showStartTimer = true;
+        } else {
+            clearSuccessMessage();
+            $scope.showStartTimer = false;
+        }
     }
 
     // Swap action button from start timer to save and vice versa.
@@ -310,11 +306,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
            
             var hrs = CTService.roundToNearest(time, timeToIncrement);
             $scope.timeEntry.Hours = hrs;
-
-            if ($scope.timeEntry.Hours) {
-                clearSuccessMessage();
-                $scope.showStartTimer = false;
-            }
+            $scope.showStartTimer = false;
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
                 TimeEntryService.updateInProgressEntry('inProgress', true);
             });
@@ -1238,45 +1230,52 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
            var UserID, RequireStopwatch, RequireStartEndTime, method;
            var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
 
-            // retrieve user object, so we may get the user id and permissions
-            chrome.storage.local.get('user', function(items) {
-              if ('user' in items) {
-                UserID = items.user.data.UserID;
-                RequireStopwatch = items.user.data.RequireStopwatch;
-                RequireStartEndTime = items.user.data.RequireStartEndTime;
-              }
+            // Set user id and permissions
+            UserID = $scope.user.UserID;
+            RequireStopwatch = $scope.user.RequireStopwatch;
+            RequireStartEndTime = $scope.user.RequireStartEndTime;
 
-              if (RequireStartEndTime || RequireStopwatch) {
+            if (RequireStartEndTime || RequireStopwatch) {
                 method = 'start-end'
-              } else {
+            } else {
                 method = 'duration'
-              }
+            }
+            $scope.changeTimeEntryMethod(method);
+            if (method == "duration") {
+                TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                    $scope.timeEntry.Hours = inProgressEntry.Hours;
+                    if ((method == "duration" && !inProgressEntry.Hours)
+                        || (method == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
+                        $scope.showStartTimer = true;    
+                    }
+                    $scope.$apply();
+                })
+            }
 
-              chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-                  if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
-                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                  } else {
-                    if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
-                        chrome.storage.sync.set({
-                            'timeEntryMethod' : {
-                                'method' : method,
-                                'UserID' : UserID
-                            }
-                        })
-                    }
-                    if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
-                        chrome.storage.sync.set({
-                            'allowReminders' : {
-                                'permission' : true,
-                                'UserID' : UserID 
-                            }
-                        }, function() {
-                          chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                        });
-                    }
-                 }
-              })
-           })
+          chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
+              if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
+                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+              } else {
+                if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
+                    chrome.storage.sync.set({
+                        'timeEntryMethod' : {
+                            'method' : method,
+                            'UserID' : UserID
+                        }
+                    })
+                }
+                if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
+                    chrome.storage.sync.set({
+                        'allowReminders' : {
+                            'permission' : true,
+                            'UserID' : UserID 
+                        }
+                    }, function() {
+                      chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                    });
+                }
+             }
+          })        
         }
 
         var afterGetUser = function (user) {
@@ -1289,19 +1288,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
              // Set the default time entry method
             chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
                 if ('timeEntryMethod' in items) {
-                   var timeEntryMethod = items.timeEntryMethod.method;
-                    $scope.changeTimeEntryMethod(timeEntryMethod);
-                    if ($scope.timeEntryMethod == "duration") {
-                        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                            $scope.timeEntry.Hours = inProgressEntry.Hours;
-                            if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
-                                || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
-                                $scope.showStartTimer = true;    
-                            }
-                        })
-                    }
+                   // var timeEntryMethod = items.timeEntryMethod.method;
+                   //  $scope.changeTimeEntryMethod(timeEntryMethod);
+                   //  if ($scope.timeEntryMethod == "duration") {
+                   //      TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                   //          $scope.timeEntry.Hours = inProgressEntry.Hours;
+                   //          if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
+                   //              || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
+                   //              $scope.showStartTimer = true;    
+                   //          }
+                   //      })
+                   //  }
                     
-                    $scope.$apply();
+                    // $scope.$apply();
                 } else {
                     $scope.showOptionsMessage = true;
                     $scope.$apply();  

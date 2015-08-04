@@ -75,14 +75,14 @@
         <div class="time-entry-item" id="time-entry-item-start">
             <div class="fieldtitle time-entry">Start Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-start" type="text" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" maxlength="5" placeholder="{{defaultStartEndTime}}">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" required="required">
             </div>
         </div>
 
         <div class="time-entry-item" id="time-entry-item-end">
             <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="text" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" maxlength="5" placeholder="{{defaultStartEndTime}}">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" required="required">
             </div>
         </div>
 
@@ -116,7 +116,7 @@
     <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer || abandonedEntry) && !abandonedStopwatch">Cancel</button>
 
 
-    <div ng-model="timerDisplay" id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes">{{timerDisplay}}</div>
+    <div ng-model="timerDisplay" id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes && !abandonedStopwatch">{{timerDisplay}}</div>
 
     <div class="success-messaging-container" ng-show="generalSuccess">
 

@@ -1301,15 +1301,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             if (now.getMonth() - stopwatch.startMonth == 0 
                                 || now.getFullYear() - stopwatch.startYear == 0) {
                                 StopwatchService.getStartTime(function (startTime) {
-                                    var midnight = new Date(2015, 0, 1, 23, 59, 59);
-                                    $scope.timeEntry.ISOStartTime = startTime;
+                                    var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
+                                        startTime.getHours(), startTime.getMinutes(), 0);
+                                    var midnight = new Date(2015, 0, 1, 23, 59, 0);
+                                    $scope.timeEntry.ISOStartTime = start;
                                     $scope.timeEntry.ISOEndTime = midnight;
-                                    TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, midnight]);
+                                    TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
                                 })
                                 $scope.abandonedStopwatch = true;
                                 $scope.runningStopwatch = false;
 
-                                $('#notes-field').css({'width': '276px', 'max-width': '276px'});
+                                $('#notes-field').css({'width': '255px', 'max-width': '255px'});
                             }
                         } else {
                             // There is a running stopwatch, but it isn't abandoned

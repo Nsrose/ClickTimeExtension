@@ -51,13 +51,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // End Google Analytics Code
 
-
-
-
-    $scope.variables = [];
-    $scope.UserName = null;
-    $scope.UserID = null;
-
     //Company custom terms
     $scope.customTerms = {};
 
@@ -69,17 +62,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Client, job, or task is empty in db
     $scope.HasEmptyEntities = false;
-    // if true, indicate to user that they can set default time entry method in extension options
-    $scope.showOptionsMessage = false;
 
+    // True if a stopwatch is running
     $scope.runningStopwatch = false;
+    // True if a stopwatch has expired from yesterday or before
     $scope.abandonedStopwatch = false;
+    // True if a time entry has expired from yesterday or before
     $scope.abandonedEntry = false;
 
+    // Link to the settings page
     $scope.settingsPage = function () {
         $location.path("/settings");
     }
 
+    // Function to test sending an error to API
     $scope.testError = function() {
         APIService.reportError($scope.Session.UserEmail,
             $scope.Session.Token,
@@ -89,22 +85,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             });
     }
 
-    //// Interface logic ////
-    //Default start end time display
-
-    // $scope.defaultStartEndTime = CTService.getNowString();
-    $scope.defaultStartEndTime = CTService.getDefaultStartEndTime();
-
     /////////////////////////////////////////// Interface logic /////////////////////////////////////
-
-    //// Handling keypress events ////
-
-    // disable backspace (weird behavior)
-    // $(document).keydown(function(e) {
-    //     if (e.which == 8) {
-    //         return false;
-    //     }
-    // })
 
     // start stopwatch, if there
     $(document).keypress(function(e) {
@@ -117,6 +98,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on hours and enter
     $("#time-entry-form-hours").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-hours").blur();
@@ -124,6 +106,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on start/end and enter
     $("#time-entry-form-start").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-start").blur();
@@ -132,6 +115,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on start/end and enter
     $("#time-entry-form-end").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-start").blur();
@@ -150,7 +134,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         
     }
 
-    // Focus on notes
+    // Focus on notes and clear errors
     $scope.focusNotes = function() {
         $scope.clearError("notes");
         if (!$scope.timeEntry.Hours) {
@@ -182,13 +166,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             return;
         }
-        // if (
-        //     ( $scope.showStartEndTimes &&
-        //     ( !$scope.timeEntry.ISOStartTime
-        //     || !$scope.timeEntry.ISOEndTime))) {
-        //     // cannot swap action with empty fields
-        //     return;
-        // }
         if ($scope.showStartTimer) {
             clearSuccessMessage();
             $scope.showStartTimer = false;
@@ -197,9 +174,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
     
-     // For the stopwatch display on start/end times:
+     
+    // For the stopwatch display on start/end times:
     $scope.endTimePromise = undefined;
 
+    // Start a stopwtach and the end time promise
     $scope.startStopwatch = function () {
         clearSuccessMessage();
         $scope.showStartTimer = false;
@@ -227,8 +206,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
        
     }
 
+    // Clear the successful save message
     var clearSuccessMessage = function() {
-
         if ($scope.generalSuccess == true) {
             $scope.generalSuccess = false;
             $scope.$apply();
@@ -1097,6 +1076,84 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         return deferred.promise;
     }
 
+    /* update the hour display if you're using duration as your time entry method*/
+    function updateDurationDisplay() {
+        if ($scope.timeEntryMethod == "duration") {
+            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                $scope.timeEntry.Hours = inProgressEntry.Hours;
+                if (($scope.timeEntryMethod == "duration" && !inProgressEntry.Hours)
+                    || ($scope.timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || 
+                    !inProgressEntry.ISOStartTime))) {
+                    $scope.showStartTimer = true;    
+                }
+            })
+        }
+    }
+
+    /* Sets the time entry method according to user's permissions,
+       starts notifications (notification permissions specified in function 
+       found in background.js).
+
+       There are two cases:
+
+        - If it's the same user, we do not set permissions at all because 
+          timeEntryMethod and allowReminders are never removed from sync, only updated as needed.
+
+        - If it's not the same user, or this is the first installation, we grab their settings
+          according to the managerial permissions set by the CT admin. We will also allow reminders
+          by default, since this is not a CT-specified property.
+       
+       Notifications are started either way. 
+
+       Pending no manual manipulation with the program, timeEntryMethod and allowReminders should always come in a pair. 
+       If one exists, it can be assumed that the other also exists, 
+       Therefore, we do not account for the case of lonely properties. 
+    */
+    function updateTimeEntryMethodInStorage() {
+       var UserID, RequireStopwatch, RequireStartEndTime, method;
+       var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
+
+        // Set user id and permissions
+        UserID = $scope.user.UserID;
+        RequireStopwatch = $scope.user.RequireStopwatch;
+        RequireStartEndTime = $scope.user.RequireStartEndTime;
+
+        if (RequireStartEndTime || RequireStopwatch) {
+            method = 'start-end'
+        } else {
+            method = 'duration'
+        }
+
+        chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
+            if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
+                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
+                updateDurationDisplay();
+            } else {
+                if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
+                    chrome.storage.sync.set({
+                        'timeEntryMethod' : {
+                            'method' : method,
+                            'UserID' : UserID
+                        }
+                    }, function() {
+                        $scope.changeTimeEntryMethod(method);
+                        updateDurationDisplay();
+                    });
+                }
+            if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
+                chrome.storage.sync.set({
+                    'allowReminders' : {
+                        'permission' : true,
+                        'UserID' : UserID 
+                    }
+                }, function() {
+                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                });
+            }
+         }
+      })        
+    }
   
 
     ///// ONLOAD: This will get executed upon opneing the chrome extension. /////////
@@ -1214,85 +1271,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
                 $scope.$apply();
             })
-        }
-        
-        /* Sets the time entry method according to user's permissions,
-           starts notifications (notification permissions specified in function 
-           found in background.js).
-
-           There are two cases:
-
-            - If it's the same user, we do not set permissions at all because 
-              timeEntryMethod and allowReminders are never removed from sync, only updated as needed.
-
-            - If it's not the same user, or this is the first installation, we grab their settings
-              according to the managerial permissions set by the CT admin. We will also allow reminders
-              by default, since this is not a CT-specified property.
-           
-           Notifications are started either way. 
-
-           Pending no manual manipulation with the program, timeEntryMethod and allowReminders should always come in a pair. 
-           If one exists, it can be assumed that the other also exists, 
-           Therefore, we do not account for the case of lonely properties. 
-        */
-        function updateTimeEntryMethodInStorage() {
-           var UserID, RequireStopwatch, RequireStartEndTime, method;
-           var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
-
-            // Set user id and permissions
-            UserID = $scope.user.UserID;
-            RequireStopwatch = $scope.user.RequireStopwatch;
-            RequireStartEndTime = $scope.user.RequireStartEndTime;
-
-            if (RequireStartEndTime || RequireStopwatch) {
-                method = 'start-end'
-            } else {
-                method = 'duration'
-            }
-
-            chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-                if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
-                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                    $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
-                    updateDurationDisplay();
-                } else {
-                    if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
-                        chrome.storage.sync.set({
-                            'timeEntryMethod' : {
-                                'method' : method,
-                                'UserID' : UserID
-                            }
-                        }, function() {
-                            $scope.changeTimeEntryMethod(method);
-                            updateDurationDisplay();
-                        });
-                    }
-                if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
-                    chrome.storage.sync.set({
-                        'allowReminders' : {
-                            'permission' : true,
-                            'UserID' : UserID 
-                        }
-                    }, function() {
-                        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                    });
-                }
-             }
-          })        
-        }
-
-        /* update the hour display if you're using duration as your time entry method*/
-        function updateDurationDisplay() {
-            if ($scope.timeEntryMethod == "duration") {
-                TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                    $scope.timeEntry.Hours = inProgressEntry.Hours;
-                    if (($scope.timeEntryMethod == "duration" && !inProgressEntry.Hours)
-                        || ($scope.timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || 
-                        !inProgressEntry.ISOStartTime))) {
-                        $scope.showStartTimer = true;    
-                    }
-                })
-            }
         }
 
         var afterGetUser = function (user) {

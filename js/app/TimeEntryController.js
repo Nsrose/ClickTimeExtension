@@ -1213,11 +1213,30 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             })
         }
         
-        // upon log in, sets the time entry method according to user's permissions
+        /* Sets the time entry method according to user's permissions,
+           starts notifications (notification permissions specified in function 
+           found in background.js).
+
+           There are two cases:
+
+            - If it's the same user, we do not set permissions at all because 
+              timeEntryMethod and allowReminders are never removed from sync, only updated as needed.
+
+            - If it's not the same user, or this is the first installation, we grab their settings
+              according to the managerial permissions set by the CT admin. We will also allow reminders
+              by default, since this is not a CT-specified property.
+           
+           Notifications are started either way. 
+
+           Pending no manual manipulation with the program, timeEntryMethod and allowReminders should always come in a pair. 
+           If one exists, it can be assumed that the other also exists, 
+           Therefore, we do not account for the case of lonely properties. 
+        */
         function updateTimeEntryMethodInStorage() {
            var UserID, RequireStopwatch, RequireStartEndTime, method;
+           var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
 
-            // retrieve user object, so we may get the user id
+            // retrieve user object, so we may get the user id and permissions
             chrome.storage.local.get('user', function(items) {
               if ('user' in items) {
                 UserID = items.user.data.UserID;
@@ -1232,46 +1251,29 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
               }
             })
 
-            // timeEntryMethod and allowReminders will stay forever in the sync storage
-            // it is updated if a different user is logged in, or if it has never been set before
             chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-                // some user has used this chrome extension before
-                if (('timeEntryMethod' in items) || ('allowReminders' in items)) {
-                    // if it is the same user, we do not set their permissions at all because the permissions are still in chrome storage
-                    // if not same user, we do the following
-                    if (UserID != items.timeEntryMethod.UserID) {
-                        chrome.storage.sync.set({
-                            'timeEntryMethod' : {
-                                'method' : method,
-                                'UserID' : UserID
-                            }
-                        })
-                    }
-                    if (UserID != items.allowReminders.UserID) {
-                        chrome.storage.sync.set({
-                            'allowReminders' : {
-                                'permission' : true,
-                                'UserID' : UserID 
-                            }
-                        })
-                    }
-                } else {
-                    // have never installed chrome extension before
-                    // default time entry method will be taken from their settings
-                    chrome.storage.sync.set({
-                        'allowReminders' : {
-                            'permission' : true,
-                            'UserID' : UserID
-                        },
-                        'timeEntryMethod' : {
-                            'method' : method,
-                            'UserID' : UserID
-                        }
-                    }, function() {
-                        var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
-                        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                    });
-                }
+                    if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
+                      chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                    } else {
+                      if ((UserID != items.timeEntryMethod.UserID) || !('timeEntryMethod' in items)) {
+                          chrome.storage.sync.set({
+                              'timeEntryMethod' : {
+                                  'method' : method,
+                                  'UserID' : UserID
+                              }
+                          })
+                      }
+                      if ((UserID != items.allowReminders.UserID) || !('allowReminders' in items)) {
+                          chrome.storage.sync.set({
+                              'allowReminders' : {
+                                  'permission' : true,
+                                  'UserID' : UserID 
+                              }
+                          }, function() {
+                            chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                          });
+                      }
+                  }
             })
         }
 

@@ -82,7 +82,7 @@ a {
     overflow: hidden;
     height: 45px;
     padding: 10px;
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     border: 1px solid #bcbcbc !important;
@@ -118,7 +118,7 @@ a {
 .total-hours-log {
     float: right;
     margin-right: 20px;
-    margin-top: 12px;
+    margin-top: 60px;
     margin-bottom: 12px;
 }
 

@@ -148,16 +148,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Focus on notes
     $scope.focusNotes = function() {
         $scope.clearError("notes");
-        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-            if (!inProgressEntry.Hours) {
-                $scope.showStartTimer = true;
-                $scope.$apply();
-            } else {
-                clearSuccessMessage();
-                $scope.showStartTimer = false;
-                $scope.$apply();
-            }
-        })
+        if (!$scope.timeEntry.Hours) {
+            $scope.showStartTimer = true;
+        } else {
+            clearSuccessMessage();
+            $scope.showStartTimer = false;
+        }
     }
 
     // Swap action button from start timer to save and vice versa.
@@ -308,11 +304,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
            
             var hrs = CTService.roundToNearest(time, timeToIncrement);
             $scope.timeEntry.Hours = hrs;
-
-            if ($scope.timeEntry.Hours) {
-                clearSuccessMessage();
-                $scope.showStartTimer = false;
-            }
+            $scope.showStartTimer = false;
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
                 TimeEntryService.updateInProgressEntry('inProgress', true);
             });

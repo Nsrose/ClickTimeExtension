@@ -85,14 +85,6 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
 
     function loginHelper() {
         $location.path("/time_entry");
-
-        // notifications should start happening if allowReminders will be set to true
-        chrome.storage.sync.get('allowReminders', function(items) {
-            if (('allowReminders' in items) && (items.allowReminders.permission)) {
-                var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
-                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-            }
-        })
         $scope.$apply();
     }
 

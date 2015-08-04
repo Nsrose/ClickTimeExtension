@@ -1,5 +1,54 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http', 
                                 function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
+    
+    // Google Analytics Code
+    dataLayer = [{}];
+    var companyId = '';
+    var userId = '';
+
+   
+    var createDataLayer = function() {
+
+        chrome.storage.local.get('company', function(items) {
+          if ('company' in items) {
+            companyId = items.company.data.CompanyID;
+            dataLayer[0].companyId = companyId;
+            }
+        });
+
+        chrome.storage.local.get('user', function(items) {
+          if ('user' in items) {
+            userId = items.user.data.UserID;
+            dataLayer[0].userId = userId;
+            }
+        });
+    };
+
+    $(document).ready(createDataLayer);
+
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-130046-14']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = 'https://ssl.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+    function trackButton(e) {
+        _gaq.push(['_trackEvent', e.target.id, 'clicked']);
+    };
+
+    var buttons = document.querySelectorAll('button');
+
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', trackButton);
+    }
+
+    // End Google Analytics Code
+
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;

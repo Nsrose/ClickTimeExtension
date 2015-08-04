@@ -51,6 +51,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // End Google Analytics Code
 
+
+
+
     $scope.variables = [];
     $scope.UserName = null;
     $scope.UserID = null;
@@ -1099,9 +1102,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     ///// ONLOAD: This will get executed upon opneing the chrome extension. /////////
     
     // Get the session of the user from storage.
+    $scope.doneLoading = [];
     var afterGetSession = function (session) {
         $scope.$parent.Session = session;
-        $scope.variables.push('session');
         // Default empty entry
         var dateString = CTService.getDateString();
         $scope.timeEntry = {
@@ -1173,6 +1176,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
+                $scope.doneLoading.push('tasks');
+                if ($scope.doneLoading.length >= 4) {
+                    $scope.$emit("pageReady");
+                }
                 return;
             }
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -1186,6 +1193,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.task = filteredTasks[0];
                         $scope.timeEntry.task = inProgressEntry.task;
                         $scope.timeEntry.TaskID = inProgressEntry.TaskID;
+                        $scope.doneLoading.push('tasks');
+                        if ($scope.doneLoading.length >= 4) {
+                            $scope.$emit("pageReady");
+                        }
                         $scope.$apply();
                         return;
                     }           
@@ -1197,7 +1208,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     $scope.timeEntry.TaskID = $scope.task.TaskID;
                 }
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
-                $scope.variables.push('tasks');
+                $scope.doneLoading.push('tasks');
+                if ($scope.doneLoading.length >= 4) {
+                    $scope.$emit("pageReady");
+                }
                 $scope.$apply();
             })
         }
@@ -1283,7 +1297,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetUser = function (user) {
             $scope.user = user;
-            $scope.variables.push('user');
+            $scope.doneLoading.push('user');
+            if ($scope.doneLoading.length >= 4) {
+                $scope.$emit("pageReady");
+            }
             $scope.$apply();
             updateTimeEntryMethodInStorage();      
             chrome.storage.sync.get(['stopwatch'], function (items) {
@@ -1352,9 +1369,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
                 'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
             }
-            $scope.variables.push('company');
+            $scope.doneLoading.push('company');
+            if ($scope.doneLoading.length >= 4) {
+                $scope.$emit("pageReady");
+            }
             $scope.$apply();
-            $scope.$parent.$broadcast("pageReady"); 
 
         }
 
@@ -1385,6 +1404,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if ($scope.jobClients.length == 0) {
                 $scope.HasEmptyEntities = true;
                 $scope.jobClient = undefined;
+                $scope.doneLoading.push("jobClients");
+                if ($scope.doneLoading.length >= 4) {
+                    $scope.$emit("pageReady");
+                }
                 $scope.$apply();
             } else {
                 TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -1401,6 +1424,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.timeEntry.job = inProgressEntry.job;
                             $scope.timeEntry.JobID = inProgressEntry.JobID;
                             $scope.timeEntry.client = inProgressEntry.client;
+                            $scope.doneLoading.push("jobClients");
+                            if ($scope.doneLoading.length >= 4) {
+                                $scope.$emit("pageReady");
+                            }
                             $scope.$apply();
                             return;
                         }           
@@ -1413,6 +1440,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
                         TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
                     });
+                    $scope.doneLoading.push("jobClients");
+                    if ($scope.doneLoading.length >= 4) {
+                        $scope.$emit("pageReady");
+                    }
                     $scope.$apply();
                 
                 })

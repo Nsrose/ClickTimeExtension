@@ -812,7 +812,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.removeLocalStorageVars();
             $scope.removeSyncStorageVars();
             chrome.extension.getBackgroundPage().stopNotifications(); // stop generation of new notifications
-            chrome.notifications.clear('enterTimeNotification'); // clear any notifications in tray
             $scope.$apply();
         })
     }

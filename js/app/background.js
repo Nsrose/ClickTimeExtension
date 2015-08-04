@@ -90,7 +90,7 @@ var stopBadge = function() {
 }
 
 ///////// Notifications /////////////////////////////////////////////////
-
+/* notifications options */
 var options = {
     type: "basic",
     title: "Clicktime Extension",
@@ -101,25 +101,28 @@ var options = {
 //notifications function (declared here to avoid hoisting confusion)
 var notificationInterval;
 
-/* create notifications if user allowed it. */
-var createNotifications = function(poll_period) {
-    chrome.storage.sync.get(['session', 'allowReminders'], function(items) {
-        if (('allowReminders' in items) && 
-            (items.allowReminders.permission) && ('session' in items)) {
-            //reminders are allowed. poll the user every x mins to enter time
-            notificationInterval = setInterval(function() {
-                chrome.storage.sync.get('stopwatch', function (items) {
-                    if (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running))) {                         
-                        chrome.notifications.create("enterTimeNotification", options);
-                    }
-                })
-            }, poll_period)
-        }
-    })
-}
+/* create notifications if all conditions true:
+    - user allows it
+    - user is logged in
+    - there isn't a running stopwatch. */
+var createNotifications = function(pollPeriod) {
+    notificationInterval = setInterval(function() {
+       chrome.storage.sync.get(['session', 'allowReminders', 'stopwatch'], function(items) {
+            if ((('allowReminders' in items) && (items.allowReminders.permission)) && 
+                ('session' in items) && 
+                (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running)))) {
+                  chrome.notifications.create("enterTimeNotification", options);
+             }
+       })
+    }, pollPeriod)
+};
 
+/* stop generation of new notifications, 
+   clear any notifications in tray
+*/
 var stopNotifications = function() {
     clearInterval(notificationInterval);
+    chrome.notifications.clear('enterTimeNotification');
 }
 
 // clicking on the body of the message will open the webapp

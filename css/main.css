@@ -8,12 +8,10 @@ a {
 }
 
 #main {
-  min-width: 556px;
+ min-width: 556px;
   width: 556px;
   min-height: 10px;
   height: 380px;
-  /* height: 500px; */
-  margin: -2px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -84,6 +82,9 @@ a {
     overflow: hidden;
     height: 45px;
     padding: 10px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
     border: 1px solid #bcbcbc !important;
     background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);
 }

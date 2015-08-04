@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
-var NOTIFICATION_POLL_PERIOD = 14400000;
+var NOTIFICATION_POLL_PERIOD = 5000;
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
@@ -95,7 +95,7 @@ var options = {
     type: "basic",
     title: "Clicktime Extension",
     message: "Let's track your time!",
-    iconUrl: "../../img/clicktime128x128.png",
+    iconUrl: "../../img/128.png",
 }
 
 //notifications function (declared here to avoid hoisting confusion)
@@ -117,7 +117,8 @@ var createNotifications = function(pollPeriod) {
     }, pollPeriod)
 };
 
-/* stop generation of new notifications, 
+/* 
+   stop generation of new notifications, 
    clear any notifications in tray
 */
 var stopNotifications = function() {
@@ -125,22 +126,29 @@ var stopNotifications = function() {
     chrome.notifications.clear('enterTimeNotification');
 }
 
-// clicking on the body of the message will open the webapp
+/* clicking on the body of the message will open the webapp in a window with id = 1
+   first check if such a window already exists (chrome will throw an exception, which 
+   we will catch). If it does exist, we will draw attention to the window. If not,
+   we will create a new window with the same ID as before.
+*/
+var windowID;
 chrome.notifications.onClicked.addListener(function (notificationId) {
-    chrome.tabs.create({
+    if (typeof windowID === 'undefined') { // if id has never beeen set before 
+        chrome.windows.create({
             url: chrome.extension.getURL('../templates/main.html'),
-            active: false
-        }, function(tab) {
-            // After the tab has been created, open a window to inject the tab
-            chrome.windows.create({
-                tabId: tab.id,
-                type: 'popup',
-                focused: true,
-                width: 556,
-                height: 380
-            });
-        }
-    );
+            type: 'popup',
+            focused: true,
+            width: 556,
+            height: 380,
+        }, function (window) {
+            windowID = window.id;
+            console.log(windowID);
+        });    
+    } else { 
+        chrome.windows.get(windowID, function (window) {
+            chrome.windows.update(window.id, {drawAttention: true});
+        });
+    }
 });
 
 chrome.notifications.onClosed.addListener(function (notificationId, byUser) {

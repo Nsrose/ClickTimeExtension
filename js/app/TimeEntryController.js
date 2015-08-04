@@ -1238,19 +1238,25 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             } else {
                 method = 'duration'
             }
+            
 
-          chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-              if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
-                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-              } else {
-                if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
-                    chrome.storage.sync.set({
-                        'timeEntryMethod' : {
-                            'method' : method,
-                            'UserID' : UserID
-                        }
-                    })
-                }
+            chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
+                if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
+                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                    $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
+                    updateDurationDisplay();
+                } else {
+                    if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
+                        chrome.storage.sync.set({
+                            'timeEntryMethod' : {
+                                'method' : method,
+                                'UserID' : UserID
+                            }
+                        }, function() {
+                            $scope.changeTimeEntryMethod(method);
+                            updateDurationDisplay();
+                        });
+                    }
                 if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
                     chrome.storage.sync.set({
                         'allowReminders' : {
@@ -1258,41 +1264,33 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             'UserID' : UserID 
                         }
                     }, function() {
-                      chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
                     });
                 }
              }
           })        
         }
 
+        /* update the hour display if you're using duration as your time entry method*/
+        function updateDurationDisplay() {
+            if ($scope.timeEntryMethod == "duration") {
+                TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                    $scope.timeEntry.Hours = inProgressEntry.Hours;
+                    if (($scope.timeEntryMethod == "duration" && !inProgressEntry.Hours)
+                        || ($scope.timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || 
+                        !inProgressEntry.ISOStartTime))) {
+                        $scope.showStartTimer = true;    
+                    }
+                })
+            }
+        }
+
         var afterGetUser = function (user) {
             $scope.user = user;
             $scope.variables.push('user');
             $scope.$apply();
-            
-            updateTimeEntryMethodInStorage();
-        
-             // Set the default time entry method
-            chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
-                if ('timeEntryMethod' in items) {
-                   var timeEntryMethod = items.timeEntryMethod.method;
-                    $scope.changeTimeEntryMethod(timeEntryMethod);
-                    if ($scope.timeEntryMethod == "duration") {
-                        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                            $scope.timeEntry.Hours = inProgressEntry.Hours;
-                            if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
-                                || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
-                                $scope.showStartTimer = true;    
-                            }
-                        })
-                    }
-                    
-                    $scope.$apply();
-                } else {
-                    $scope.showOptionsMessage = true;
-                    $scope.$apply();  
-                }
-
+            updateTimeEntryMethodInStorage();      
+            chrome.storage.sync.get(['stopwatch'], function (items) {
                 // Check for abandoned stopwatch
                 if ('stopwatch' in items) {
                     var now = new Date();

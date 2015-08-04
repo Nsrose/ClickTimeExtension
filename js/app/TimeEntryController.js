@@ -523,7 +523,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     $('#main').on('click', function() {
-        console.log($scope.generalSuccess);
         if ($scope.generalSuccess == true) {
             $scope.generalSuccess = false;
             $scope.$apply();
@@ -531,10 +530,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     })
 
     $scope.saveTimeEntry = function (session, timeEntry) {
-        // if ($scope.runningStopwatch && !$scope.abandonedStopwatch) {
-        //     $scope.timeEntryErrorActiveStopwatch = true;
-        //     return;
-        // }
         $scope.saving = true;
         $scope.clearAllErrors();
         $scope.refresh().then(function() {
@@ -599,15 +594,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 .then(function (response) {
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
-
-                    //ALEX JONES
-                    console.log(clickTimeEntry.Hours);
-                    console.log($scope.company.MinTimeIncrement);
-
                     var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    console.log(successMessageTotalRaw);
-
-
                     var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
                     var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
@@ -737,11 +724,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         TimeEntryService.removeInProgressEntry();
         $scope.abandonedStopwatch = false;
     }
-
-    $scope.$watch('timeEntry.ISOStartTime', function (before, after) {
-        console.log(before);
-        console.log(after);
-    })
 
     // Add an entity to the scope's time entry. Called with every selection of a dropdown.
     $scope.addEntityTimeEntry = function (entityType, entity) {
@@ -899,6 +881,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.jobClients = jobClientsList;
                 var index = EntityService.indexJobClient(jobClientsList, currentJobClient);
                 $scope.jobClient = jobClientsList[index];
+                var currentJob = $scope.jobClient.job;
+                var currentTask = $scope.task;
+                if (currentTask && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
+                    var permittedTaskIDs = currentJob.PermittedTasks.split(",");
+                    if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
+                        $scope.setError("taskConflict", "We're sorry but the "
+                                + $scope.customTerms.taskTermSingLow + " "
+                                + currentTask.DisplayName + " you've chosen is no longer available. "
+                                + "Please choose a different "
+                                + $scope.customTerms.taskTermSingLow
+                                + " or contact your company's ClickTime administrator for more details.");
+                    }
+                }
             }
 
             if (jobClientsList.length == 0) {
@@ -1301,15 +1296,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             if (now.getMonth() - stopwatch.startMonth == 0 
                                 || now.getFullYear() - stopwatch.startYear == 0) {
                                 StopwatchService.getStartTime(function (startTime) {
-                                    var midnight = new Date(2015, 0, 1, 23, 59, 59);
-                                    $scope.timeEntry.ISOStartTime = startTime;
+                                    var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
+                                        startTime.getHours(), startTime.getMinutes(), 0);
+                                    var midnight = new Date(2015, 0, 1, 23, 59, 0);
+                                    $scope.timeEntry.ISOStartTime = start;
                                     $scope.timeEntry.ISOEndTime = midnight;
-                                    TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, midnight]);
+                                    TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
                                 })
                                 $scope.abandonedStopwatch = true;
                                 $scope.runningStopwatch = false;
 
-                                $('#notes-field').css({'width': '276px', 'max-width': '276px'});
+                                $('#notes-field').css({'width': '255px', 'max-width': '255px'});
                             }
                         } else {
                             // There is a running stopwatch, but it isn't abandoned

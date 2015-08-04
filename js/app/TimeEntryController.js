@@ -215,6 +215,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     }
 
+    // Stop a stopwatch and end a timer promise
     $scope.stopStopwatch = function() {
         $scope.saveFromTimer = true;
         $scope.$broadcast("stopStopwatch");
@@ -223,27 +224,24 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.saveTimeEntry($scope.Session, $scope.timeEntry);
     }
 
+    // Clear an in progress stopwatch
     $scope.clearStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
         $scope.timerDisplay = "00:00:00";
         $interval.cancel($scope.endTimePromise);
     }
 
+    // Save an abandoned stopwatch
     $scope.saveAbandonedStopwatch = function() {
         $scope.saveTimeEntry($scope.Session, $scope.timeEntry);
     }
 
-    $scope.$on("stoppedStopwatch", function() {
-        $scope.clearError('activeStopwatch');
-    })
 
-
+    // Display fields for running stopwatch
     $scope.elapsedHrs = 0;
     $scope.elapsedMin = 0;
     $scope.elapsedSec = 0;
-
-   
-
+    
     $scope.$on("updateStopwatch", function() {
         $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
     })
@@ -386,9 +384,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "task":
                 $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid #bcbcbc");
                 $("#fieldtitle-task").css("color", "black");
-                break;
-            case "activeStopwatch":
-                $scope.timeEntryErrorActiveStopwatch = false;
                 break;
             default:
                 break;

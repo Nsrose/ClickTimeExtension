@@ -51,13 +51,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // End Google Analytics Code
 
-
-
-
-    $scope.variables = [];
-    $scope.UserName = null;
-    $scope.UserID = null;
-
     //Company custom terms
     $scope.customTerms = {};
 
@@ -69,17 +62,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Client, job, or task is empty in db
     $scope.HasEmptyEntities = false;
-    // if true, indicate to user that they can set default time entry method in extension options
-    $scope.showOptionsMessage = false;
 
+    // True if a stopwatch is running
     $scope.runningStopwatch = false;
+    // True if a stopwatch has expired from yesterday or before
     $scope.abandonedStopwatch = false;
+    // True if a time entry has expired from yesterday or before
     $scope.abandonedEntry = false;
 
+    // Link to the settings page
     $scope.settingsPage = function () {
         $location.path("/settings");
     }
 
+    // Function to test sending an error to API
     $scope.testError = function() {
         APIService.reportError($scope.Session.UserEmail,
             $scope.Session.Token,
@@ -89,22 +85,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             });
     }
 
-    //// Interface logic ////
-    //Default start end time display
-
-    // $scope.defaultStartEndTime = CTService.getNowString();
-    $scope.defaultStartEndTime = CTService.getDefaultStartEndTime();
-
     /////////////////////////////////////////// Interface logic /////////////////////////////////////
-
-    //// Handling keypress events ////
-
-    // disable backspace (weird behavior)
-    // $(document).keydown(function(e) {
-    //     if (e.which == 8) {
-    //         return false;
-    //     }
-    // })
 
     // start stopwatch, if there
     $(document).keypress(function(e) {
@@ -117,6 +98,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on hours and enter
     $("#time-entry-form-hours").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-hours").blur();
@@ -124,6 +106,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on start/end and enter
     $("#time-entry-form-start").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-start").blur();
@@ -132,6 +115,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Save time entry if focused on start/end and enter
     $("#time-entry-form-end").keypress(function(e) {
         if (e.which == 13) {
             $("#time-entry-form-start").blur();
@@ -150,7 +134,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         
     }
 
-    // Focus on notes
+    // Focus on notes and clear errors
     $scope.focusNotes = function() {
         $scope.clearError("notes");
         if (!$scope.timeEntry.Hours) {
@@ -182,13 +166,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             return;
         }
-        // if (
-        //     ( $scope.showStartEndTimes &&
-        //     ( !$scope.timeEntry.ISOStartTime
-        //     || !$scope.timeEntry.ISOEndTime))) {
-        //     // cannot swap action with empty fields
-        //     return;
-        // }
         if ($scope.showStartTimer) {
             clearSuccessMessage();
             $scope.showStartTimer = false;
@@ -197,9 +174,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
     
-     // For the stopwatch display on start/end times:
+     
+    // For the stopwatch display on start/end times:
     $scope.endTimePromise = undefined;
 
+    // Start a stopwtach and the end time promise
     $scope.startStopwatch = function () {
         clearSuccessMessage();
         $scope.showStartTimer = false;
@@ -227,8 +206,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
        
     }
 
+    // Clear the successful save message
     var clearSuccessMessage = function() {
-
         if ($scope.generalSuccess == true) {
             $scope.generalSuccess = false;
             $scope.$apply();

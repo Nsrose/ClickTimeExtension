@@ -101,7 +101,7 @@ var options = {
 //notifications function (declared here to avoid hoisting confusion)
 var notificationInterval;
 
-/* create notifications if user allowed it. Self invoking function, so starts upon notification */
+/* create notifications if user allowed it. */
 var createNotifications = function(poll_period) {
     chrome.storage.sync.get(['session', 'allowReminders'], function(items) {
         if (('allowReminders' in items) && 

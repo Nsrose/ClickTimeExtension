@@ -6,7 +6,30 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     var companyId = '';
     var userId = '';
 
-   
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-130046-14']);
+    _gaq.push(['_trackPageview']);
+
+    // console.log(_gaq);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = 'https://ssl.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+    // function trackButton(e) {
+    //     _gaq.push(['_trackEvent', e.target.id, 'clicked']);
+    // };
+
+    // var buttons = document.querySelectorAll('button');
+
+    // for (var i = 0; i < buttons.length; i++) {
+    //     buttons[i].addEventListener('click', trackButton);
+    // }
+
+    // Populate dataLayer
     var createDataLayer = function() {
 
         chrome.storage.local.get('company', function(items) {
@@ -25,27 +48,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     };
 
     $(document).ready(createDataLayer);
-
-
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-130046-14']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = 'https://ssl.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-
-    function trackButton(e) {
-        _gaq.push(['_trackEvent', e.target.id, 'clicked']);
-    };
-
-    var buttons = document.querySelectorAll('button');
-
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', trackButton);
-    }
 
     // End Google Analytics Code
 
@@ -1238,7 +1240,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             } else {
                 method = 'duration'
             }
-            
 
             chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
                 if (('allowReminders' in items) && ('timeEntryMethod' in items)) {

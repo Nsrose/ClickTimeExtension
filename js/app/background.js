@@ -95,7 +95,7 @@ var options = {
     type: "basic",
     title: "Clicktime Extension",
     message: "Let's track your time!",
-    iconUrl: "../../img/clicktime128x128.png",
+    iconUrl: "../../img/lgLogo.png",
 }
 
 //notifications function (declared here to avoid hoisting confusion)

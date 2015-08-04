@@ -1,9 +1,9 @@
 {
   "manifest_version" : 2,
-  "name": "Clicktime Extension",
+  "name": "Clicktime for Chrome",
   "version":"0.76.2",
 
-  "description" : "Clicktime extension",
+  "description" : "Clicktime for Chrome is the most frictionless way to enter time for ClickTime users.",
 
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
 
@@ -16,10 +16,10 @@
 
   "browser_action" : {
     "default_icon" : {
-        "19": "img/19.png",
-        "38": "img/38.png"
+        "19": "img/smallLogo.png",
+        "38": "img/medLogo.png"
     },
-    "default_title" : "ClickTime",
+    "default_title" : "ClickTime for Chrome",
     "default_popup" : "templates/main.html"
    },
 
@@ -35,7 +35,8 @@
 
   "web_accessible_resources" : [
     "js/*",
-    "templates/*"
+    "templates/*",
+    "https://*.google-analytics.com/**/*"
   ],
   
   "permissions": [ "http://*/*", "https://*/*", "unlimitedStorage", "storage", "contextMenus", "cookies", "tabs", "notifications"]

@@ -22,10 +22,10 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
             url: requestURL,
             headers: {
                 'Authorization' : 'Basic ' + credentials,
-                'Client': {
+                'client': JSON.stringify({
                     'appname': 'chromeExtension',
                     'version': version
-                }
+                })
             },
             data: data,
             timeout: TIMEOUT

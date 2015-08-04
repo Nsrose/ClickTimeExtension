@@ -1238,6 +1238,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             } else {
                 method = 'duration'
             }
+            $scope.changeTimeEntryMethod(method);
+            if (method == "duration") {
+                TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                    $scope.timeEntry.Hours = inProgressEntry.Hours;
+                    if ((method == "duration" && !inProgressEntry.Hours)
+                        || (method == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
+                        $scope.showStartTimer = true;    
+                    }
+                    $scope.$apply();
+                })
+            }
 
           chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
               if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
@@ -1275,19 +1286,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
              // Set the default time entry method
             chrome.storage.sync.get(['timeEntryMethod', 'stopwatch'], function (items) {
                 if ('timeEntryMethod' in items) {
-                   var timeEntryMethod = items.timeEntryMethod.method;
-                    $scope.changeTimeEntryMethod(timeEntryMethod);
-                    if ($scope.timeEntryMethod == "duration") {
-                        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                            $scope.timeEntry.Hours = inProgressEntry.Hours;
-                            if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
-                                || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
-                                $scope.showStartTimer = true;    
-                            }
-                        })
-                    }
+                   // var timeEntryMethod = items.timeEntryMethod.method;
+                   //  $scope.changeTimeEntryMethod(timeEntryMethod);
+                   //  if ($scope.timeEntryMethod == "duration") {
+                   //      TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                   //          $scope.timeEntry.Hours = inProgressEntry.Hours;
+                   //          if ((timeEntryMethod == "duration" && !inProgressEntry.Hours)
+                   //              || (timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || !inProgressEntry.ISOStartTime))) {
+                   //              $scope.showStartTimer = true;    
+                   //          }
+                   //      })
+                   //  }
                     
-                    $scope.$apply();
+                    // $scope.$apply();
                 } else {
                     $scope.showOptionsMessage = true;
                     $scope.$apply();  

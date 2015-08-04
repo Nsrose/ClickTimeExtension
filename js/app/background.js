@@ -136,8 +136,8 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
                 tabId: tab.id,
                 type: 'popup',
                 focused: true,
-                width: 554,
-                height: 430
+                width: 556,
+                height: 380
             });
         }
     );

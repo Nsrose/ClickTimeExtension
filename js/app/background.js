@@ -126,14 +126,15 @@ var stopNotifications = function() {
     chrome.notifications.clear('enterTimeNotification');
 }
 
-/* clicking on the body of the message will open the webapp in a window with id = 1
-   first check if such a window already exists (chrome will throw an exception, which 
-   we will catch). If it does exist, we will draw attention to the window. If not,
-   we will create a new window with the same ID as before.
+/*  
+    clicking on the body of the message will open the webapp in a window
+    if there is no current window open.
+    if there is a window open, the program will prompt you by flashing
+    the window in your face
 */
-var windowID;
+var windowID = null;
 chrome.notifications.onClicked.addListener(function (notificationId) {
-    if (typeof windowID === 'undefined') { // if id has never beeen set before 
+    if (!windowID) { // if id has never beeen set before 
         chrome.windows.create({
             url: chrome.extension.getURL('../templates/main.html'),
             type: 'popup',
@@ -144,12 +145,16 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
             windowID = window.id;
             console.log(windowID);
         });    
-    } else { 
-        chrome.windows.get(windowID, function (window) {
-            chrome.windows.update(window.id, {drawAttention: true});
-        });
+    } else {        
+        chrome.windows.update(windowID, {drawAttention: true});
     }
 });
+
+/* on window close, reset the windowID to null to indicate that 
+   there does not exist a current window open */
+chrome.windows.onRemoved.addListener(function (closedWindowID) {
+    if (closedWindowID == windowID) windowID = null;
+})
 
 chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
     stopNotifications();    

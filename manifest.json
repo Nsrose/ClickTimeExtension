@@ -23,7 +23,7 @@
     "default_popup" : "templates/main.html"
   },
 
-  "icons": { 
+  "icons": {
     "16": "img/smallLogo.png",
     "48": "img/medLogo.png",
     "128": "img/lgLogo.png" 

@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
-var NOTIFICATION_POLL_PERIOD = 14400000; 
+var NOTIFICATION_POLL_PERIOD = 14400000;
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
@@ -136,7 +136,7 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
                 tabId: tab.id,
                 type: 'popup',
                 focused: true,
-                width: 580,
+                width: 554,
                 height: 430
             });
         }

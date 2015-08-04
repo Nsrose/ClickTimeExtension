@@ -19,7 +19,7 @@ Switch the developing/testing environment on your extension by navigating to the
 
 Deployment:  
 When ready to deploy, first update the manifest.json attribute "version" to the newest version. Then run:  
-&nbsp;&nbsp;&nbsp;&nbsp;$ python uploader.py  
+&nbsp;&nbsp;&nbsp;&nbsp;`$ python uploader.py ` 
 
 &nbsp;&nbsp;&nbsp;&nbsp;This will generate a zipped chrome extension folder ready for upload.  
 
@@ -64,18 +64,29 @@ uploader.py: Run this guy to create a zipped chrome extension folder **after upd
 &nbsp;&nbsp;`$ python uploader.py ` 
 
 destruct.py: Run this script to create a zipped chrome extension to replace the current one on the Developer Dashboard in case of emergency destruct of the Clicktime extension.  
-&nbsp;&nbsp;$ python destruct.py  
+&nbsp;&nbsp;`$ python destruct.py  `
 
 Views  
 -----
 All views are wrapped by the main.html template. Main uses AppController.js.  
 
 Login:  
-&nbsp;&nbsp;&nbsp;&nbsp;Template: login.html
+&nbsp;&nbsp;&nbsp;&nbsp;Template: login.html  
 &nbsp;&nbsp;&nbsp;&nbsp;Controller: LoginEntryController.js  
 &nbsp;&nbsp;&nbsp;&nbsp;Services: APIService.js  
 &nbsp;&nbsp;&nbsp;&nbsp;Overview: Controller checks to see if there is an existing session in Chrome sync storage. If so, user will be logged in. Otherwise, user will remain on Login view. Once they have entered email and password (and passed validation checks) they can press enter or click login to be redirected to Time Entry.  
 
+Time Entry:  
+&nbsp;&nbsp;&nbsp;&nbsp;Template: time_entry.html  
+&nbsp;&nbsp;&nbsp;&nbsp;Controller: TimeEntryController.js   
+&nbsp;&nbsp;&nbsp;&nbsp;Services: APIService.js, CTService.js, EntityService.js, TimeEntryService.js, StopwatchService.js  
+&nbsp;&nbsp;&nbsp;&nbsp;Overview: Upon logging in or an existing session is found, controller will use that session to go fetch all entites (clients, jobs, tasks, time entries, user, company). It will check local storage first, and if they aren't found, ask the API. Once the view is loaded, the user can select entities and make edits to their time entry. Any edit will result in an update of their inProgressEntry in Chrome sync storage. Fields are validated upon entering text, and also upon clicking "save". Uncaught API errors are sent to the Clicktime error email.  
+
+Settings:  
+&nbsp;&nbsp;&nbsp;&nbsp;Template: settings.html  
+&nbsp;&nbsp;&nbsp;&nbsp;Controller: SettingsController.js  
+&nbsp;&nbsp;&nbsp;&nbsp;Services: None  
+&nbsp;&nbsp;&nbsp;&nbsp;Overview: User can select which time entry method they want to use (start/end or duration) here, if those methods are available to them. Refresh lists will call the API directly to get all entities, overwriting Chrome local storage in the process. If Allow Reminders is checked, user will get reminders to enter time every 4 hours. Leave Feedback will direct user to Google form for chrome extension feedback. Sign out will log the user out.  
 
 
 Team Members:  

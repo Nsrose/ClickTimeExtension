@@ -45,6 +45,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
               }
             }, function () {
               chrome.extension.getBackgroundPage().stopNotifications();
+              console.log('initiallized')
             });
           }
         }

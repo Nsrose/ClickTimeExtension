@@ -1219,6 +1219,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             'method' : method,
                             'UserID' : UserID
                         }
+                    }, function() {
+                        var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
+                        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
                     });
                 }
             })

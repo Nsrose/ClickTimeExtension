@@ -5,6 +5,7 @@ var NOTIFICATION_POLL_PERIOD = 14400000;
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
+
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -100,11 +101,11 @@ var options = {
 //notifications function (declared here to avoid hoisting confusion)
 var notificationInterval;
 
-/* create notifications if user allowed it */
+/* create notifications if user allowed it. Self invoking function, so starts upon notification */
 var createNotifications = function(poll_period) {
-   // console.log('create notifications called');
     chrome.storage.sync.get(['session', 'allowReminders'], function(items) {
-        if (('allowReminders' in items) && (items.allowReminders.permission) && ('session' in items)) {
+        if (('allowReminders' in items) && 
+            (items.allowReminders.permission) && ('session' in items)) {
             //reminders are allowed. poll the user every x mins to enter time
             notificationInterval = setInterval(function() {
                 chrome.storage.sync.get('stopwatch', function (items) {
@@ -117,9 +118,7 @@ var createNotifications = function(poll_period) {
     })
 }
 
-
 var stopNotifications = function() {
-//    console.log("stop notification called");
     clearInterval(notificationInterval);
 }
 
@@ -137,7 +136,8 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
                 width: 580,
                 height: 430
             });
-        });
+        }
+    );
 });
 
 chrome.notifications.onClosed.addListener(function (notificationId, byUser) {

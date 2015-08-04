@@ -1251,28 +1251,28 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
               }
 
               chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
-                      if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
-                        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                      } else {
-                        if ((UserID != items.timeEntryMethod.UserID) || !('timeEntryMethod' in items)) {
-                            chrome.storage.sync.set({
-                                'timeEntryMethod' : {
-                                    'method' : method,
-                                    'UserID' : UserID
-                                }
-                            })
-                        }
-                        if ((UserID != items.allowReminders.UserID) || !('allowReminders' in items)) {
-                            chrome.storage.sync.set({
-                                'allowReminders' : {
-                                    'permission' : true,
-                                    'UserID' : UserID 
-                                }
-                            }, function() {
-                              chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                            });
-                        }
+                  if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
+                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                  } else {
+                    if (!('timeEntryMethod' in items) || (UserID != items.timeEntryMethod.UserID)) {
+                        chrome.storage.sync.set({
+                            'timeEntryMethod' : {
+                                'method' : method,
+                                'UserID' : UserID
+                            }
+                        })
                     }
+                    if (!('allowReminders' in items) || (UserID != items.allowReminders.UserID)) {
+                        chrome.storage.sync.set({
+                            'allowReminders' : {
+                                'permission' : true,
+                                'UserID' : UserID 
+                            }
+                        }, function() {
+                          chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                        });
+                    }
+                 }
               })
            })
         }

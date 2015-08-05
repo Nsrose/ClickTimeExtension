@@ -241,12 +241,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.elapsedHrs = 0;
     $scope.elapsedMin = 0;
     $scope.elapsedSec = 0;
-    
+
     $scope.$on("updateStopwatch", function() {
         $scope.timerDisplay = $scope.elapsedHrs + ":" + $scope.elapsedMin + ":" + $scope.elapsedSec;    
     })
 
 
+    // Clear in progress entry hours
     $scope.clearHours = function() {
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.showStartTimer = true;
@@ -330,7 +331,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         
     }
 
-
+    // Clear in progress start end times
     $scope.clearStartEndTimes = function() {
         $scope.timeEntry.ISOStartTime = null;
         $scope.timeEntry.ISOEndTime = null;
@@ -340,7 +341,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
 
-
+    // Clear all template errors
     $scope.clearAllErrors = function () {
         $scope.generalError = false;
         $scope.clearError("hours");
@@ -352,6 +353,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearError("task");
     }
 
+    // Clear a specific error by errorfield
     $scope.clearError = function (errorField) {
         $scope.generalError = false;
         switch (errorField) {
@@ -439,11 +441,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }  
 
+    // If there's been an error on saving a time entry, stop the stopwatch
     $scope.$on("timeEntryError", function() {
         $scope.saving = false;
         $scope.clearStopwatch();
     })
 
+    // Actions to take upon successful time entry save
     $scope.$on("timeEntrySuccess", function() {
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.timeEntry.Comment = "";
@@ -478,6 +482,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Time entry methods
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
+
+    // Change the template time entry method
     $scope.changeTimeEntryMethod = function (timeEntryMethod) {
       $scope.timeEntryMethod = timeEntryMethod;
     	switch (timeEntryMethod) {
@@ -499,6 +505,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     	}
     }
 
+    // Clear successful message upon clicking anywhere on the extension
     $('#main').on('click', function() {
         if ($scope.generalSuccess == true) {
             $scope.generalSuccess = false;
@@ -506,6 +513,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         } 
     })
 
+    // SUPER AWESOME FUNCTION!! Save a time entry
+    /** First, refresh all entity lists. (see below) Then, validate the entry.
+      * If successful, broadcast a success. If failed, show an error. */
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
@@ -695,6 +705,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         return true;
     }
 
+    // Cancel an abandoned stopwatch
     $scope.cancelAbandonedStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
         $scope.clearTimeEntry();
@@ -724,34 +735,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
-    // Returns true iff the stopwatch should be shown for this user.
-    var showStopwatch = function () {
-        if ($scope.user != null) {
-            return $scope.user.RequireStopwatch;
-        }
-        bootbox.alert("Need to get user before calling showStopwatch");
-    }
-
-    // Returns true iff start and end time fields should be shown for this user.
-    // True iff start and end times are required AND the stopwatch shouldn't be shown.
-    var showStartEndTimes = function() {
-        if ($scope.user != null) {
-            return !$scope.showStopwatch && $scope.user.RequireStartEndTime;
-        }
-        bootbox.alert("Need to get user before calling showStartEndTimes");
-    }
-
-    // Returns true iff the regular hour entry field should be shown for this user.
-    var showHourEntryField = function() {
-        if ($scope.user != null) {
-            return !$scope.showStopwatch && !$scope.showStartEndTimes;
-        }
-        bootbox.alert("Need to get user before calling showHourEntryField");
-    }
-
     ////////////////////////////
 
-    // Logout function
+    // Logout function - will remove local and sync storage variables.
     $scope.logout = function() {
         chrome.storage.sync.get('stopwatch', function (items) {
             if ('stopwatch' in items && items.stopwatch.running) {
@@ -769,17 +755,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         })
     }
 
+    // Remove local storage variables from chrome
     $scope.removeLocalStorageVars = function() {
         chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
             chrome.browserAction.setBadgeText({text:""});
         })
     }
 
+    // Rmove sync storage variables from chrome
     $scope.removeSyncStorageVars = function() {
         chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
     }
 
-    $scope.doneRefresh = [];
+
 
 
     // Check for update to jobClient and reset permitted task list.
@@ -808,8 +796,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // If populated with 4 entites, then scope is done refreshing:
+    $scope.doneRefresh = [];
+
     // Refresh function
-    // This forces an API call for the jobs, clients, and tasks dropdown menus
+    /** Force an update to all entity lists from the API. Do not check local storage first.
+        This method also deals with conflicts -- for example, if you try to save a time entry
+        with a job that no longer exists in Clicktime, this will set an error. */
     $scope.refresh = function() {
         var deferred = $q.defer();
         if ($location.url() == '/settings') {
@@ -1071,7 +1064,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         return deferred.promise;
     }
 
-    /* update the hour display if you're using duration as your time entry method*/
+    /* Update the hour display if you're using duration as your time entry method*/
     function updateDurationDisplay() {
         if ($scope.timeEntryMethod == "duration") {
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -1151,10 +1144,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
   
 
-    ///// ONLOAD: This will get executed upon opneing the chrome extension. /////////
+    ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
     
-    // Get the session of the user from storage.
+    // When this list is populated with 4 entities, the scope is ready. 
     $scope.doneLoading = [];
+
+    /** Get the session, from sync storage if it exists, otherwise call the API.
+        Then get all entities. */
     var afterGetSession = function (session) {
         $scope.$parent.Session = session;
         // Default empty entry
@@ -1172,6 +1168,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             "TaskID":""
         }
 
+        // Go fetch the in progress entry and fill out scope fields, if necessary
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
             if (inProgressEntry.Date) {
                 var yearStr = inProgressEntry.Date.substring(0, 4);
@@ -1285,6 +1282,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         if (now.getDate() - stopwatch.startDay > 0) {
                             if (now.getMonth() - stopwatch.startMonth == 0 
                                 || now.getFullYear() - stopwatch.startYear == 0) {
+                                // There is an abandoned stopwatch
                                 StopwatchService.getStartTime(function (startTime) {
                                     var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
                                         startTime.getHours(), startTime.getMinutes(), 0);
@@ -1365,10 +1363,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 min = Math.floor(min * 60);
             }
             $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-
-            //ALEX JONES
             $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-            //ALEX JONES
         }
 
         var afterGetJobClients = function (jobClientsList) {
@@ -1433,6 +1428,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
     EntityService.getSession(afterGetSession);
 
+
+    // Show offline message if you don't have internet
     var offlineBox;
     window.addEventListener('offline', function(e) {
         offlineBox = bootbox.dialog({

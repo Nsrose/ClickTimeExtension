@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
-var NOTIFICATION_POLL_PERIOD = 5000;
+var NOTIFICATION_POLL_PERIOD = 14400000;
 // Delayed if User says "remind me later"
 var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
 
@@ -124,6 +124,11 @@ var createNotifications = function(pollPeriod) {
 var stopNotifications = function() {
     clearInterval(notificationInterval);
     chrome.notifications.clear('enterTimeNotification');
+}
+
+/* Create a new notification and send, for demonstration purposes.*/
+var sendOneNotification = function() {
+    chrome.notifications.create('enterTimeNotification', options);
 }
 
 /*  

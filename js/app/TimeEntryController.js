@@ -98,6 +98,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    // Send a notification immediately for demonstration purposes
+    $scope.sendNotification = function () {
+        chrome.extension.getBackgroundPage().sendOneNotification();
+    }
+
     // Save time entry if focused on hours and enter
     $("#time-entry-form-hours").keypress(function(e) {
         if (e.which == 13) {

@@ -677,3 +677,9 @@ input[type=time]::-webkit-inner-spin-button {
 #time-entry-form-hours {
     width: 110px;
 }
+.notification-button {
+    width: 20px;
+    height: 20px;
+    /* float: right; */
+    clear: both;
+}

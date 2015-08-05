@@ -68,8 +68,6 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     	timerPromise = undefined;
     	StopwatchService.clear(function() {
             chrome.extension.getBackgroundPage().stopBadge();
-            chrome.browserAction.setBadgeText({text: ""});
-            console.log("Cleared stopwatch");
         })
     }
 
@@ -101,7 +99,6 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                 timerPromise = undefined;
                 $scope.$apply();
                 chrome.extension.getBackgroundPage().stopBadge();
-                chrome.browserAction.setBadgeText({text: ""});
             })
         }
     }

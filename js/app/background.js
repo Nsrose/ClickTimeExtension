@@ -2,9 +2,6 @@
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
 var NOTIFICATION_POLL_PERIOD = 5000;
-// Delayed if User says "remind me later"
-var DELAYED_NOTIFICATION_POLL_PERIOD  = NOTIFICATION_POLL_PERIOD * 2;
-
 
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
@@ -17,46 +14,49 @@ chrome.runtime.onMessage.addListener(
 
 //////////////////////////////////////////////////////////////////////////
 
-// this timer is for display purposes only
-// stopping/starting it will have no effect on 
-// the internal sync timer
+/* 
+   this timer is for badge display purposes only
+   stopping/starting it will have no effect on the chrome sync timer
+*/
 var timer;
 
 var updateBadge = function(StopwatchService) {
     var badgeHrs, badgeMin, badgeSec;
     timer = setInterval(function() {
         StopwatchService.getElapsedTime(function(elapsedObj) {
-            badgeSec = elapsedObj.elapsedSec % 60;
+
+            badgeSec = elapsedObj.elapsedSec % 60; // unused except for testing
             badgeMin = elapsedObj.elapsedMin % 60;
             badgeHrs = elapsedObj.elapsedHrs;
+/*
             if (badgeHrs > 9) {
-                chrome.browserAction.setBadgeText({text: badgeHrs + "+"});
                 stopBadge();
+                chrome.browserAction.setBadgeText({text: badgeHrs + "+"});
                 updateBadgeHours(StopwatchService);
             } else {
-                badgeMin += '';
+                badgeMin += ''; //toString
                 badgeHrs += '';
                 if (badgeMin.length == 1) {
                     badgeMin = "0" + badgeMin;
                 }
                 chrome.browserAction.setBadgeText({text: badgeHrs + ':' + badgeMin});
             }
+*/
+             // test with seconds
+             if (badgeMin > 9) {
+                 stopBadge();
+                 chrome.browserAction.setBadgeText({text: "10+"});
+                 updateBadgeSeconds(StopwatchService);
+             } else {
+                 badgeMin += '';
+                 badgeSec += '';
 
-            // // test with seconds
-            // if (badgeSec > 9) {
-            //     chrome.browserAction.setBadgeText({text: "10+"});
-            //     stopBadge(); //stops current badge, wtimer will be reset in next call
-            //     updateBadgeSeconds(StopwatchService);
-
-            // } else {
-            //     badgeMin += '';
-            //     badgeSec += '';
-
-            //     if (badgeSec.length == 1) {
-            //         badgeSec = "0" + badgeSec;
-            //     }
-            //     chrome.browserAction.setBadgeText({text: badgeMin + ':' + badgeSec});
-            // }
+                 if (badgeSec.length == 1) {
+                     badgeSec = "0" + badgeSec;
+                 }
+                 chrome.browserAction.setBadgeText({text: badgeMin + ':' + badgeSec});
+                 console.log("badge being called");
+             }
         })
     }, 1000);
 }
@@ -73,20 +73,22 @@ var updateBadgeHours = function(StopwatchService) {
     }, 3600000);
 }
 
-// // test function for updateBadgeHours
-// var updateBadgeSeconds = function(StopwatchService) {
-//     var badgeSec;
-//     timer = setInterval(function() {
-//         // every second after 10
-//         getElapsedTime(function(elapsedObj) {
-//             badgeSec = elapsedObj.elapsedSec + '';
-//             chrome.browserAction.setBadgeText({text: badgeSec + "+"})
-//         })
-//     }, 1000);
-// }
+ // test function for updateBadgeHours
+ var updateBadgeSeconds = function(StopwatchService) {
+     var badgeSec;
+     timer = setInterval(function() {
+         // every second after 10
+         getElapsedTime(function(elapsedObj) {
+             badgeSec = elapsedObj.elapsedSec + '';
+             chrome.browserAction.setBadgeText({text: badgeSec + "+"})
+         })
+     }, 1000);
+ }
 
 var stopBadge = function() {
     clearInterval(timer);
+    chrome.browserAction.setBadgeText({text: ""});
+    console.log("i stopped the badge");
 }
 
 ///////// Notifications /////////////////////////////////////////////////
@@ -98,7 +100,7 @@ var options = {
     iconUrl: "../../img/lgLogo.png",
 }
 
-//notifications function (declared here to avoid hoisting confusion)
+//notifications function 
 var notificationInterval;
 
 /* create notifications if all conditions true:
@@ -156,9 +158,10 @@ chrome.windows.onRemoved.addListener(function (closedWindowID) {
     if (closedWindowID == windowID) windowID = null;
 })
 
+/* on notification close, create another notification later. */
 chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
     stopNotifications();    
-    createNotifications(DELAYED_NOTIFICATION_POLL_PERIOD);
+    createNotifications(NOTIFICATION_POLL_PERIOD);
 });
 
 ////////////////////////////////////////////////////////////////////

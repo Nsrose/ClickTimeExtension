@@ -125,7 +125,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     })
 
 
-    // Update in progress entry notes
+    // Update in progress entry notes on blur
     $scope.updateNotes = function() {
         if ($scope.timeEntry.Comment && $scope.timeEntry.Comment != "") {
             $scope.clearError("notes");
@@ -137,9 +137,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Focus on notes and clear errors
     $scope.focusNotes = function() {
         $scope.clearError("notes");
-        if (!$scope.timeEntry.Hours) {
+        if ($scope.showHourEntryField && !$scope.timeEntry.Hours) {
             $scope.showStartTimer = true;
-        } else {
+        } else if ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime 
+            && !$scope.timeEntry.ISOEndTime)) {
+            $scope.showStartTimer = true;
+        } 
+        else {
             clearSuccessMessage();
             $scope.showStartTimer = false;
         }
@@ -1279,23 +1283,24 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var now = new Date();
                     var stopwatch = items.stopwatch;
                     if (stopwatch.running) {
-                        if (now.getDate() - stopwatch.startDay > 0) {
-                            if (now.getMonth() - stopwatch.startMonth == 0 
-                                || now.getFullYear() - stopwatch.startYear == 0) {
-                                // There is an abandoned stopwatch
-                                StopwatchService.getStartTime(function (startTime) {
-                                    var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
-                                        startTime.getHours(), startTime.getMinutes(), 0);
-                                    var midnight = new Date(2015, 0, 1, 23, 59, 0);
-                                    $scope.timeEntry.ISOStartTime = start;
-                                    $scope.timeEntry.ISOEndTime = midnight;
-                                    TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
-                                })
-                                $scope.abandonedStopwatch = true;
-                                $scope.runningStopwatch = false;
+                        var stopwatchDate = new Date(stopwatch.startYear, stopwatch.startMonth,
+                            stopwatch.startDay, now.getHours(), now.getMinutes(), now.getSeconds(),
+                            now.getMilliseconds());
 
-                                $('#notes-field').css({'width': '255px', 'max-width': '255px'});
-                            }
+                        if (now > stopwatchDate) {
+                            // There is an abandoned stopwatch
+                            StopwatchService.getStartTime(function (startTime) {
+                                var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
+                                    startTime.getHours(), startTime.getMinutes(), 0);
+                                var midnight = new Date(2015, 0, 1, 23, 59, 0);
+                                $scope.timeEntry.ISOStartTime = start;
+                                $scope.timeEntry.ISOEndTime = midnight;
+                                TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
+                            })
+                            $scope.abandonedStopwatch = true;
+                            $scope.runningStopwatch = false;
+
+                            $('#notes-field').css({'width': '255px', 'max-width': '255px'});
                         } else {
                             // There is a running stopwatch, but it isn't abandoned
                             var now = new Date();

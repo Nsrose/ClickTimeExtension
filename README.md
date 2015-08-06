@@ -44,7 +44,7 @@ js/
 &nbsp;&nbsp;app/  
 &nbsp;&nbsp;&nbsp;&nbsp;app.js: Main module for the app. Has a bunch of constants.  
 &nbsp;&nbsp;&nbsp;&nbsp;AppController.js: Main wrapper controller. A few broadcasts, mostly a parent controller.  
-&nbsp;&nbsp;&nbsp;&nbsp;background.js: Script that runs on every page in the background, not the extension. Handles appearance of the badge icon of the extension in relation to stopwatch.  
+&nbsp;&nbsp;&nbsp;&nbsp;background.js: Script that runs on every page in the background, not the extension. Handles the ticking badge in the extension icon and notifications
 &nbsp;&nbsp;&nbsp;&nbsp;config.js: Script that handles the routing for each page of the application.  
 &nbsp;&nbsp;&nbsp;&nbsp;content.js: Script injected into each page.  
 &nbsp;&nbsp;&nbsp;&nbsp;LoginController.js: User is directed here first. If session exists and not timeout, then will go on to TimeEntry.  

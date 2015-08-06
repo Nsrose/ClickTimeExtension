@@ -2,44 +2,49 @@
     Back to tracking time
 </button>
 
-<h3 id="settings-title-text">Settings</h3>
+<div id="page-wrapper">
+    <h3 id="settings-title-text">Settings</h3>
 
-<div class="settings-column" id="settings-column-left">
-    <div ng-hide="requireStartEndTime" id="time-entry-method-container" class="btn-group icon-group">
-        <h5 id="entry-method-toggle-text">Time Entry Method</h5>
-        <button id="duration" type="button" class="btn btn-custom">Duration</button>
-        <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
-        <p id="warning">Note: Changing your default time entry method will erase any unsaved time entries</p>
+    <div class="settings-column" id="settings-column-left">
+        <div ng-class="{'no-display': requireStartEndTime }" id="time-entry-method-container" class="btn-group icon-group">
+            <h5 id="entry-method-toggle-text">Time Entry Method</h5>
+            <button id="duration" type="button" class="btn btn-custom">Duration</button>
+            <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
+            <p id="warning">Note: Changing your default time entry method will erase any unsaved time entries</p>
+        </div>
+
+        <div ng-class="{'top-bumper' : requireStartEndTime}" class="settings-controls icon-group" ng-controller="TimeEntryController" id="refresh-container">
+            <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button">
+                <i class="fa fa-refresh"></i>&nbsp; Refresh
+            </button>
+            <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span>
+            <div id="refresh-status"></div>
+        </div>
+        <label id='reminder-toggle-text'><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
+
+        <a href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank">
+            <button class="feedback-container btn btn-custom settings-button icon-group"><i class="fa fa-bullhorn"></i>&nbsp;
+                Leave Feedback
+            </button>
+        </a>
+        <p id="warning">Tell us what you think about ClickTime for Chrome!</p>
+
     </div>
-    <div class="settings-controls icon-group" ng-controller="TimeEntryController" id="refresh-container">
-        <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button"> <i class="fa fa-refresh"></i>&nbsp; Refresh Lists</button>
-        <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span>
-        <div id="refresh-status"></div>
-    </div>
-    <label id='reminder-toggle-text'><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
 
-</div>
+    <div class="settings-column">
+        
+        <a href="../help/help.html" target="_blank">
+            <button class="settings-width btn btn-custom settings-btn icon-group top-bumper" id="settings-help"><i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
+        </a>
 
+        <a id="contact-us-link" tabIndex="-1" href="http://www.clicktime.com/company/contact" target="_blank">
+            <button class="settings-width btn btn-custom settings-btn icon-group" id="contact-us"><i class="fa fa-phone"></i>&nbsp;
+                Contact Us
+            </button>
+        </a>
 
-<div class="settings-column">
-
-    <div>
-        <button class="feedback-container btn btn-custom settings-button icon-group">
-            <a href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank">Leave Feedback</a>
+        <button id="sign-out" class="settings-width icon-group btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
+            Sign out of ClickTime
         </button>
-        Tell us what you think about ClickTime for Chrome!
     </div>
-
-    <button class="settings-width btn btn-custom settings-btn icon-group" id="settings-help"> <i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
-    
-    <a id="contact-us-link" tabIndex="-1" href="http://www.clicktime.com/company/contact" target="_blank">
-        <button class="settings-width btn btn-custom settings-btn icon-group" id="contact-us"><i class="fa fa-phone"></i>&nbsp;
-            Contact Us
-        </button>
-    </a>
-
-
-    <button id="sign-out" class="settings-width icon-group btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
-        Sign out of ClickTime
-    </button>
 </div>

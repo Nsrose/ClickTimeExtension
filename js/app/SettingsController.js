@@ -5,10 +5,9 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   }
 
   $scope.$on("refresh", function() {
-   var status = document.getElementById('refresh-status');
-    status.textContent = 'Lists refreshed!';
+    $('#refresh-status').text('Lists refreshed!');
     setTimeout(function() {
-      status.textContent = '';
+       $('#refresh-status').text('');
     }, 750);
   })
 
@@ -57,9 +56,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
       if ('user' in items) {
         if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
           $scope.requireStartEndTime = true;
-          $('#refresh-button').css('margin-top', '106px');
         } else {
-          $('#refresh-button').css('margin-top', '0px');
           //query the local storage for last-set method
           chrome.storage.sync.get('timeEntryMethod', function(items) {
             if ('timeEntryMethod' in items) {
@@ -76,7 +73,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
 
     // when toggling, update defaultTimeEntryMethod in local storage
     $(".btn-group > .btn").click(function() {
-      // visuals
+       // visuals
       $(this).addClass("active").siblings().removeClass("active");
       //storage set
       chrome.storage.sync.get('timeEntryMethod', function (items) {
@@ -98,7 +95,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
             });
           }
         }
-      })
-    });
+      })     
+    })
   })
 }])

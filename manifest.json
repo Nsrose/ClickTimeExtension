@@ -11,7 +11,7 @@
     "scripts" : [
         "js/lib/jquery-1.11.3.min.js",
         "js/app/background.js"
-    ],
+    ]
   },
 
   "browser_action" : {

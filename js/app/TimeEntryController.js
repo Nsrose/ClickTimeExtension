@@ -39,47 +39,20 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 'DevicePlatform': 'GOogle chrome'
             });
     }
+    
 
-    /////////////////////////////// Integrations ////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
 
-    /** Integrate a time entry from google calendar. */
-    $scope.integrateTimeEntry = function (timeString) {
-        var splitTime = timeString.split(",");
-        var timeDate = splitTime[1];
-        var timeDelta = splitTime[2];
-        var splitTimeDelta = timeDelta.split("–");
-        var startTimeString = splitTimeDelta[0];
-        var amStartSplit = startTimeString.split("am");
-        var startTimeRaw;
-        if (amStartSplit.length == 1) {
-            // This time is PM
-            // FIX: Doesn't handle HH:MM format, only works for even hours
-            startTimeRaw = parseInt(startTimeString.split("pm")[0]) + 12;
-        } else {
-            // This time is AM
-            // FIX: Doesn't handle HH:MM format, only works for even hours
-            startTimeRaw = parseInt(amStartSplit[0]);
-        }
-
-
-
-        var now = new Date();
-        var timeEntryDate = new Date(now.getFullYear() + timeDate);
-
-        console.log(startTimeRaw);
-        console.log(timeEntryDate);
-    }
-
-    /** Listen for a request to integrate a google calendar time entry. */
+    // Listen for update from an integration
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {
-            if (request.integrateTimeEntry) {
-                $scope.integrateTimeEntry(request.timeString);
+            if (request.updateIntegration) {
+                $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
+                $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
+                $scope.showStartTimer = false;
             }
         }
     )
-
-    /////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////// Interface logic /////////////////////////////////////
 
@@ -1150,6 +1123,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
   
 
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
+
+    // Once page has loaded, send a message that this was loaded.
+    $scope.sendPageReady = function() {
+        chrome.runtime.sendMessage({
+            pageReady: true
+        })
+    }
     
     // When this list is populated with 4 entities, the scope is ready. 
     $scope.doneLoading = [];
@@ -1232,6 +1212,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.HasEmptyEntities = true;
                 $scope.doneLoading.push('tasks');
                 if ($scope.doneLoading.length >= 4) {
+                    $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
                 return;
@@ -1249,6 +1230,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.timeEntry.TaskID = inProgressEntry.TaskID;
                         $scope.doneLoading.push('tasks');
                         if ($scope.doneLoading.length >= 4) {
+                            $scope.sendPageReady();
                             $scope.$emit("pageReady");
                         }
                         $scope.$apply();
@@ -1264,6 +1246,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
                 $scope.doneLoading.push('tasks');
                 if ($scope.doneLoading.length >= 4) {
+                    $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
                 $scope.$apply();
@@ -1274,6 +1257,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.user = user;
             $scope.doneLoading.push('user');
             if ($scope.doneLoading.length >= 4) {
+                $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
             $scope.$apply();
@@ -1348,6 +1332,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.doneLoading.push('company');
             if ($scope.doneLoading.length >= 4) {
+                $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
             $scope.$apply();
@@ -1380,6 +1365,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.jobClient = undefined;
                 $scope.doneLoading.push("jobClients");
                 if ($scope.doneLoading.length >= 4) {
+                    $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
                 $scope.$apply();
@@ -1400,6 +1386,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.timeEntry.client = inProgressEntry.client;
                             $scope.doneLoading.push("jobClients");
                             if ($scope.doneLoading.length >= 4) {
+                                $scope.sendPageReady();
                                 $scope.$emit("pageReady");
                             }
                             $scope.$apply();
@@ -1416,6 +1403,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     });
                     $scope.doneLoading.push("jobClients");
                     if ($scope.doneLoading.length >= 4) {
+                        $scope.sendPageReady();
                         $scope.$emit("pageReady");
                     }
                     $scope.$apply();

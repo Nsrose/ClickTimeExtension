@@ -136,7 +136,8 @@ myApp.service('CTService', function() {
     /** Convert a hh:mm format to Clicktime's ISO time string */
     this.convertISO = function (date) {
     	// T splits date/time, . splits ms and the rest
-    	return date.toISOString().split('T')[1].split('.')[0];
+    	//return date.toISOString().split('T')[1].split('.')[0];
+        return date.toTimeString().split(" ")[0];
         //return time + ":00"; 
     }
 
@@ -267,5 +268,6 @@ myApp.service('CTService', function() {
     }
 
     //ALEX JONES
-   
+
+
 })

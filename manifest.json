@@ -12,7 +12,6 @@
         "js/lib/jquery-1.11.3.min.js",
         "js/app/background.js"
     ],
-    "persistent": true
   },
 
   "browser_action" : {

@@ -20,19 +20,59 @@ chrome.runtime.onMessage.addListener(
 */
 var timer;
 
-var updateBadge = function(StopwatchService) {
+/* function taken from StopwatchService. 
+   FAQ: 
+   - Why not just use the service by passing it in as a param? 
+        the service stops once the chrome extension page closes. Therefore,
+        we can't rely on the service.
+   - Okay, so then register the service in the manifest as a background script.
+        Sure, that works. But then you will have to register the service here,
+        and that wasn't worth it to register so many dependencies just for one
+        function to work.  
+*/
+var getElapsedTime = function (callback) {
+  chrome.storage.sync.get('stopwatch', function (items) {
+    if ('stopwatch' in items) {
+      var now = new Date();
+      var storedWatch = items.stopwatch;
+      var startTime = new Date(storedWatch.startYear, storedWatch.startMonth, storedWatch.startDay,
+        storedWatch.startHrs, storedWatch.startMin, storedWatch.startSec);
+      var elapsedTimeMS = now - startTime;
+      var elapsedSec = Math.floor(elapsedTimeMS / 1000);
+      var elapsedMin = Math.floor(elapsedSec / 60);
+      var elapsedHrs = Math.floor(elapsedMin / 60);
+      var elapsedObj = { 
+        'elapsedHrs' : elapsedHrs,
+        'elapsedMin' : elapsedMin,
+        'elapsedSec' : elapsedSec,
+        'running' : storedWatch.running
+      };  
+      callback(elapsedObj);
+    } else {
+      var elapsedObj = { 
+        'elapsedHrs' : 0,
+        'elapsedMin' : 0,
+        'elapsedSec' : 0,
+        'running' : false
+      };  
+      callback(elapsedObj);
+    }   
+  })  
+}   
+
+var updateBadge = function() {
     var badgeHrs, badgeMin, badgeSec;
     timer = setInterval(function() {
-        StopwatchService.getElapsedTime(function(elapsedObj) {
+        getElapsedTime(function(elapsedObj) {
 
             badgeSec = elapsedObj.elapsedSec % 60; // unused except for testing
             badgeMin = elapsedObj.elapsedMin % 60;
             badgeHrs = elapsedObj.elapsedHrs;
-/*
+
             if (badgeHrs > 9) {
                 stopBadge();
                 chrome.browserAction.setBadgeText({text: badgeHrs + "+"});
-                updateBadgeHours(StopwatchService);
+                updateBadgeHours();
             } else {
                 badgeMin += ''; //toString
                 badgeHrs += '';
@@ -41,12 +81,12 @@ var updateBadge = function(StopwatchService) {
                 }
                 chrome.browserAction.setBadgeText({text: badgeHrs + ':' + badgeMin});
             }
-*/
+/*
              // test with seconds
-             if (badgeMin > 9) {
+             if (badgeSec > 9) {
                  stopBadge();
                  chrome.browserAction.setBadgeText({text: "10+"});
-                 updateBadgeSeconds(StopwatchService);
+                 updateBadgeSeconds();
              } else {
                  badgeMin += '';
                  badgeSec += '';
@@ -57,24 +97,26 @@ var updateBadge = function(StopwatchService) {
                  chrome.browserAction.setBadgeText({text: badgeMin + ':' + badgeSec});
                  console.log("badge being called");
              }
+*/
         })
     }, 1000);
 }
 
 // updates the badge at every hour after 10 to be 10+, 11+ ... etc
-var updateBadgeHours = function(StopwatchService) {
+var updateBadgeHours = function() {
     var badgeHrs;
     timer = setInterval(function() {
         // every hour after 10
-        StopwatchService.getElapsedTime(function(elapsedObj) {
+        getElapsedTime(function(elapsedObj) {
             badgeHrs = elapsedObj.elapsedHrs + '';
             chrome.browserAction.setBadgeText({text: badgeHrs + "+"})
         })
     }, 3600000);
 }
 
- // test function for updateBadgeHours
- var updateBadgeSeconds = function(StopwatchService) {
+ /* test function for updateBadgeHours. Is never called unless you are 
+    testing with seconds */ 
+ var updateBadgeSeconds = function() {
      var badgeSec;
      timer = setInterval(function() {
          // every second after 10
@@ -88,7 +130,6 @@ var updateBadgeHours = function(StopwatchService) {
 var stopBadge = function() {
     clearInterval(timer);
     chrome.browserAction.setBadgeText({text: ""});
-    console.log("i stopped the badge");
 }
 
 ///////// Notifications /////////////////////////////////////////////////

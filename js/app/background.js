@@ -99,7 +99,7 @@ var updateBadge = function() {
              }
 */
         })
-    }, 1000);
+    }, 60000);
 }
 
 // updates the badge at every hour after 10 to be 10+, 11+ ... etc

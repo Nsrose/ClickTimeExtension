@@ -174,23 +174,11 @@ var sendOneNotification = function() {
     chrome.notifications.create('enterTimeNotification', options);
 }
 
-
-
-
 /*  
     clicking on the body of the message will open the webapp in a window
-    if there is no current window open.
-    if there is a window open, the program will prompt you by flashing
-    the window in your face
 */
-var windowID = null;
-
 chrome.notifications.onClicked.addListener(function (notificationId) {
-    if (!windowID) { // if id has never beeen set before    
-        createWindow();
-    } else {        
-        chrome.windows.update(windowID, {drawAttention: true});
-    }
+  createWindow();
 });
 
 // Listen for Create Window request from content:
@@ -204,23 +192,35 @@ chrome.runtime.onMessage.addListener(
 
 /* Create a new chrome ext window and update windowID.
     If timeString isn't null, send a message to the new window
-    indicating that start and end time should be filled out. */
+    indicating that start and end time should be filled out.
+    if there is no current window open. This is determined by the existence
+    of windowID.
+    If a current window exists, the program will bring the current window into focus
+    and will not open a new window. 
+*/
+var windowID = null;
+
 function createWindow(timeString) {
-    chrome.windows.create({
-    url: chrome.extension.getURL('../templates/main.html'),
-    type: 'popup',
-    focused: true,
-    width: 556,
-    height: 380
-    }, function (window) {
-        windowID = window.id;
-    })
-    if (timeString) {
+  if (!windowID) { // if current window does not exist
+   chrome.windows.create({
+      url: chrome.extension.getURL('../templates/main.html'),
+      type: 'popup',
+      focused: true,
+      width: 556,
+      height: 380
+      }, function (window) {
+          windowID = window.id;
+      })
+
+      if (timeString) {
         chrome.runtime.sendMessage({
             integrateTimeEntry: true,
             timeString: timeString
         })
-    }
+      }
+  } else {        
+      chrome.windows.update(windowID, {drawAttention: true, focused: true});
+  }
 }
 
 /* on window close, reset the windowID to null to indicate that 

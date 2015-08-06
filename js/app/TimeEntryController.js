@@ -25,6 +25,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $location.path("/settings");
     }
 
+    // opens popup
+    $scope.openPopup = function() {
+        chrome.extension.getBackgroundPage().createWindow();
+    }
+
     // Function to test sending an error to API
     $scope.testError = function() {
         APIService.reportError($scope.Session.UserEmail,

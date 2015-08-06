@@ -6,7 +6,7 @@
     <h3 id="settings-title-text">Settings</h3>
 
     <div class="settings-column" id="settings-column-left">
-        <div ng-if="!requireStartEndTime" id="time-entry-method-container" class="btn-group icon-group">
+        <div ng-class="{'no-display': requireStartEndTime }" id="time-entry-method-container" class="btn-group icon-group">
             <h5 id="entry-method-toggle-text">Time Entry Method</h5>
             <button id="duration" type="button" class="btn btn-custom">Duration</button>
             <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
@@ -15,7 +15,7 @@
 
         <div ng-class="{'top-bumper' : requireStartEndTime}" class="settings-controls icon-group" ng-controller="TimeEntryController" id="refresh-container">
             <button ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button">
-                <i class="fa fa-refresh"></i>&nbsp; Refresh List
+                <i class="fa fa-refresh"></i>&nbsp; Refresh
             </button>
             <span id="tooltip" ng-hide="true">Updates your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists and settings.</span>
             <div id="refresh-status"></div>

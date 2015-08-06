@@ -5,10 +5,9 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   }
 
   $scope.$on("refresh", function() {
-   var status = document.getElementById('refresh-status');
-    status.textContent = 'Lists refreshed!';
+    $('#refresh-status').text('Lists refreshed!');
     setTimeout(function() {
-      status.textContent = '';
+       $('#refresh-status').text('');
     }, 750);
   })
 
@@ -74,7 +73,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
 
     // when toggling, update defaultTimeEntryMethod in local storage
     $(".btn-group > .btn").click(function() {
-      // visuals
+       // visuals
       $(this).addClass("active").siblings().removeClass("active");
       //storage set
       chrome.storage.sync.get('timeEntryMethod', function (items) {
@@ -96,7 +95,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
             });
           }
         }
-      })
-    });
+      })     
+    })
   })
 }])

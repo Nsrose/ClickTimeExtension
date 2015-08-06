@@ -177,21 +177,15 @@ var sendOneNotification = function() {
 
 /*  
     clicking on the body of the message will open the webapp in a window
-    if there is no current window open.
-    if there is a window open, the program will prompt you by flashing
-    the window in your face
 */
+
 var windowID = null;
 
 // TImeString from integration
 var timeString = null;
 
 chrome.notifications.onClicked.addListener(function (notificationId) {
-    if (!windowID) { // if id has never beeen set before    
-        createWindow();
-    } else {        
-        chrome.windows.update(windowID, {drawAttention: true});
-    }
+  createWindow();
 });
 
 // Listen for Create Window request from content:
@@ -208,6 +202,33 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
+
+/* Create a new chrome ext window and update windowID.
+    If timeString isn't null, send a message to the new window
+    indicating that start and end time should be filled out.
+    if there is no current window open. This is determined by the existence
+    of windowID.
+    If a current window exists, the program will bring the current window into focus
+    and will not open a new window. 
+*/
+var windowID = null;
+
+function createWindow(timeString) {
+  if (!windowID) { // if current window does not exist
+   chrome.windows.create({
+      url: chrome.extension.getURL('../templates/main.html'),
+      type: 'popup',
+      focused: true,
+      width: 580,
+      height: 450
+      }, function (window) {
+          windowID = window.id;
+      })
+
+     
+  } else {        
+      chrome.windows.update(windowID, {drawAttention: true, focused: true});
+  }
 
 // Listen for page ready after create window
 chrome.runtime.onMessage.addListener(
@@ -274,19 +295,6 @@ function toTime (time) {
         startTime.setHours(hours, minutes, 0, 0);
     }
     return startTime;
-}
-
-/* Create a new chrome ext window and update windowID. */
-function createWindow(timeString) {
-    chrome.windows.create({
-    url: chrome.extension.getURL('../templates/main.html'),
-    type: 'popup',
-    focused: true,
-    width: 580,
-    height: 450
-    }, function (window) {
-        windowID = window.id;
-    })  
 }
 
 /** Integrate a time entry from google calendar.*/

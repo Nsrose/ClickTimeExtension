@@ -10,6 +10,22 @@ chrome.runtime.onMessage.addListener(
     }
 )
 
+// Append logo to google calendar bubble
+function appendLogoGoogleCalendar(calendarHTML) {
+    $(".bubblemain").append(calendarHTML);
+    document.querySelector('#clicktime-calendar-integration').addEventListener("click", integrateTimeEntry);
+}
+
+// Record time entry with Google calendar integration
+function integrateTimeEntry() {
+    var timeString = $(".eb-date").text();
+    chrome.runtime.sendMessage({
+        createWindow: true,
+        timeString: timeString
+    })
+}
+
+
 // Try to send locally stored time entries
 chrome.storage.local.get('storedTimeEntries', function (items) {
     if ('storedTimeEntries' in items) {
@@ -54,3 +70,15 @@ chrome.storage.local.get('storedTimeEntries', function (items) {
     }
 })
 
+var calendarHTML = "<div style='width:20px;height:20px;position:absolute;top:0;left:0;z-index=999;' id='clicktime-calendar-integration'>";
+var imgURL = chrome.extension.getURL("../../img/smallLogo.png");
+
+calendarHTML += "<img src=" + imgURL + "></div>";
+
+
+$(document).ready(function() {
+    window.setTimeout(function() {
+        appendLogoGoogleCalendar(calendarHTML);
+    }, 3000);
+
+})

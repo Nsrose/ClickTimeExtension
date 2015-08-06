@@ -85,6 +85,47 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             });
     }
 
+    /////////////////////////////// Integrations ////////////////////////////
+
+    /** Integrate a time entry from google calendar. */
+    $scope.integrateTimeEntry = function (timeString) {
+        var splitTime = timeString.split(",");
+        var timeDate = splitTime[1];
+        var timeDelta = splitTime[2];
+        var splitTimeDelta = timeDelta.split("–");
+        var startTimeString = splitTimeDelta[0];
+        var amStartSplit = startTimeString.split("am");
+        var startTimeRaw;
+        if (amStartSplit.length == 1) {
+            // This time is PM
+            // FIX: Doesn't handle HH:MM format, only works for even hours
+            startTimeRaw = parseInt(startTimeString.split("pm")[0]) + 12;
+        } else {
+            // This time is AM
+            // FIX: Doesn't handle HH:MM format, only works for even hours
+            startTimeRaw = parseInt(amStartSplit[0]);
+        }
+
+
+
+        var now = new Date();
+        var timeEntryDate = new Date(now.getFullYear() + timeDate);
+
+        console.log(startTimeRaw);
+        console.log(timeEntryDate);
+    }
+
+    /** Listen for a request to integrate a google calendar time entry. */
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) {
+            if (request.integrateTimeEntry) {
+                $scope.integrateTimeEntry(request.timeString);
+            }
+        }
+    )
+
+    /////////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////// Interface logic /////////////////////////////////////
 
     // start stopwatch, if there
@@ -97,6 +138,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
         }
     })
+
+    // Send a notification immediately for demonstration purposes
+    $scope.sendNotification = function () {
+        chrome.extension.getBackgroundPage().sendOneNotification();
+    }
 
     // Save time entry if focused on hours and enter
     $("#time-entry-form-hours").keypress(function(e) {

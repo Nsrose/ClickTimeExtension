@@ -1,7 +1,7 @@
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
-var NOTIFICATION_POLL_PERIOD = 5000;
+var NOTIFICATION_POLL_PERIOD = 14400000;
 
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
@@ -169,6 +169,14 @@ var stopNotifications = function() {
     chrome.notifications.clear('enterTimeNotification');
 }
 
+/* Create a new notification and send, for demonstration purposes.*/
+var sendOneNotification = function() {
+    chrome.notifications.create('enterTimeNotification', options);
+}
+
+
+
+
 /*  
     clicking on the body of the message will open the webapp in a window
     if there is no current window open.
@@ -176,22 +184,44 @@ var stopNotifications = function() {
     the window in your face
 */
 var windowID = null;
+
 chrome.notifications.onClicked.addListener(function (notificationId) {
-    if (!windowID) { // if id has never beeen set before 
-        chrome.windows.create({
-            url: chrome.extension.getURL('../templates/main.html'),
-            type: 'popup',
-            focused: true,
-            width: 556,
-            height: 380,
-        }, function (window) {
-            windowID = window.id;
-            console.log(windowID);
-        });    
+    if (!windowID) { // if id has never beeen set before    
+        createWindow();
     } else {        
         chrome.windows.update(windowID, {drawAttention: true});
     }
 });
+
+// Listen for Create Window request from content:
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        if (request.createWindow) {
+            createWindow(request.timeString);
+        }
+    }
+)
+
+/* Create a new chrome ext window and update windowID.
+    If timeString isn't null, send a message to the new window
+    indicating that start and end time should be filled out. */
+function createWindow(timeString) {
+    chrome.windows.create({
+    url: chrome.extension.getURL('../templates/main.html'),
+    type: 'popup',
+    focused: true,
+    width: 556,
+    height: 380
+    }, function (window) {
+        windowID = window.id;
+    })
+    if (timeString) {
+        chrome.runtime.sendMessage({
+            integrateTimeEntry: true,
+            timeString: timeString
+        })
+    }
+}
 
 /* on window close, reset the windowID to null to indicate that 
    there does not exist a current window open */

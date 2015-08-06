@@ -57,9 +57,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
       if ('user' in items) {
         if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
           $scope.requireStartEndTime = true;
-          $('#refresh-button').css('margin-top', '106px');
         } else {
-          $('#refresh-button').css('margin-top', '0px');
           //query the local storage for last-set method
           chrome.storage.sync.get('timeEntryMethod', function(items) {
             if ('timeEntryMethod' in items) {

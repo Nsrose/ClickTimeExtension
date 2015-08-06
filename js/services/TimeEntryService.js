@@ -1,7 +1,7 @@
 // Services for entering time.
 
 myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBase) {
-
+	var me = this;
 
 	// Function for making async API calls.
     var api = function (url, email, token, method, data) {
@@ -155,6 +155,24 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 			}
 		})
 	}
+
+	//Listen for an update in prog entry request from background:
+	chrome.runtime.onMessage.addListener(
+	    function (request, sender, sendResponse) {
+	        if (request.updateInProgressEntry) {
+	        	var startTime = JSON.parse(request.startTime);
+	        	var endTime = JSON.parse(request.endTime);
+	        	var startEndTimes = [startTime, endTime];
+	            me.updateInProgressEntry("startEndTimes", startEndTimes, function() {
+	            	chrome.runtime.sendMessage({
+	            		updateIntegration: true,
+	            		startTime: request.startTime,
+	            		endTime: request.endTime
+	            	})
+	            });
+	        }
+	    }
+	)
 
 	// Remove an in progress entry
 	this.removeInProgressEntry = function() {

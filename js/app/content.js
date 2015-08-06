@@ -1,6 +1,9 @@
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 var TIMEOUT = 10000;
 
+// Google calendar time string
+var timeString = null;
+
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -18,9 +21,9 @@ function appendLogoGoogleCalendar(calendarHTML) {
 
 // Record time entry with Google calendar integration
 function integrateTimeEntry() {
-    var timeString = $(".eb-date").text();
+    timeString = $(".eb-date").text();
     chrome.runtime.sendMessage({
-        createWindow: true,
+        openWindow: true,
         timeString: timeString
     })
 }

@@ -132,8 +132,6 @@ var sendOneNotification = function() {
 }
 
 
-
-
 /*  
     clicking on the body of the message will open the webapp in a window
     if there is no current window open.
@@ -141,6 +139,9 @@ var sendOneNotification = function() {
     the window in your face
 */
 var windowID = null;
+
+// TImeString from integration
+var timeString = null;
 
 chrome.notifications.onClicked.addListener(function (notificationId) {
     if (!windowID) { // if id has never beeen set before    
@@ -153,32 +154,99 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 // Listen for Create Window request from content:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        if (request.createWindow) {
+        if (request.integrateTimeEntry) {
+            console.log("Got request to integrate time entry");
+            integrateTimeEntry(request.timeString);
+        }
+        if (request.openWindow) {
+            timeString = request.timeString;
+            console.log("Got request to open window");
             createWindow(request.timeString);
         }
     }
 )
 
-/* Create a new chrome ext window and update windowID.
-    If timeString isn't null, send a message to the new window
-    indicating that start and end time should be filled out. */
+// Listen for page ready after create window
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        if (request.pageReady && timeString) {
+            integrateTimeEntry(timeString);
+            timeString = null;
+        }
+    }
+)
+
+/** Integrate a time entry from google calendar. Save to local in prog entry. */
+function integrateTimeEntry (timeString) {
+    var splitTime = timeString.split(",");
+    var timeDate = splitTime[1];
+    var timeDelta = splitTime[2];
+    var splitTimeDelta = timeDelta.split(" ");
+    var startTimeString = splitTimeDelta[1];
+    var endTimeString = splitTimeDelta[3];
+
+    var startTimeProper = toProperTimeString(startTimeString);
+    var endTimeProper = toProperTimeString(endTimeString);
+
+    var now = new Date();
+    var timeEntryDate = new Date(now.getFullYear() + timeDate);
+
+    var startTime = toTime(startTimeProper);
+    var endTime = toTime(endTimeProper);
+
+    var startEndTimes = [JSON.stringify(startTime), JSON.stringify(endTime)];
+    chrome.runtime.sendMessage({
+        updateInProgressEntry: true,
+        startTime: JSON.stringify(startTime),
+        endTime : JSON.stringify(endTime)
+    })
+
+}
+
+// Convert format '12:15pm' to '12:15 pm' for Date parsing
+function toProperTimeString (timeString) {
+    var amSplit = timeString.split("am");
+    if (amSplit.length == 1) {
+        // PM time
+        var pmSplit = timeString.split("pm");
+        return pmSplit[0] + " pm";
+    } else {
+        // AM time
+        return amSplit[0] + " am";
+    }
+}
+
+// Convert "2 pm" or "2:14 pm" to a Date object
+function toTime (time) {
+    if (time.indexOf(":") == -1) {
+        time = time.split(" ")[0] + ":00" + " " + time.split(" ")[1];
+    }
+    var startTime = new Date();
+    var parts = time.match(/(\d+):(\d+) (am|pm)/);
+    if (parts) {
+        var hours = parseInt(parts[1]),
+            minutes = parseInt(parts[2]),
+            tt = parts[3];
+        if (tt === 'pm' && hours < 12) hours += 12;
+        startTime.setHours(hours, minutes, 0, 0);
+    }
+    return startTime;
+}
+
+/* Create a new chrome ext window and update windowID. */
 function createWindow(timeString) {
     chrome.windows.create({
     url: chrome.extension.getURL('../templates/main.html'),
     type: 'popup',
     focused: true,
-    width: 556,
-    height: 380
+    width: 580,
+    height: 450
     }, function (window) {
         windowID = window.id;
-    })
-    if (timeString) {
-        chrome.runtime.sendMessage({
-            integrateTimeEntry: true,
-            timeString: timeString
-        })
-    }
+    })  
 }
+
+/** Integrate a time entry from google calendar.*/
 
 /* on window close, reset the windowID to null to indicate that 
    there does not exist a current window open */

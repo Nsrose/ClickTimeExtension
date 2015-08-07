@@ -20,8 +20,10 @@ a {
   overflow: hidden;
 }
 
-.img-scaled {
-  width: 100%;
+
+.label.label-success {
+    background-color: #5e659d;
+    margin-left: 4px;
 }
 
 .clear {
@@ -97,13 +99,17 @@ a {
 
 
 .header-icon {
-    margin-left: 15px;}
+    margin-left: 15px;
+    float: right;
+}
+
 
 .header-item {
     cursor: pointer;
     position: absolute;
     left: 466px;
     top: 12px;
+    width: 70px;
 }
 
 
@@ -117,6 +123,17 @@ a {
     left: 352px;
     background: #ffffff;
     position: absolute;
+}
+
+.feedback-link {
+    float: left;
+    text-decoration: underline;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-left: 18px;
+}
+.feedback-link a {
+    color: #444444;
 }
 
 .total-hours-log {
@@ -683,7 +700,7 @@ input[type="text"]:disabled {
     margin-left: 24px;
     margin-top: 53px;
     margin-bottom: 0px;
-    width: 216px;
+    width: 220px;
     text-align: left;
 }
 

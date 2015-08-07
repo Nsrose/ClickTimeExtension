@@ -3,6 +3,8 @@ var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
 var NOTIFICATION_POLL_PERIOD = 14400000;
 
+var showPopupArrow = true;
+
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -174,16 +176,12 @@ var sendOneNotification = function() {
     chrome.notifications.create('enterTimeNotification', options);
 }
 
+// TImeString from integration
+var timeString = null;
 
 /*  
     clicking on the body of the message will open the webapp in a window
 */
-
-var windowID = null;
-
-// TImeString from integration
-var timeString = null;
-
 chrome.notifications.onClicked.addListener(function (notificationId) {
   createWindow();
 });
@@ -222,13 +220,18 @@ function createWindow(timeString) {
       width: 580,
       height: 450
       }, function (window) {
+          console.log("i aint no hollaback gurl")
           windowID = window.id;
+          hidePopupArrow();
       })
-
-     
-  } else {        
+  } else {    
       chrome.windows.update(windowID, {drawAttention: true, focused: true});
   }
+}
+
+function hidePopupArrow() {
+    showPopupArrow = false
+}
 
 // Listen for page ready after create window
 chrome.runtime.onMessage.addListener(
@@ -300,9 +303,14 @@ function toTime (time) {
 /** Integrate a time entry from google calendar.*/
 
 /* on window close, reset the windowID to null to indicate that 
-   there does not exist a current window open */
+   there does not exist a current window open. It will also broadcast
+   to show the popout button in the template */
 chrome.windows.onRemoved.addListener(function (closedWindowID) {
-    if (closedWindowID == windowID) windowID = null;
+    if (closedWindowID == windowID) {
+      windowID = null;
+      showPopupArrow = true
+
+    }
 })
 
 /* on notification close, create another notification later. */

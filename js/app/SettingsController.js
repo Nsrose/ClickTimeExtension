@@ -34,8 +34,8 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
                 permission: true
               }
             });
-            var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
-            chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+            var pollPeriod = chrome.runtime.getBackgroundPage().NOTIFICATION_POLL_PERIOD
+            chrome.runtime.getBackgroundPage().createNotifications(pollPeriod);
           } else {
             chrome.storage.sync.set({
               'allowReminders': {
@@ -43,7 +43,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
                 permission: false
               }
             }, function () {
-              chrome.extension.getBackgroundPage().stopNotifications();
+              chrome.runtime.getBackgroundPage().stopNotifications();
             });
           }
         }

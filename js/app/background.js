@@ -7,7 +7,7 @@ var showPopupArrow = true;
 
 
 chrome.app.runtime.onLaunched.addListener(function() {
-  chrome.app.window.create('window.html', {
+  chrome.app.window.create('../templates/main.html', {
     'outerBounds': {
       'width': 580,
       'height': 450 
@@ -225,7 +225,7 @@ var windowID = null;
 function createWindow(timeString) {
   if (!windowID) { // if current window does not exist
    chrome.windows.create({
-      url: chrome.extension.getURL('../templates/main.html'),
+      url: chrome.runtime.getURL('../templates/main.html'),
       type: 'popup',
       focused: true,
       width: 580,

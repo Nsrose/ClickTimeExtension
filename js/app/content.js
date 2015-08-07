@@ -103,7 +103,7 @@ chrome.storage.local.get('storedTimeEntries', function (items) {
 })
 
 var calendarHTML = "<div style='width:20px;height:20px;position:absolute;top:0;left:0;z-index=999;' id='clicktime-calendar-integration'>";
-var imgURL = chrome.extension.getURL("../../img/smallLogo.png");
+var imgURL = chrome.runtime.getURL("../../img/smallLogo.png");
 
 calendarHTML += "<img src=" + imgURL + "></div>";
 

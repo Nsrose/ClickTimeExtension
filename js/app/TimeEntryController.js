@@ -20,7 +20,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // True if a time entry has expired from yesterday or before
     $scope.abandonedEntry = false;
     // Whether to show pop out icon
-    $scope.showPopupArrow = chrome.extension.getBackgroundPage().showPopupArrow;
+    chrome.runtime.getBackgroundPage(function(window) {
+      $scope.showPopupArrow = window.showPopupArrow; 
+    })
   
     // Link to the settings page
     $scope.settingsPage = function () {
@@ -29,7 +31,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // opens popup
     $scope.openPopup = function() {
-        chrome.extension.getBackgroundPage().createWindow();
+        chrome.runtime.getBackgroundPage().createWindow();
     }
 
     // Function to test sending an error to API
@@ -85,7 +87,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Send a notification immediately for demonstration purposes
     $scope.sendNotification = function () {
-        chrome.extension.getBackgroundPage().sendOneNotification();
+        chrome.runtime.getBackgroundPage().sendOneNotification();
     }
 
     // Save time entry if focused on hours and enter
@@ -744,7 +746,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $location.path("/login");
             $scope.removeLocalStorageVars();
             $scope.removeSyncStorageVars();
-            chrome.extension.getBackgroundPage().stopNotifications(); // stop generation of new notifications
+            chrome.runtime.getBackgroundPage().stopNotifications(); // stop generation of new notifications
             $scope.$apply();
         })
     }
@@ -1093,7 +1095,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     */
     function updateTimeEntryMethodInStorage() {
        var UserID, RequireStopwatch, RequireStartEndTime, method;
-       var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
+       var pollPeriod = chrome.runtime.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
 
         // Set user id and permissions
         UserID = $scope.user.UserID;
@@ -1108,7 +1110,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         chrome.storage.sync.get(['timeEntryMethod', 'allowReminders'], function (items) {
             if (('allowReminders' in items) && ('timeEntryMethod' in items)) {
-                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                chrome.runtime.getBackgroundPage().createNotifications(pollPeriod);
                 $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
                 updateDurationDisplay();
             } else {
@@ -1130,7 +1132,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         'UserID' : UserID 
                     }
                 }, function() {
-                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+                    chrome.runtime.getBackgroundPage().createNotifications(pollPeriod);
                 });
             }
          }

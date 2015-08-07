@@ -67,7 +67,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     	$interval.cancel(timerPromise);
     	timerPromise = undefined;
     	StopwatchService.clear(function() {
-            chrome.extension.getBackgroundPage().stopBadge();
+            chrome.runtime.getBackgroundPage().stopBadge();
         })
     }
 
@@ -81,7 +81,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                 startTime = start;
                 $scope.running = true;
                 $scope.$parent.runningStopwatch = true;
-                chrome.extension.getBackgroundPage().updateBadge();
+                chrome.runtime.getBackgroundPage().updateBadge();
                 timerPromise = $interval(function() {
                     $scope.getElapsedTime();
                 }, 31);
@@ -98,7 +98,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                 $interval.cancel(timerPromise);
                 timerPromise = undefined;
                 $scope.$apply();
-                chrome.extension.getBackgroundPage().stopBadge();
+                chrome.runtime.getBackgroundPage().stopBadge();
             })
         }
     }

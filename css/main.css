@@ -211,7 +211,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     font-size: 23px;
     border:  1px solid #bcbcbc;
     padding: 0 0 0 8px;
-    margin-right: 10px;
+    margin-right: 2px;
 }
 
 
@@ -643,13 +643,11 @@ input[type="text"]:disabled {
 }
 
 .system-message {
+    width: 520px;
     margin-left: 18px;
     color: red;
 }
 
-#abandoned-stopwatch-message {
-    color: red;
-}
 #environment-options {
     margin-left: -10px;
 }

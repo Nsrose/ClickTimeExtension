@@ -492,14 +492,15 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     /* margin-left: 20px; */
     float: right;
     margin-right: 20px;
+    width: 120px;
     height: 42px;
     font-size: 24px;
     background-color: #e4e4e4;
     border: 1px solid #bcbcbc;
     border-radius: 1px;
     padding: 5px;
-    padding-left: 55px;
-    padding-right: 55px;
+    padding-left: 12px;
+    padding-right: 0px;
 }
 
 .success-messaging-container {

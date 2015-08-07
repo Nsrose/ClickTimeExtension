@@ -5,6 +5,16 @@ var NOTIFICATION_POLL_PERIOD = 14400000;
 // Whether to show pop out icon
 var showPopupArrow = true;
 
+
+chrome.app.runtime.onLaunched.addListener(function() {
+  chrome.app.window.create('window.html', {
+    'outerBounds': {
+      'width': 580,
+      'height': 450 
+    }
+  });
+});
+
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {

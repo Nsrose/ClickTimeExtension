@@ -64,6 +64,7 @@ var getElapsedTime = function (callback) {
 
 var updateBadge = function() {
     var badgeHrs, badgeMin, badgeSec;
+    chrome.browserAction.setBadgeText({text: "0:00"});
     timer = setInterval(function() {
         getElapsedTime(function(elapsedObj) {
 
@@ -81,7 +82,7 @@ var updateBadge = function() {
                 if (badgeMin.length == 1) {
                     badgeMin = "0" + badgeMin;
                 }
-                chrome.browserAction.setBadgeText({text: badgeHrs + ':' + badgeMin});
+                chrome.browserAction.setBadgeText({text: badgeHrs + ":" + badgeMin});
             }
 /*
              // test with seconds

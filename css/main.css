@@ -217,7 +217,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 }
 
 #time-entry-form-start, #time-entry-form-end {
-    width: 120px;
+    width: 130px;
     font-size: 23px;
     border:  1px solid #bcbcbc;
     padding: 0 0 0 8px;

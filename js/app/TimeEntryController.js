@@ -491,7 +491,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = true;
     			$scope.showStopwatch = false;
-                $('#notes-field').css({'width': '248px', 'max-width': '248px', 'margin-right' : '20px'});
+                $('#notes-field').css({'width': '248px', 'max-width': '248px', 'margin-right' : '0px'});
     			break;
     		default:
     			bootbox.alert("Invalid time entry method");
@@ -564,6 +564,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
                 timeEntry.Hours = compiledHours;
             }
+
+            if ($scope.user.RequireStopwatch) {
+                var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                if (ISOStartTime == ISOEndTime) {
+                    var endSplit = ISOEndTime.split(":");
+                    ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
+                }
+                clickTimeEntry.ISOStartTime = ISOStartTime;
+                clickTimeEntry.ISOEndTime = ISOEndTime;
+            }
+
+
 
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
@@ -1181,8 +1194,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var msDay = 60*60*24*1000;
                 var dayDiff = Math.floor((now - then) / msDay);
                 if (dayDiff >= 1 && !$scope.abandonedStopwatch) {
-                    $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
-                    $scope.abandonedEntry = true;
+                    if (inProgressEntry.Hours || inProgressEntry.ISOStartTime || inProgressEntry.ISOEndTime) {
+                        $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
+                        $scope.abandonedEntry = true;
+                    }
+                   
                 }
             }
             $scope.showStartTimer = true;

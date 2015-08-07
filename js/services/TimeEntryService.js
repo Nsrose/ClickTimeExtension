@@ -164,14 +164,16 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 	        	var endTime = JSON.parse(request.endTime);
 	        	var startEndTimes = [startTime, endTime];
 
-	            me.updateInProgressEntry("startEndTimes", startEndTimes, function() {
-	            	console.log("Updated in progres entyr. Now sending update integration.");
-	            	chrome.runtime.sendMessage({
-	            		updateIntegration: true,
-	            		startTime: request.startTime,
-	            		endTime: request.endTime
-	            	})
-	            });
+	        	me.updateInProgressEntry("Comment", request.timeInfo, function() {
+	        		me.updateInProgressEntry("startEndTimes", startEndTimes, function() {
+		            	chrome.runtime.sendMessage({
+		            		updateIntegration: true,
+		            		startTime: request.startTime,
+		            		endTime: request.endTime,
+		            		timeInfo: request.timeInfo
+		            	})
+		            });
+	        	})
 	        }
 	    }
 	)

@@ -52,11 +52,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     */ 
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {
-
             if (request.updateIntegration) {
-                console.log("Got request to update intgegration")
                 $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
                 $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
+                $scope.timeEntry.Comment = request.timeInfo;
                 $scope.showStartTimer = false;
                 $scope.$apply();
             }

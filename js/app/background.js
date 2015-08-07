@@ -179,6 +179,8 @@ var sendOneNotification = function() {
 
 // TImeString from integration
 var timeString = null;
+// Info from latest google calendar reqeust
+var timeInfo = null;
 
 /*  
     clicking on the body of the message will open the webapp in a window
@@ -191,12 +193,11 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.integrateTimeEntry) {
-            console.log("Got request to integrate time entry");
             integrateTimeEntry(request.timeString);
         }
         if (request.openWindow) {
             timeString = request.timeString;
-            console.log("Got request to open window");
+            timeInfo = request.timeInfo;
             createWindow(request.timeString);
         }
     }
@@ -213,7 +214,7 @@ chrome.runtime.onMessage.addListener(
 var windowID = null;
 
 function createWindow(timeString) {
-  if (!windowID) { // if current window does not exist
+  if (!windowID || timeString) { // if current window does not exist
    chrome.windows.create({
       url: chrome.extension.getURL('../templates/main.html'),
       type: 'popup',
@@ -233,14 +234,14 @@ function createWindow(timeString) {
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.pageReady && timeString) {
-            integrateTimeEntry(timeString);
+            integrateTimeEntry(timeString, timeInfo);
             timeString = null;
         }
     }
 )
 
 /** Integrate a time entry from google calendar. Save to local in prog entry. */
-function integrateTimeEntry (timeString) {
+function integrateTimeEntry (timeString, timeInfo) {
     var splitTime = timeString.split(",");
     var timeDate = splitTime[1];
     var timeDelta = splitTime[2];
@@ -261,7 +262,8 @@ function integrateTimeEntry (timeString) {
     chrome.runtime.sendMessage({
         updateInProgressEntry: true,
         startTime: JSON.stringify(startTime),
-        endTime : JSON.stringify(endTime)
+        endTime : JSON.stringify(endTime),
+        timeInfo : timeInfo
     })
 
 }

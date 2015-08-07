@@ -119,6 +119,17 @@ a {
     position: absolute;
 }
 
+.feedback-link {
+    float: left;
+    text-decoration: underline;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-left: 18px;
+}
+.feedback-link a {
+    color: #444444;
+}
+
 .total-hours-log {
     float: right;
     margin-right: 20px;

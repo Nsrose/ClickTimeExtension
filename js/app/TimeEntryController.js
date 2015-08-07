@@ -1301,6 +1301,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.abandonedStopwatch = true;
                             $scope.runningStopwatch = false;
 
+                            
                             $('#notes-field').css({'width': '248px', 'max-width': '248px'});
                         } else {
                             // There is a running stopwatch, but it isn't abandoned

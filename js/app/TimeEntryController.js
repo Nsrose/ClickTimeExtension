@@ -491,7 +491,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = true;
     			$scope.showStopwatch = false;
-                $('#notes-field').css({'width': '248px', 'max-width': '248px', 'margin-right' : '20px'});
+                $('#notes-field').css({'width': '248px', 'max-width': '248px', 'margin-right' : '0px'});
     			break;
     		default:
     			bootbox.alert("Invalid time entry method");

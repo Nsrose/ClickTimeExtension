@@ -1181,8 +1181,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var msDay = 60*60*24*1000;
                 var dayDiff = Math.floor((now - then) / msDay);
                 if (dayDiff >= 1 && !$scope.abandonedStopwatch) {
-                    $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
-                    $scope.abandonedEntry = true;
+                    if (inProgressEntry.Hours || inProgressEntry.ISOStartTime || inProgressEntry.ISOEndTime) {
+                        $scope.abandonedDateString = yearStr + "/" + monthStr + "/" + dayStr;
+                        $scope.abandonedEntry = true;
+                    }
+                   
                 }
             }
             $scope.showStartTimer = true;

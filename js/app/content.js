@@ -37,7 +37,6 @@ function appendLogoGoogleCalendar(calendarHTML) {
 
 // Record time entry with Google calendar integration
 function integrateTimeEntry() {
-    debugger;
     timeString = $(".eb-date").text();
     var splitTime = timeString.split(",");
     var timeDate = splitTime[1];

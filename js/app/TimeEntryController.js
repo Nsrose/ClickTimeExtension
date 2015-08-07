@@ -565,6 +565,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 timeEntry.Hours = compiledHours;
             }
 
+            if ($scope.user.RequireStopwatch) {
+                var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                if (ISOStartTime == ISOEndTime) {
+                    var endSplit = ISOEndTime.split(":");
+                    ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
+                }
+                clickTimeEntry.ISOStartTime = ISOStartTime;
+                clickTimeEntry.ISOEndTime = ISOEndTime;
+            }
+
+
+
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");

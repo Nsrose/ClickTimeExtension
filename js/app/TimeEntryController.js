@@ -52,21 +52,23 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     */ 
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {
-            switch(request) {
-                case (request.updateIntegration):
-                    $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
-                    $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
-                    $scope.showStartTimer = false;
-                    break;
-                
-                case (request.showPopupArrow == false):
-                    $scope.showPopupArrow = false;
-                    break;
 
-                case (request.refresh):
-                    $scope.$apply();
-                    break;
-            }            
+            if (request.updateIntegration) {
+                console.log("Got request to update intgegration")
+                $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
+                $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
+                $scope.showStartTimer = false;
+                $scope.$apply();
+            }
+
+            if (request.showPopupArrow == false) {
+                $scope.showPopupArrow = false;
+                $scope.$apply();
+            }
+
+            if (request.refresh) {
+                $scope.$apply();
+            }
         }     
     )
 
@@ -1155,6 +1157,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Once page has loaded, send a message that this was loaded.
     $scope.sendPageReady = function() {
+        console.log("Sending page ready");
         chrome.runtime.sendMessage({
             pageReady: true
         })

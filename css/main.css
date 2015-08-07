@@ -97,13 +97,17 @@ a {
 
 
 .header-icon {
-    margin-left: 15px;}
+    margin-left: 15px;
+    float: right;
+}
+
 
 .header-item {
     cursor: pointer;
     position: absolute;
     left: 466px;
     top: 12px;
+    width: 70px;
 }
 
 

@@ -190,14 +190,13 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 #notes-field {
     display: inline-block;
     float: left;
-    /*width: 276px;*/
     width: 390px;
     max-width: 390px;
     height: 65px;
     max-height: 65px;
     margin-left: 18px;
     margin-top: 0px;
-    margin-right: 16px;
+    margin-right: 15px;
     border: 1px solid #bcbcbc;
     border-radius: 1px;
     resize: none;
@@ -228,6 +227,10 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     border:  1px solid #bcbcbc;
     padding: 0 0 0 8px;
     margin-right: 2px;
+}
+
+input[type="text"].time-entry-form-input {
+    padding-right: 6px;
 }
 
 

@@ -97,17 +97,14 @@ a {
     cursor: pointer;
     position: absolute;
     right: 16px;
+    top: 12px;
 }
 
-#header-item-gear {
-    top: 10px;
-    right: 60px;
+.header-icon {
+    margin-left: 20px;
 }
 
-#header-item-popout {
-    top: 10px;
-}
-#header-item-button {   
+#back-to-homepage {   
     width: 140px;
     height: 27px;
     top: 9px;

@@ -2,7 +2,7 @@
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours
 var NOTIFICATION_POLL_PERIOD = 14400000;
-
+// Whether to show pop out icon
 var showPopupArrow = true;
 
 // Listen for API url change:
@@ -220,17 +220,12 @@ function createWindow(timeString) {
       width: 580,
       height: 450
       }, function (window) {
-          console.log("i aint no hollaback gurl")
           windowID = window.id;
-          hidePopupArrow();
+          showPopupArrow = false
       })
   } else {    
       chrome.windows.update(windowID, {drawAttention: true, focused: true});
   }
-}
-
-function hidePopupArrow() {
-    showPopupArrow = false
 }
 
 // Listen for page ready after create window
@@ -303,13 +298,15 @@ function toTime (time) {
 /** Integrate a time entry from google calendar.*/
 
 /* on window close, reset the windowID to null to indicate that 
-   there does not exist a current window open. It will also broadcast
-   to show the popout button in the template */
+   there does not exist a current window open. It will also force a
+   scope refresh on the time entry template to show the popout button. */
 chrome.windows.onRemoved.addListener(function (closedWindowID) {
     if (closedWindowID == windowID) {
       windowID = null;
-      showPopupArrow = true
-
+      showPopupArrow = true;
+      chrome.runtime.sendMessage({
+        refresh : true
+      })
     }
 })
 

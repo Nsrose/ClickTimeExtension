@@ -19,7 +19,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.abandonedStopwatch = false;
     // True if a time entry has expired from yesterday or before
     $scope.abandonedEntry = false;
-    
+    // Whether to show pop out icon
     $scope.showPopupArrow = chrome.extension.getBackgroundPage().showPopupArrow;
   
     // Link to the settings page
@@ -48,18 +48,26 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     /* Listen for update from the following things:
         - from an integration
         - from popup arrow broadcasting
+        - forced page refresh
     */ 
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {
-            if (request.updateIntegration) {
-                $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
-                $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
-                $scope.showStartTimer = false;
-            }
-            if (request.showPopupArrow == false) {
-                $scope.showPopupArrow = false;
-            }
-        }
+            switch(request) {
+                case (request.updateIntegration):
+                    $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
+                    $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
+                    $scope.showStartTimer = false;
+                    break;
+                
+                case (request.showPopupArrow == false):
+                    $scope.showPopupArrow = false;
+                    break;
+
+                case (request.refresh):
+                    $scope.$apply();
+                    break;
+            }            
+        }     
     )
 
     /////////////////////////////////////////// Interface logic /////////////////////////////////////

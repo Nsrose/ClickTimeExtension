@@ -4,6 +4,22 @@ var TIMEOUT = 10000;
 // Google calendar time string
 var timeString = null;
 
+// Mapping from Month numbers to Month strings
+monthToStrings = {
+    0 : "January",
+    1 : "February",
+    2 : "March",
+    3 : "April",
+    4 : "May",
+    5 : "June",
+    6 : "July",
+    7 : "August",
+    8 : "September",
+    9 : "October",
+    10 : "November",
+    11 : "December"
+}
+
 // Listen for API url change:
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -21,7 +37,21 @@ function appendLogoGoogleCalendar(calendarHTML) {
 
 // Record time entry with Google calendar integration
 function integrateTimeEntry() {
+    debugger;
     timeString = $(".eb-date").text();
+    var splitTime = timeString.split(",");
+    var timeDate = splitTime[1];
+    var monthString = timeDate.split(" ")[1];
+    var date = parseInt(timeDate.split(" ")[2]);
+
+    var now = new Date();
+    var nowMonthStr = monthToStrings[now.getMonth()];
+    var nowDate = now.getDate();
+
+    if (nowDate != date || nowMonthStr != monthString) {
+        alert("Oops! You can't enter a time entry for a day other than today.");
+        return;
+    }
     chrome.runtime.sendMessage({
         openWindow: true,
         timeString: timeString

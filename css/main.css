@@ -8,14 +8,16 @@ a {
 }
 
 #main {
- min-width: 556px;
+  min-width: 556px;
   width: 556px;
-  min-height: 10px;
+  min-height: 380px;
   height: 380px;
+
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  overflow: hidden;
 }
 
 .img-scaled {
@@ -93,27 +95,29 @@ a {
     float: left;
 }
 
+
+.header-icon {
+    margin-left: 15px;}
+
 .header-item {
     cursor: pointer;
     position: absolute;
-    right: 16px;
+    left: 466px;
     top: 12px;
 }
 
-.header-icon {
-    margin-left: 20px;
-}
 
 #back-to-homepage {   
-    width: 140px;
-    height: 27px;
+    width: 160px;
+    height: 28px;
     top: 9px;
     text-align: center;
     line-height: 12px;
     font-size: 12px;
-    margin-left: 0px;
+    left: 348px;
     margin-right: 10px;
     background: white;
+    position: absolute;
 }
 
 .total-hours-log {
@@ -179,6 +183,8 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-top: 0px;
     margin-right: 16px;
     border: 1px solid #bcbcbc;
+    border-radius: 1px;
+    resize: none;
 }
 
 .time-entry-item {
@@ -191,38 +197,36 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 }
 
 .time-entry-form-input {
-    /* width: 110px; */
     height: 65px;
     font-size: 38px;
     text-align: right;
     float: left;
     clear: both;
     border: 1px solid #bcbcbc;
+    border-radius: 1px;
 }
 
-#time-entry-form-start {
-    /* margin-left: 18px; */
-    /* width: 96px !important; */
+#time-entry-form-start, #time-entry-form-end {
+    width: 120px;
     font-size: 23px;
     border:  1px solid #bcbcbc;
-    padding: 0;
-}
-
-#time-entry-form-end {
-    /* margin-left: 8px; */
-    /* width: 96px !important; */
-    font-size: 23px;
-    border: 1px solid #bcbcbc;
+    padding: 0 0 0 8px;
+    margin-right: 10px;
 }
 
 
 .time-entry-form-input::-webkit-input-placeholder {
     padding-right: 6px;
+    color: #c4c4c4;
 }
 
-input, textarea {
-    padding-right: 6px;
+#time-entry-item-start::-webkit-input-placeholder, #time-entry-item-end::-webkit-input-placeholder {
+    padding-right: 0;
 }
+
+/*input, textarea {
+    padding-right: 6px;
+}*/
 
 .notes-field-container {
     display: inline-block;
@@ -235,16 +239,8 @@ input, textarea {
     margin-bottom: 0px;
 }
 
-.fieldtitle.time-entry {
-    margin-left: 18px;
-}
-
-#time-entry-field-hours-title, #field-title-timer {
+.fieldtitle.time-entry, #time-entry-form-end-title, #time-entry-field-hours-title, #field-title-timer {
     margin-left: 0px;
-}
-
-#time-entry-form-end-title {
-    margin-left: 8px;
 }
 
 .settings-controls .tooltip > .tooltip-inner {
@@ -291,14 +287,24 @@ input, textarea {
     text-align: center;
 }
 
+.modal-footer .btn.btn-default {
+    margin-left: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #444444;
+    border: 1px solid #bcbcbc !important;
+    background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);
+  
+}
+
 .settings-column {
     display: inline-block;
     vertical-align: top;
-    width: 220px;
+    width: 276px;
 }
 
-#settings-column-left {
-    margin-right: 37px;
+.settings-column a {
+    text-decoration: none;
 }
 
 .settings-btn {
@@ -311,9 +317,12 @@ input, textarea {
     text-align: left;
 }
 
-
 .settings-width {
     width: 235px;
+}
+
+#bottom-button-bar {
+    margin-top: 10px;
 }
 
 .btn, .btn-primary, .btn-primary:focus, .btn-primary:hover, .btn-primary:active {
@@ -346,7 +355,7 @@ input, textarea {
 }
 
 .btn-custom {
-    height: 28px;
+    height: 32px;
     color: #444444;
     background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);
     border: 1px solid #bcbcbc !important;
@@ -356,18 +365,29 @@ input, textarea {
     font-size: 12px;
 }
 
+.modal-footer .btn+.btn {
+    margin-left: 12px;
+}
+
 #duration {
-    width: 70px;
+    width: 98px;
+    margin-left: 28px;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
 }
 
+#duration::-webkit-input-placeholder {
+    padding-right: 6px;
+}
+
 #start-end {
     width: 120px;
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
 
@@ -376,7 +396,7 @@ input, textarea {
 }
 
 #settings-title-text, #entry-method-toggle-text, #refresh-status, #reminder-toggle {
-    margin-left: 18px;
+    margin-left: 28px;
 }
 
 
@@ -404,19 +424,15 @@ input, textarea {
 #refresh-button, #settings-help, #contact-us, #sign-out {
     width: 216px;
     text-align: left;
+    margin-left: 28px;
 }
-
-#refresh-button {
-    margin-top: 0;
-}
-
 
 .top-bumper {
     margin-top: 27px;
 }
 
-.fa.fa-refresh, .fa.fa-info-circle, .fa.fa-phone, .fa.fa-sign-out {
-    margin-right: 8px;
+.fa.fa-refresh, .fa.fa-bullhorn, .fa.fa-info-circle, .fa.fa-phone, .fa.fa-sign-out {
+    margin-right: 2px;
 }
 
 #clear-time-entry {
@@ -445,18 +461,6 @@ input, textarea {
     position: absolute;
 }
 
-.settings-column a {
-    text-decoration: none;
-}
-
-#time-entry-method-container {
-    margin-bottom: 17px;
-}
-
-#refresh-button {
-    text-align: left;
-}
-
 .time-entry-item-clear {
     text-decoration: underline;
     cursor: pointer;
@@ -479,13 +483,20 @@ input, textarea {
     border: 1px solid #bcbcbc !important;
 }
 
+#time-entry-form-timer::-webkit-input-placeholder {
+    padding-right: 0px;
+}
+
 #running-stopwatch-gif {
     display: inline-block;
     /* margin-left: 20px; */
     float: right;
     margin-right: 20px;
+    height: 42px;
     font-size: 24px;
-    background-color: lightgrey;
+    background-color: #e4e4e4;
+    border: 1px solid #bcbcbc;
+    border-radius: 1px;
     padding: 5px;
     padding-left: 55px;
     padding-right: 55px;
@@ -493,7 +504,7 @@ input, textarea {
 
 .success-messaging-container {
     display: inline-block;
-    width: 386px;
+    width: 383px;
     height: 42px;
     background-color: #eef5ed;
     border: 1px solid #8EBC89;
@@ -516,14 +527,15 @@ input, textarea {
     width: auto;
     max-width: 250px;
     margin-left: 50px;
-    margin-top: -19px;
+    margin-top: -25px;
+    padding-top: 5px;
 }
 
 #edit-entry-link {
     width: 90px;
     font-size: 11px;
     float: right;
-    margin-right: 8px;
+    margin-right: 14px;
     margin-top: -26px;
     line-height: 11px;
     text-decoration: underline;
@@ -538,8 +550,8 @@ input, textarea {
 }
 
 .error-messaging p{
-    margin-top: -20px;
-    margin-bottom: 0px;
+    margin-top: -15px;
+    position: absolute;
 }
 
 .login-screen-column {
@@ -653,16 +665,24 @@ input[type="text"]:disabled {
     right: 0;
 }
 
-#warning {
-    font-size: 9px;
-    margin-left: 20px;
+#warning, #feedbackEncouragement {
+    position: absolute;
+    font-size: 10px;
+    margin-left: 28px;
 }
+
+#warning{
+    width: 216px;
+    height: auto;
+    top: 60px;
+}
+
 #dcaa-sub-job-error-text {
     bottom: 0;
     right: 0;
 }
 .feedback-container {
-    margin-left: 20px;
+    margin-left: 28px;
     margin-top: 35px;
     margin-bottom: 0px;
     width: 216px;

@@ -1,5 +1,5 @@
 <button id="back-to-homepage" type="button" class="btn btn-custom header-item" ng-click="timeEntryPage()">
-    Back to tracking time
+    <i class="fa fa-arrow-left"></i>&nbsp; Back to tracking time
 </button>
 
 <div id="page-wrapper">
@@ -23,18 +23,18 @@
         <label id='reminder-toggle-text'><input class="icon-group" id="reminder-toggle" type="checkbox"> Allow Reminders</label>
 
         <a href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank">
-            <button class="feedback-container btn btn-custom settings-button icon-group"><i class="fa fa-bullhorn"></i>&nbsp;
+            <button class="feedback-container btn btn-custom settings-button icon-group" id="feedback"><i class="fa fa-bullhorn"></i>&nbsp;
                 Leave Feedback
             </button>
         </a>
-        <p id="warning">Tell us what you think about ClickTime for Chrome!</p>
+        <p id="feedbackEncouragement">Tell us what you think about ClickTime for Chrome!</p>
 
     </div>
 
     <div class="settings-column">
         
         <a href="../help/help.html" target="_blank">
-            <button class="settings-width btn btn-custom settings-btn icon-group top-bumper" id="settings-help"><i class="fa fa-info-circle"></i>&nbsp; Help with ClickTime for Chrome</button>
+            <button class="settings-width btn btn-custom settings-btn icon-group top-bumper" id="settings-help"><i class="fa fa-info-circle"></i>&nbsp; Help</button>
         </a>
 
         <a id="contact-us-link" tabIndex="-1" href="http://www.clicktime.com/company/contact" target="_blank">
@@ -44,7 +44,7 @@
         </a>
 
         <button id="sign-out" class="settings-width icon-group btn btn-custom settings-btn" ng-controller="TimeEntryController" ng-click="logout()"><i class="fa fa-sign-out"></i>&nbsp;
-            Sign out of ClickTime
+            Sign out of ClickTime for Chrome
         </button>
     </div>
 </div>

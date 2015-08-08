@@ -1,3 +1,22 @@
+// /* google analytics */
+// var _gaq = _gaq || [];
+// _gaq.push(['_setAccount', 'UA-66098130-1']);
+// _gaq.push(['_trackPageview']);
+
+// (function() {
+//   console.log('call me ')
+//   var ga = document.createElement('script'); 
+//   ga.type = 'text/javascript'; 
+//   ga.async = true;
+//   ga.src = 'https://ssl.google-analytics.com/ga.js';
+//   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+// })();
+
+// /* tracking each button */
+// function trackButtonClick(e) {
+//   _gaq.push(['_trackEvent', e.target.id, 'clicked']);
+// }
+
 // Constants
 var API_BASE = "https://app.clicktime.com/api/1.3/";
 // Time before asking user again if they want to enter time. Remind every 4 hours

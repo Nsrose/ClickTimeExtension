@@ -5,10 +5,12 @@
 
   ga('create', 'UA-66098130-1', 'auto');
   ga('set', 'checkProtocolTask', function(){});
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview', '/main.html');
 
 
+  //ga requests
+  // ga('send', 'pageview', '/main.html');
+  // ga('send', 'pageview', '/settings.html')
+  // ga('send', 'pageview', '/login.html')
 // /* tracking each button */
 // function trackButtonClick(e) {
 //   _gaq.push(['_trackEvent', e.target.id, 'clicked']);

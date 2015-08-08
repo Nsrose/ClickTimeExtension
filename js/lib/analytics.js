@@ -7,10 +7,6 @@
   ga('set', 'checkProtocolTask', function(){});
 
 
-  //ga requests
-  // ga('send', 'pageview', '/main.html');
-  // ga('send', 'pageview', '/settings.html')
-  // ga('send', 'pageview', '/login.html')
 // /* tracking each button */
 // function trackButtonClick(e) {
 //   _gaq.push(['_trackEvent', e.target.id, 'clicked']);

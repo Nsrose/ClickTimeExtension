@@ -1,5 +1,7 @@
 myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', '$apiBase',
                                 function ($scope, APIService, $http, $location, $apiBase) {
+    ga('send', 'pageview', '/login.html')
+    
     $scope.rerouting = false;
     // Get the session, if it exists, go to time entry. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {

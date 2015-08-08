@@ -38,6 +38,7 @@ function appendLogoGoogleCalendar(calendarHTML) {
 // Record time entry with Google calendar integration
 function integrateTimeEntry() {
     timeString = $(".eb-date").text();
+    info = $(".ui-sch-schmedit").text();
     var splitTime = timeString.split(",");
     var timeDate = splitTime[1];
     var monthString = timeDate.split(" ")[1];
@@ -53,7 +54,8 @@ function integrateTimeEntry() {
     }
     chrome.runtime.sendMessage({
         openWindow: true,
-        timeString: timeString
+        timeString: timeString,
+        timeInfo: info
     })
 }
 

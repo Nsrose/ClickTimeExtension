@@ -808,10 +808,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     // Remove local storage variables from chrome
-    $scope.removeLocalStorageVars = function() {
-        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
-            chrome.browserAction.setBadgeText({text:""});
-        })
+    $scope.removeLocalStorageVars = function(vars) {
+        if (vars) {
+            chrome.storage.local.remove(vars, function() {
+                chrome.browserAction.setBadgeText({text:""});
+            })
+        } else {
+            chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
+                chrome.browserAction.setBadgeText({text:""});
+            })
+        }
+        
     }
 
     // Rmove sync storage variables from chrome
@@ -889,8 +896,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             TimeEntryService.removeInProgressEntry();
         }
        
-
-        $scope.removeLocalStorageVars();
+        var toRemove = [
+            'user',
+            'company',
+            'tasksList',
+            'jobClientsList',
+            'storedTimeEntries',
+            'stringJobClientsList'
+        ]
+        $scope.removeLocalStorageVars(toRemove);
 
         var afterGetJobClients = function (jobClientsList) {
 
@@ -1040,9 +1054,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             } else {
                                 $scope.tasks = tasksList;    
                             }
-                            if ($scope.tasks.length > 0) {
+                            // if ($scope.tasks.length > 0) {
+                            //     $scope.task = $scope.tasks[0];
+                            // }
+                            var taskIndex = EntityService.indexTask($scope.tasks, currentTask);
+                            if (taskIndex != -1) {
+                                $scope.task = $scope.tasks[taskIndex];
+                            } else {
                                 $scope.task = $scope.tasks[0];
                             }
+                            
                             if ($scope.task) {
                                 $scope.timeEntry.task = $scope.task;
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;

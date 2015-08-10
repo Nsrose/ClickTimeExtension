@@ -402,32 +402,39 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "hours":
                 $("#time-entry-form-hours").css("border", "1px solid red");
                 $("#time-entry-field-hours-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "notes":
                 $("#notes-field").css("border", "1px solid red");
                 $("#fieldtitle-notes").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;
             case "startTime":
                 $("#time-entry-form-start").css("border", "1px solid red");
                 $("#time-entry-form-start-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "endTime":
                 $("#time-entry-form-end").css("border", "1px solid red");
                 $("#time-entry-form-end-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "startEndTimes":
                 $("#time-entry-form-start").css("border", "1px solid red");
                 $("#time-entry-form-end").css("border", "1px solid red");
                 $("#time-entry-form-start-title").css("color", "red");
                 $("#time-entry-form-end-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "jobClient":
                 $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
                 $("#fieldtitle-jobclient").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "task":
                 $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
                 $("#fieldtitle-task").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "jobConflict":
                 $scope.setError('jobClient', errorMessage);
@@ -439,9 +446,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError('task', errorMessage);
                 break;
             default:
+                ga('send', 'event', 'Other Error', 'post', 'Unsuccessful time entry completion');
                 break;
         }
-    }  
+    }
 
     // If there's been an error on saving a time entry, stop the stopwatch
     $scope.$on("timeEntryError", function() {
@@ -463,7 +471,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
-        ga('send', 'event', 'Saved Entries', 'post', 'Post a time entry'); // google analytics
+        ga('send', 'event', 'Successful Saves', 'post', 'successfully post a time entry'); // google analytics
     })
 
     // Clear an in progress entry and remove display fields
@@ -895,7 +903,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 + $scope.timeEntry.job.DisplayName 
             }
             if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
-                $scope.setError("jobClientConflict", "We're sorry but the "
+                $scope.setError("jobConflict", "We're sorry but the "
                             + $scope.customTerms.clientTermSingLow + "/"
                             + $scope.customTerms.jobTermSingLow + " "
                             + currentJobClient.DisplayName + " you've chosen is no longer available. "

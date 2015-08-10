@@ -596,7 +596,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
                     var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
+                    console.log(successMessageTotalRaw);
+                    var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
                     var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
                     $scope.successMessage = successMessageHrsMinsFormatted + " saved!";

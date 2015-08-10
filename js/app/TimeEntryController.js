@@ -463,8 +463,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
+        ga('send', 'event', 'Saved Entries', 'post', 'Post a time entry'); // google analytics
     })
-
 
     // Clear an in progress entry and remove display fields
     $scope.clearTimeEntry = function() {

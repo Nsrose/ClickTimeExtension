@@ -799,11 +799,38 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.task = undefined;
             }
             $scope.tasks = permittedTasks;
-            if ($scope.task) {
-                $scope.timeEntry.task = $scope.task;
-                $scope.timeEntry.TaskID = $scope.task.TaskID;    
-            }
-            TimeEntryService.updateInProgressEntry('task', $scope.task);
+
+            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                if (inProgressEntry.task != undefined) {
+                    var filteredTasks = $scope.tasks.filter(function (task) { 
+                        return task.TaskID == inProgressEntry.task.TaskID
+                    })
+
+                    if (filteredTasks.length > 0) {
+                        // If in progress entity is in the entity list
+                        $scope.task = filteredTasks[0];
+                        $scope.timeEntry.task = inProgressEntry.task;
+                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;
+                        $scope.$apply();
+                        return;
+                    }           
+                }
+                // No in progress entity
+                $scope.task = permittedTasks[0];
+                if ($scope.task) {
+                    $scope.timeEntry.task = $scope.task;
+                    $scope.timeEntry.TaskID = $scope.task.TaskID;
+                }
+                TimeEntryService.updateInProgressEntry("task", $scope.task);
+                $scope.$apply();
+            })
+
+           
+            // if ($scope.task) {
+            //     $scope.timeEntry.task = $scope.task;
+            //     $scope.timeEntry.TaskID = $scope.task.TaskID;    
+            // }
+            // TimeEntryService.updateInProgressEntry('task', $scope.task);
         }
     })
 

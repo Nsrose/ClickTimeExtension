@@ -1,6 +1,7 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http', 
                                 function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     
+    //google analytics
     ga('send', 'pageview', '/main.html');  
 
     //Company custom terms
@@ -462,8 +463,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
+        ga('send', 'event', 'Saved Entries', 'post', 'Post a time entry'); // google analytics
     })
-
 
     // Clear an in progress entry and remove display fields
     $scope.clearTimeEntry = function() {

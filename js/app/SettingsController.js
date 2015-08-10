@@ -1,5 +1,6 @@
 myApp.controller('SettingsController', ['$scope', '$location', function ($scope, $location) {
 
+  //google analytics
   ga('send', 'pageview', '/settings.html')
 
   $scope.timeEntryPage = function () {

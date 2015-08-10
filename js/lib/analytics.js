@@ -6,32 +6,16 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-66098130-1', 'auto');
 ga('set', 'checkProtocolTask', function(){});
 
-/* tracking each button click */
-// function trackButtonClick(buttonID) {
-// 	var buttonTrackingInfo = {
-// 		'hitType': 'event',
-// 	  	'eventCategory': 'button',
-// 	  	'eventAction': 'click',
-// 	  	'eventlabel': ''
-//  	}
-// 	buttonTrackingInfo.eventLabel = buttonID;
-//  	ga('send', buttonTrackingInfo);
-// }
-
-document.addEventListener('DOMContentLoaded', function () {
-  var buttons = document.querySelectorAll('button');
-  for (var i = 0; i < buttons.length; i++) {
-  	var buttonID = buttons[i].id;
-    // buttons[i].addEventListener('click', trackButtonClick(buttonID));
-    $("#" + buttonID).click(function () {
-    	var buttonTrackingInfo = {
-			'hitType': 'event',
-		  	'eventCategory': 'button',
-		  	'eventAction': 'click',
-		  	'eventlabel': ''
-	 	};
-		buttonTrackingInfo.eventLabel = buttonID;
-	 	ga('send', buttonTrackingInfo);
-    })
-  }
+// add a listener to all the buttons
+$(function () {
+  $("body").on("click", "button", function() {
+    var buttonTrackingInfo = {
+      'hitType': 'event',
+      'eventCategory': 'button',
+      'eventAction': 'click',
+      'eventLabel': ''
+    }
+    buttonTrackingInfo.eventLabel = this.id;
+    ga('send', buttonTrackingInfo);
+  });
 });

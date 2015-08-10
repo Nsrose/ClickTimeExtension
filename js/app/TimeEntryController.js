@@ -580,6 +580,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
                 clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
                 timeEntry.Hours = compiledHours;
+                if ($scope.showStartEndTimes) {
+                    var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                    var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                    if (ISOStartTime == ISOEndTime) {
+                        var endSplit = ISOEndTime.split(":");
+                        ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
+                    }
+                    clickTimeEntry.ISOStartTime = ISOStartTime;
+                    clickTimeEntry.ISOEndTime = ISOEndTime;
+                }
             }
 
             if ($scope.user.RequireStopwatch) {
@@ -593,6 +603,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.ISOEndTime = ISOEndTime;
             }
 
+            // console.log(clickTimeEntry);
+            // return;
+
 
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
@@ -605,7 +618,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
                     var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
+                    console.log(successMessageTotalRaw);
+                    var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
                     var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
                     $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
@@ -860,13 +874,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
                 $scope.$apply();
             })
-
-           
-            // if ($scope.task) {
-            //     $scope.timeEntry.task = $scope.task;
-            //     $scope.timeEntry.TaskID = $scope.task.TaskID;    
-            // }
-            // TimeEntryService.updateInProgressEntry('task', $scope.task);
         }
     })
 

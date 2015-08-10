@@ -95,8 +95,23 @@ myApp.service('CTService', function() {
         } else if (splitTime.length == 2) {
             var mm = (("." + splitTime[1]) * 60).toString();
             if (mm.length == 1) {
-                var mm = mm + '0';
+                var mm = '0' + mm;
             }
+            return splitHrs + ":" + mm;
+        } else {
+            console.log("Invalid time to convert to hours: " + time);
+            return;
+        }
+    }
+
+    /** Return the 'hours and minutes' representation of a h.mm format. */
+    this.toHoursForSuccessMessage = function(time) {
+        var splitTime = time.toString().split(".");
+        var splitHrs = splitTime[0];
+        if (splitTime.length == 1) {
+            return splitHrs + ":00";
+        } else if (splitTime.length == 2) {
+            var mm = (("." + splitTime[1]) * 60).toString();
             return splitHrs + ":" + mm;
         } else {
             console.log("Invalid time to convert to hours: " + time);
@@ -188,10 +203,13 @@ myApp.service('CTService', function() {
 
         var returnString = "";
         var unsplitTotal = successMessageTotalRaw;
+        console.log(unsplitTotal);
         var splitTotal = unsplitTotal.split(":");
         console.log(splitTotal);
         var hoursFormatted = splitTotal[0];
         var minutesFormatted = splitTotal[1];
+
+        console.log(minutesFormatted);
 
         if (parseInt(hoursFormatted) < 1) {
 

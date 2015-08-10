@@ -527,7 +527,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
 
             tasksByRecent.push(angular.copy(task));
 
-            console.log(jobClientsByRecent);
+            console.log(tasksByRecent);
 
             chrome.storage.local.set({
                 'jobClientsByRecent' : jobClientsByRecent,

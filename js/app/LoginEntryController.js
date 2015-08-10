@@ -1,5 +1,7 @@
 myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', '$apiBase',
                                 function ($scope, APIService, $http, $location, $apiBase) {
+
+    // google analytics
     ga('send', 'pageview', '/login.html')
     
     $scope.rerouting = false;

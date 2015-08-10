@@ -1,6 +1,7 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http', 
                                 function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     
+    //google analytics
     ga('send', 'pageview', '/main.html');  
 
     //Company custom terms

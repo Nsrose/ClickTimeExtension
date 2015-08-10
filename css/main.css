@@ -126,11 +126,11 @@ a {
 }
 
 .feedback-link {
-    float: left;
+    position: absolute;
+    left: 18px;
+    bottom: 10px;
     text-decoration: underline;
     font-weight: bold;
-    margin-top: 60px;
-    margin-left: 18px;
 }
 .feedback-link a {
     color: #444444;
@@ -360,6 +360,7 @@ input[type="text"].time-entry-form-input {
 .btn-primary, .btn-primary:focus, .btn-primary:hover, .btn-primary:active {
     background: #38aa67 !important;
 }
+
 
 #save-time-entry:active, #start-stopwatch:active, #stop-stopwatch:active {
     background: #38aa67 !important;

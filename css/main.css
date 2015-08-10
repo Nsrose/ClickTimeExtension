@@ -645,6 +645,7 @@ input[type="email"], input[type="password"] {
     color: #ff0000;
     padding: 0;
     margin-bottom: 0px;
+    width: 90%;
 }
 
 #invalid-login {
@@ -697,7 +698,7 @@ input[type="text"]:disabled {
 
 #dcaa-sub-job-error-text {
     bottom: 0;
-    right: 0;
+    left: 12px;
 }
 .feedback-container {
     margin-left: 24px;

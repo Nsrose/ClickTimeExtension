@@ -1,5 +1,7 @@
 myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$location', '$apiBase',
                                 function ($scope, APIService, $http, $location, $apiBase) {
+    ga('send', 'pageview', '/login.html')
+    
     $scope.rerouting = false;
     // Get the session, if it exists, go to time entry. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {
@@ -66,8 +68,6 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     }
 
     $("#email-input").keypress(function(e) {
-        console.log(typeof this.value);
-        console.log(typeof $('#password-input').value);
 
         if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
@@ -75,8 +75,7 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     })
 
     $("#password-input").keypress(function(e) {
-        console.log(typeof this.value);
-        console.log(typeof $('#email-input').value);
+     
 
         if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);

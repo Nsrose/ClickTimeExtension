@@ -317,7 +317,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             else {
                 var hourDiff = CTService.difference(endTime, startTime, $scope.company.MinTimeIncrement);
                 if (hourDiff <= 0) {
-                     $scope.setError("startEndTimes", "Oops! Please enter a start time later than the end time.");
+                     $scope.setError("startEndTimes", "Oops! Please enter an end time later than your start time.");
                      return;
                 }
                 if (hourDiff > 24) {

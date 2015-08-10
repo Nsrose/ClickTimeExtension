@@ -557,7 +557,7 @@ input[type="text"].time-entry-form-input {
     width: 90px;
     font-size: 11px;
     float: right;
-    margin-right: 14px;
+    margin-right: 0px;
     margin-top: -26px;
     line-height: 11px;
     text-decoration: underline;

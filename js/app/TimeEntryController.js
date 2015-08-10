@@ -571,6 +571,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
                 clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
                 timeEntry.Hours = compiledHours;
+                if ($scope.showStartEndTimes) {
+                    var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
+                    var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
+                    if (ISOStartTime == ISOEndTime) {
+                        var endSplit = ISOEndTime.split(":");
+                        ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
+                    }
+                    clickTimeEntry.ISOStartTime = ISOStartTime;
+                    clickTimeEntry.ISOEndTime = ISOEndTime;
+                }
             }
 
             if ($scope.user.RequireStopwatch) {
@@ -583,6 +593,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.ISOStartTime = ISOStartTime;
                 clickTimeEntry.ISOEndTime = ISOEndTime;
             }
+
+            // console.log(clickTimeEntry);
+            // return;
 
 
             if (!validateTimeEntry(timeEntry)) {
@@ -851,13 +864,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
                 $scope.$apply();
             })
-
-           
-            // if ($scope.task) {
-            //     $scope.timeEntry.task = $scope.task;
-            //     $scope.timeEntry.TaskID = $scope.task.TaskID;    
-            // }
-            // TimeEntryService.updateInProgressEntry('task', $scope.task);
         }
     })
 

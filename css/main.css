@@ -132,6 +132,7 @@ a {
     text-decoration: underline;
     font-weight: bold;
 }
+
 .feedback-link a {
     color: #444444;
 }
@@ -512,8 +513,8 @@ input[type="text"].time-entry-form-input {
     /* margin-left: 20px; */
     float: right;
     margin-right: 20px;
-    width: 120px;
-    height: 42px;
+    width: 130px;
+    height: 44px;
     font-size: 24px;
     background-color: #e4e4e4;
     border: 1px solid #bcbcbc;

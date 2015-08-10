@@ -23,6 +23,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.abandonedEntry = false;
     // Whether to show pop out icon
     $scope.showPopupArrow = chrome.extension.getBackgroundPage().showPopupArrow;
+
+    // How much time has been logged, total
+    $scope.totalHrs = 0;
+    $scope.totalMin = 0;
   
     // Link to the settings page
     $scope.settingsPage = function () {
@@ -516,6 +520,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
+
         $scope.refresh().then(function() {
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
@@ -580,7 +585,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
 
-
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");
@@ -618,7 +622,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             min = Math.floor(min * 60);
                         }
                         $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-                        
+                        $scope.totalHrs = hrs;
+                        $scope.totalMin = min;
                         //ALEX JONES
                         $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
                         //ALEX JONES
@@ -687,6 +692,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             } else if (!timeEntry.Hours) {
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return false;
+            } else {
+                var totalMin = $scope.totalMin;
+                var totalHrs = $scope.totalHrs;
+                if ((totalMin + '').length == 1) {
+                    totalMin = "0" + totalMin;
+                }
+                var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
+                if (timeSoFar + hourDiff > 24) {
+                    $scope.setError("startEndTimes",  "Please make sure your daily hourly total is less than 24 hours.");
+                    return false;
+                }
             }
         }
 
@@ -696,7 +712,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return false;
             }
-            if (timeEntry.Hours > 24.00) {
+            if (timeEntry.Hours > 24) {
                 $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
                 return false;
             }
@@ -709,6 +725,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             else if (!CTService.isNumeric(timeEntry.Hours)) {
                 $scope.setError("hours", "Please enter time using a valid format.");
                 return false;
+            } else {
+                var totalMin = $scope.totalMin;
+                var totalHrs = $scope.totalHrs;
+                if ((totalMin + '').length == 1) {
+                    totalMin = "0" + totalMin;
+                }
+                var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
+                if (timeSoFar + timeEntry.Hours > 24) {
+                    $scope.setError("hours",  "Please make sure your daily hourly total is less than 24 hours.");
+                    return false;
+                }
             }
         }
 
@@ -1420,6 +1447,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
             $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+            $scope.totalHrs = hrs;
+            $scope.totalMin = min;
         }
 
         var afterGetJobClients = function (jobClientsList) {

@@ -760,7 +760,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $location.path("/login");
             $scope.removeLocalStorageVars();
             $scope.removeSyncStorageVars();
-            chrome.extension.getBackgroundPage().stopNotifications(); // stop generation of new notifications
+            chrome.extension.getBackgroundPage().stopNotifications();
+            chrome.extension.getBackgroundPage().stopBadge();
             $scope.$apply();
         })
     }

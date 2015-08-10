@@ -317,7 +317,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             else {
                 var hourDiff = CTService.difference(endTime, startTime, $scope.company.MinTimeIncrement);
                 if (hourDiff <= 0) {
-                     $scope.setError("startEndTimes", "Oops! Please enter a start time later than the end time.");
+                     $scope.setError("startEndTimes", "Oops! Please enter an end time later than your start time.");
                      return;
                 }
                 if (hourDiff > 24) {
@@ -402,32 +402,39 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "hours":
                 $("#time-entry-form-hours").css("border", "1px solid red");
                 $("#time-entry-field-hours-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "notes":
                 $("#notes-field").css("border", "1px solid red");
                 $("#fieldtitle-notes").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;
             case "startTime":
                 $("#time-entry-form-start").css("border", "1px solid red");
                 $("#time-entry-form-start-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "endTime":
                 $("#time-entry-form-end").css("border", "1px solid red");
                 $("#time-entry-form-end-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "startEndTimes":
                 $("#time-entry-form-start").css("border", "1px solid red");
                 $("#time-entry-form-end").css("border", "1px solid red");
                 $("#time-entry-form-start-title").css("color", "red");
                 $("#time-entry-form-end-title").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "jobClient":
                 $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
                 $("#fieldtitle-jobclient").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "task":
                 $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
                 $("#fieldtitle-task").css("color", "red");
+                ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "jobConflict":
                 $scope.setError('jobClient', errorMessage);
@@ -439,9 +446,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError('task', errorMessage);
                 break;
             default:
+                ga('send', 'event', 'Other Error', 'post', 'Unsuccessful time entry completion');
                 break;
         }
-    }  
+    }
 
     // If there's been an error on saving a time entry, stop the stopwatch
     $scope.$on("timeEntryError", function() {
@@ -463,7 +471,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
-        ga('send', 'event', 'Saved Entries', 'post', 'Post a time entry'); // google analytics
+        ga('send', 'event', 'Successful Saves', 'post', 'successfully post a time entry'); // google analytics
     })
 
     // Clear an in progress entry and remove display fields
@@ -544,10 +552,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             if (!$scope.saveFromTimer && $scope.showStartEndTimes || $scope.abandonedStopwatch) {
-                if (!timeEntry.ISOStartTime && !timeEntry.ISOEndTime) {
-                    $scope.setError("startEndTimes", "Oops! Please enter a start and end time to save this entry.");
-                    return;
-                }
                 if (!timeEntry.ISOStartTime) {
                     $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
                     return;
@@ -595,10 +599,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.ISOEndTime = ISOEndTime;
             }
 
-            // console.log(clickTimeEntry);
-            // return;
-
-
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");
@@ -610,7 +610,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
                     var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    var successHoursAsTimeClock = CTService.toHours(successMessageTotalRaw);
+                    console.log(successMessageTotalRaw);
+                    var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
                     var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
                     $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
@@ -731,12 +732,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 return false;
             }
 
-            else if (timeEntry.Hours < 0) {
-                $scope.setError("hours", "Please make sure your time entry is greater than 0.");
+            if (timeEntry.Hours <= 0) {
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");    
                 return false;
             }
 
-            else if (!CTService.isNumeric(timeEntry.Hours)) {
+            if (!CTService.isNumeric(timeEntry.Hours)) {
                 $scope.setError("hours", "Please enter time using a valid format.");
                 return false;
             } else {
@@ -915,7 +916,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 + $scope.timeEntry.job.DisplayName 
             }
             if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
-                $scope.setError("jobClientConflict", "We're sorry but the "
+                $scope.setError("jobConflict", "We're sorry but the "
                             + $scope.customTerms.clientTermSingLow + "/"
                             + $scope.customTerms.jobTermSingLow + " "
                             + currentJobClient.DisplayName + " you've chosen is no longer available. "

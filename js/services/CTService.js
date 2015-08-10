@@ -59,6 +59,9 @@ myApp.service('CTService', function() {
 
     /** Return the h.mm representation of a hh:mm format. */
     this.toDecimal = function(time) {
+        if (!time) {
+            return "";
+        }
         if (time.startsWith(":")) {
             time = "0" + time;
         }

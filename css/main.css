@@ -696,6 +696,7 @@ input[type="text"]:disabled {
     width: 216px;
     height: auto;
     top: 60px;
+    visibility: hidden;
 }
 
 #dcaa-sub-job-error-text {

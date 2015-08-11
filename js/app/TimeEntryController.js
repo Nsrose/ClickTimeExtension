@@ -528,7 +528,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
-        $scope.doneRefresh.length = 0;
+        $scope.doneRefresh.length = 0; // necessary to have both before and after refresh because just in case
         $scope.refresh().then(function() {
             $scope.doneRefresh.length = 0;
             var clickTimeEntry = {
@@ -1145,7 +1145,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if ($scope.doneRefresh.length >= 4) {
                 deferred.resolve();
             }
-            
+
             $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }
@@ -1172,14 +1172,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
+
     /* 
       Set time entry settings according to the managerial permissions set by the CT admin. 
 
       Since allowReminder is not a ct-specified property, We will look to see if allow reminders has been set before. 
         - if it's been set before
-            - same user: keep their old settings
+            - same user: keep their old settings (don't do anything -- old settings already in storage)
             - not same user: allow reminders by default (we can't make it persistent with the user because
-              of the lack of a database)
+              no database)
         - if it's not been set before
             - allow reminders by default
 
@@ -1189,6 +1190,33 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     function updateTimeEntryMethodInStorage() {
         var UserID, RequireStopwatch, RequireStartEndTime, method;
         var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
+        
+        function timeEntryMethodSyncSetter() {
+            chrome.storage.sync.set({
+                'timeEntryMethod' : {
+                    'method' : method,
+                    'UserID' : UserID
+                }
+            }, function() {
+                console.log('method is ' + method)
+                $scope.changeTimeEntryMethod(method);
+                updateDurationDisplay();
+                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+            });
+        }
+
+        function allowRemindersSyncSetter() {
+            chrome.storage.sync.get(['allowReminders'], function (items) {
+                if (!('allowReminders' in items) || !(UserID == items.allowReminders.UserID)) {
+                    chrome.storage.sync.set({
+                        'allowReminders' : {
+                            'permission' : true,
+                            'UserID' : UserID 
+                        }
+                    });
+                }
+            })     
+        }
 
         // grab permissions
         UserID = $scope.user.UserID;
@@ -1197,38 +1225,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         if (RequireStartEndTime || RequireStopwatch) {
             method = 'start-end'
+            timeEntryMethodSyncSetter()
         } else {
-            method = 'duration'
+            // method could be either. if s&e has never been set before, then method = duration. 
+            // but if has been set before, then method is whatever you have
+            chrome.storage.sync.get('timeEntryMethod', function(items) {
+                if ('timeEntryMethod' in items) {
+                    method = items.timeEntryMethod.method;
+                } else {
+                    method = 'duration'
+                }
+                timeEntryMethodSyncSetter()
+            })
         }
-
-        // set time entry method
-       chrome.storage.sync.set({
-            'timeEntryMethod' : {
-                'method' : method,
-                'UserID' : UserID
-            }
-        }, function() {
-            $scope.changeTimeEntryMethod(method);
-            updateDurationDisplay();
-        });
-
         // set allowReminder
-        chrome.storage.sync.get(['allowReminders'], function (items) {
-            if (('allowReminders' in items) && (UserID == items.allowReminders.UserID)) {
-                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                $scope.changeTimeEntryMethod(items.timeEntryMethod.method);
-                updateDurationDisplay(); 
-            } else {
-                chrome.storage.sync.set({
-                    'allowReminders' : {
-                        'permission' : true,
-                        'UserID' : UserID 
-                    }
-                }, function() {
-                    chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-                });
-            }
-        })     
+       allowRemindersSyncSetter()
     }
 
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////

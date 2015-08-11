@@ -139,7 +139,7 @@ var stopBadge = function() {
 /* notifications options */
 var options = {
     type: "basic",
-    title: "Clicktime Extension",
+    title: "ClickTime for Chrome",
     message: "Let's track your time!",
     iconUrl: "../../img/lgLogo.png",
 }

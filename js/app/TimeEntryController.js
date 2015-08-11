@@ -523,14 +523,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         } 
     })
 
-    // SUPER AWESOME FUNCTION!! Save a time entry
-    /** First, refresh all entity lists. (see below) Then, validate the entry.
-      * If successful, broadcast a success. If failed, show an error. */
+    /* First, refresh all entity lists. (see below) Then, validate the entry.
+       If successful, broadcast a success. If failed, show an error. */
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
-
+        $scope.doneRefresh.length = 0;
         $scope.refresh().then(function() {
+            $scope.doneRefresh.length = 0;
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,
@@ -893,6 +893,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         with a job that no longer exists in Clicktime, this will set an error. */
     $scope.refresh = function() {
         var deferred = $q.defer();
+
         if ($location.url() == '/settings') {
             $scope.$emit("refresh");
         }
@@ -913,6 +914,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             'storedTimeEntries',
             'stringJobClientsList'
         ]
+
         $scope.removeLocalStorageVars(toRemove);
 
         var afterGetJobClients = function (jobClientsList) {
@@ -970,7 +972,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 deferred.resolve();
             }
             $scope.$apply();
-
         }
 
         var afterGetTasks = function (tasksList) {
@@ -1005,10 +1006,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.timeEntry.TaskID = $scope.task.TaskID;
                     }
                     TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                    $scope.doneRefresh.push("tasks");
-                    if ($scope.doneRefresh.length >= 4) {
-                        deferred.resolve();
-                    }
                     $scope.$apply();
                 } else {
                     var currentJob = $scope.timeEntry.job;
@@ -1042,11 +1039,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.task = $scope.task;
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
-                            TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                            $scope.doneRefresh.push("tasks");
-                            if ($scope.doneRefresh.length >= 4) {
-                                deferred.resolve();
-                            }
+                            TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);                    
                             $scope.$apply();
                         } else {
                             $scope.allTasks = tasksList;
@@ -1078,18 +1071,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
                             TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                            $scope.doneRefresh.push("tasks");
-                            if ($scope.doneRefresh.length >= 4) {
-                                deferred.resolve();
-                            }
                             $scope.$apply();
                         }
                     }
-                    
-
                 }
             }
-            
+            $scope.doneRefresh.push("tasks");
+            if ($scope.doneRefresh.length >= 4) {
+                deferred.resolve();
+            }
         }
 
         var afterGetUser = function (user) {
@@ -1122,8 +1112,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
               return;
             }
             $scope.user = user;
-            $scope.doneRefresh.push("user");
 
+            $scope.doneRefresh.push("user");
             if ($scope.doneRefresh.length >= 4) {
                 deferred.resolve();
             }
@@ -1150,10 +1140,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
                 'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
             }
+          
             $scope.doneRefresh.push("company");
             if ($scope.doneRefresh.length >= 4) {
                 deferred.resolve();
             }
+            
             $scope.$parent.$broadcast("pageReady");
             $scope.$apply();
         }

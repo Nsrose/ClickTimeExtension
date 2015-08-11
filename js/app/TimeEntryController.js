@@ -792,19 +792,28 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Logout function - will remove local and sync storage variables.
     $scope.logout = function() {
         chrome.storage.sync.get('stopwatch', function (items) {
+            debugger;
             if ('stopwatch' in items && items.stopwatch.running) {
                 bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
                     if (!result) {
                         return;
+                    } else {
+                        $location.path("/login");
+                        $scope.removeLocalStorageVars();
+                        $scope.removeSyncStorageVars();
+                        chrome.extension.getBackgroundPage().stopNotifications();
+                        chrome.extension.getBackgroundPage().stopBadge();
+                        $scope.$apply();
                     }
                 })
+            } else {
+                $location.path("/login");
+                $scope.removeLocalStorageVars();
+                $scope.removeSyncStorageVars();
+                chrome.extension.getBackgroundPage().stopNotifications();
+                chrome.extension.getBackgroundPage().stopBadge();
+                $scope.$apply();
             }
-            $location.path("/login");
-            $scope.removeLocalStorageVars();
-            $scope.removeSyncStorageVars();
-            chrome.extension.getBackgroundPage().stopNotifications();
-            chrome.extension.getBackgroundPage().stopBadge();
-            $scope.$apply();
         })
     }
 

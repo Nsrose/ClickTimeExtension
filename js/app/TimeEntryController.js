@@ -203,7 +203,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.timeEntry.ISOEndTime = end;
                 TimeEntryService.updateInProgressEntry('startEndTimes',
                     [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-            }, 60000);
+            }, 1000);
         }
        
     }

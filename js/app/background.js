@@ -220,7 +220,7 @@ function createWindow(timeString) {
       type: 'popup',
       focused: true,
       width: 580,
-      height: 450
+      height: 460
       }, function (window) {
           windowID = window.id;
           showPopupArrow = false

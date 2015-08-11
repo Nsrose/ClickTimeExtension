@@ -464,6 +464,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.$broadcast("clearStopwatch");
         $scope.timeEntry.ISOStartTime = null;
         $scope.timeEntry.ISOEndTime = null;
+        $interval.cancel($scope.endTimePromise);
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.showStartTimer = true;

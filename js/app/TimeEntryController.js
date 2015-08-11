@@ -552,10 +552,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             if (!$scope.saveFromTimer && $scope.showStartEndTimes || $scope.abandonedStopwatch) {
-                if (!timeEntry.ISOStartTime && !timeEntry.ISOEndTime) {
-                    $scope.setError("startEndTimes", "Oops! Please enter a start and end time to save this entry.");
-                    return;
-                }
                 if (!timeEntry.ISOStartTime) {
                     $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
                     return;
@@ -602,10 +598,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 clickTimeEntry.ISOStartTime = ISOStartTime;
                 clickTimeEntry.ISOEndTime = ISOEndTime;
             }
-
-            // console.log(clickTimeEntry);
-            // return;
-
 
             if (!validateTimeEntry(timeEntry)) {
                 console.log(timeEntry);
@@ -740,12 +732,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 return false;
             }
 
-            else if (timeEntry.Hours < 0) {
-                $scope.setError("hours", "Please make sure your time entry is greater than 0.");
+            if (timeEntry.Hours <= 0) {
+                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");    
                 return false;
             }
 
-            else if (!CTService.isNumeric(timeEntry.Hours)) {
+            if (!CTService.isNumeric(timeEntry.Hours)) {
                 $scope.setError("hours", "Please enter time using a valid format.");
                 return false;
             } else {
@@ -817,10 +809,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     // Remove local storage variables from chrome
-    $scope.removeLocalStorageVars = function() {
-        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
-            chrome.browserAction.setBadgeText({text:""});
-        })
+    $scope.removeLocalStorageVars = function(vars) {
+        if (vars) {
+            chrome.storage.local.remove(vars, function() {
+                chrome.browserAction.setBadgeText({text:""});
+            })
+        } else {
+            chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
+                chrome.browserAction.setBadgeText({text:""});
+            })
+        }
+        
     }
 
     // Rmove sync storage variables from chrome
@@ -898,8 +897,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             TimeEntryService.removeInProgressEntry();
         }
        
-
-        $scope.removeLocalStorageVars();
+        var toRemove = [
+            'user',
+            'company',
+            'tasksList',
+            'jobClientsList',
+            'storedTimeEntries',
+            'stringJobClientsList'
+        ]
+        $scope.removeLocalStorageVars(toRemove);
 
         var afterGetJobClients = function (jobClientsList) {
 
@@ -1049,9 +1055,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             } else {
                                 $scope.tasks = tasksList;    
                             }
-                            if ($scope.tasks.length > 0) {
+                            // if ($scope.tasks.length > 0) {
+                            //     $scope.task = $scope.tasks[0];
+                            // }
+                            var taskIndex = EntityService.indexTask($scope.tasks, currentTask);
+                            if (taskIndex != -1) {
+                                $scope.task = $scope.tasks[taskIndex];
+                            } else {
                                 $scope.task = $scope.tasks[0];
                             }
+                            
                             if ($scope.task) {
                                 $scope.timeEntry.task = $scope.task;
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;

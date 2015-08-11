@@ -501,7 +501,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
         // Get caches from local storage and update them
         chrome.storage.local.get(['jobClientsByRecent', 'tasksByRecent'], function (items) {
           
-            var jobClientsByRecent = [];  
+            var jobClientsByRecent = [];
           
             var tasksByRecent = [];
             
@@ -509,12 +509,18 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
             if ('jobClientsByRecent' in items) {
                 jobClientsByRecent = items.jobClientsByRecent;
             }
+
             jcindex = indexOfJobClient(jobClientsByRecent, jobClient);
             if (jcindex != -1) {
                 jobClientsByRecent.splice(jcindex, 1);
             }
 
             jobClientsByRecent.push(angular.copy(jobClient));
+
+            // Keep list to 5 items
+            if (jobClientsByRecent.length > 5) {
+                jobClientsByRecent.splice(0, 1);
+            }
 
             if ('tasksByRecent' in items) {
                 tasksByRecent = items.tasksByRecent;
@@ -527,7 +533,10 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
 
             tasksByRecent.push(angular.copy(task));
 
-            console.log(tasksByRecent);
+            // Keep list to 5 items
+            if (tasksByRecent.length > 5) {
+                tasksByRecent.splice(0, 1);
+            }
 
             chrome.storage.local.set({
                 'jobClientsByRecent' : jobClientsByRecent,

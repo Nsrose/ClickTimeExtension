@@ -196,8 +196,6 @@ myApp.service('CTService', function() {
         return parseFloat(roundedHrs);
     }
 
-    //ALEX JONES
-
     // Get a string in plain english of a successfully saved entry's hours nad minutes
     this.getSuccessTotalFormatted = function (successMessageTotalRaw) {
 
@@ -241,8 +239,6 @@ myApp.service('CTService', function() {
         return returnString;
     }
 
-    //ALEX JONES
-
     /** Return a string of the current number of logged hrs */
     this.getLogMessage = function (hrs, min) {
 
@@ -279,7 +275,6 @@ myApp.service('CTService', function() {
         }
     }
 
-    //ALEX JONES
     this.getZeroHoursMessage = function(hrs, min) {
         
         if ((!hrs || hrs == 0) && (!min || min == 0)) {
@@ -287,8 +282,4 @@ myApp.service('CTService', function() {
             return " - Let's track some time!";
         }
     }
-
-    //ALEX JONES
-
-
 })

@@ -792,7 +792,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Logout function - will remove local and sync storage variables.
     $scope.logout = function() {
         chrome.storage.sync.get('stopwatch', function (items) {
-            debugger;
             if ('stopwatch' in items && items.stopwatch.running) {
                 bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
                     if (!result) {
@@ -1406,6 +1405,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             var now = new Date();
                             var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
                                 now.getHours(), now.getMinutes(), 0);
+                            $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
+                            stopwatch.startDay, stopwatch.startHrs, stopwatch.startMin, 0);
                             $scope.timeEntry.ISOEndTime = end;
                             TimeEntryService.updateInProgressEntry('startEndTimes',
                                     [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
@@ -1417,7 +1418,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.ISOEndTime = end;
                                 TimeEntryService.updateInProgressEntry('startEndTimes',
                                     [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-                            }, 30000);
+                            }, 1000);
                             $scope.$apply();
                         }
                     }

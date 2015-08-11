@@ -230,7 +230,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-right: 2px;
 }
 
-input[type="text"].time-entry-form-input {
+input[type="text"].time-entry-form-hours {
     padding-right: 6px;
 }
 
@@ -426,7 +426,7 @@ input[type="text"].time-entry-form-input {
 }
 
 #reminder-toggle {
-    top: 2px;
+    top: 0px;
     margin-top: 0px;
     padding: 0;
     position: relative;
@@ -727,6 +727,7 @@ input[type=time]::-webkit-inner-spin-button {
 #time-entry-form-hours {
     width: 110px;
 }
+
 .notification-button {
     width: 20px;
     height: 20px;

@@ -98,7 +98,6 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
           });
         }
       }
-    })     
+    })
   })
-
 }])

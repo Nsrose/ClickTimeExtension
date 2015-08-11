@@ -1191,7 +1191,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     function updateTimeEntryMethodInStorage() {
         var UserID, RequireStopwatch, RequireStartEndTime, method;
         var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
-        
+
         function timeEntryMethodSyncSetter() {
             chrome.storage.sync.set({
                 'timeEntryMethod' : {

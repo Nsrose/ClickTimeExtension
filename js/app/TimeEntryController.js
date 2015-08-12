@@ -2,7 +2,17 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     
     //google analytics
-    ga('send', 'pageview', '/main.html');  
+    ga('send', 'pageview', '/main.html'); 
+
+
+    // $(function () {
+    //     $(".my-dropdown").on("click", function() {
+    //         console.log('asdf');
+    //         $("#jobClient-dropdown").children().children().append('<option value="0">Recent</option>');
+    //          $("#task-dropdown").children().children().append('<option value="0">Recent</option>');
+    //     })
+    // })
+
 
     //Company custom terms
     $scope.customTerms = {};

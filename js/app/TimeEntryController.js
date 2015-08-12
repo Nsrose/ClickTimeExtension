@@ -83,7 +83,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // start stopwatch, if there
     $(document).keypress(function(e) {
         if (e.which == 13) {
-            if (($scope.showHourEntryField && !$scope.timeEntry.Hours)
+
+            if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
                 || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
                 && $scope.showStartTimer && !$scope.runningStopwatch) {
                  $("#start-stopwatch").click();

@@ -93,8 +93,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // start stopwatch, if there
     $(document).keypress(function(e) {
         if (e.which == 13) {
-            if ($scope.showStartTimer && !$scope.runningStopwatch) {
-                $("#start-stopwatch").click();
+
+            if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
+                || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
+                && $scope.showStartTimer && !$scope.runningStopwatch) {
+                 $("#start-stopwatch").click();
             } else if ($scope.runningStopwatch) {
                 $scope.stopStopwatch();
             }
@@ -126,9 +129,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Save time entry if focused on start/end and enter
     $("#time-entry-form-end").keypress(function(e) {
         if (e.which == 13) {
-            $("#time-entry-form-start").blur();
-            $("#time-entry-form-end").blur();
-            $("#save-time-entry").click();
+            if ($scope.timeEntry.ISOStartTime && $scope.timeEntry.ISOEndTime) {
+                $("#time-entry-form-start").blur();
+                $("#time-entry-form-end").blur();
+                $("#save-time-entry").click();
+            }
+            
         }
     })
 
@@ -758,7 +764,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     totalMin = "0" + totalMin;
                 }
                 var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
-                if (timeSoFar + timeEntry.Hours > 24) {
+                var thisTime = CTService.toDecimal(timeEntry.Hours);
+                if (timeSoFar + thisTime > 24) {
                     $scope.setError("hours",  "Please make sure your daily hourly total is less than 24 hours.");
                     return false;
                 }

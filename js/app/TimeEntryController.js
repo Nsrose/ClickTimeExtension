@@ -119,9 +119,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // Save time entry if focused on start/end and enter
     $("#time-entry-form-end").keypress(function(e) {
         if (e.which == 13) {
-            $("#time-entry-form-start").blur();
-            $("#time-entry-form-end").blur();
-            $("#save-time-entry").click();
+            if ($scope.timeEntry.ISOStartTime && $scope.timeEntry.ISOEndTime) {
+                $("#time-entry-form-start").blur();
+                $("#time-entry-form-end").blur();
+                $("#save-time-entry").click();
+            }
+            
         }
     })
 

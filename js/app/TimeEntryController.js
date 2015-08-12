@@ -5,13 +5,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     ga('send', 'pageview', '/main.html'); 
 
 
-    // $(function () {
-    //     $(".my-dropdown").on("click", function() {
-    //         console.log('asdf');
-    //         $("#jobClient-dropdown").children().children().append('<option value="0">Recent</option>');
-    //          $("#task-dropdown").children().children().append('<option value="0">Recent</option>');
-    //     })
-    // })
 
 
     //Company custom terms
@@ -1261,10 +1254,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
 
     // Once page has loaded, send a message that this was loaded.
+    $scope.appended = false;
     $scope.sendPageReady = function() {
-        console.log("Sending page ready");
         chrome.runtime.sendMessage({
             pageReady: true
+        })
+
+        $(function () {
+            $(".dropdown-toggle").on("click", function() {
+                if (!$scope.appended) {
+                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li role="presentation">Recent</li>');
+                     $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li role="presentation">Recent</li>');
+                    $scope.appended = true;
+                }
+               
+            })
         })
     }
     

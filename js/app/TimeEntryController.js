@@ -4,9 +4,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //google analytics
     ga('send', 'pageview', '/main.html'); 
 
-
-
-
     //Company custom terms
     $scope.customTerms = {};
 
@@ -86,7 +83,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // start stopwatch, if there
     $(document).keypress(function(e) {
         if (e.which == 13) {
-
             if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
                 || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
                 && $scope.showStartTimer && !$scope.runningStopwatch) {
@@ -846,9 +842,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
     }
 
-
-
-
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {
         if (newJobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
@@ -1254,7 +1247,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
 
     // Once page has loaded, send a message that this was loaded.
-    $scope.appended = false;
+    var appended = false;
     $scope.sendPageReady = function() {
         chrome.runtime.sendMessage({
             pageReady: true
@@ -1262,12 +1255,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         $(function () {
             $(".dropdown-toggle").on("click", function() {
-                if (!$scope.appended) {
+                if (!appended) {
                     $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
                     $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
                     $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
                     $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
-                    $scope.appended = true;
+                    appended = true;
                 }
                
             })

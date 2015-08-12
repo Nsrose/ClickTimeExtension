@@ -754,7 +754,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     totalMin = "0" + totalMin;
                 }
                 var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
-                if (timeSoFar + timeEntry.Hours > 24) {
+                var thisTime = CTService.toDecimal(timeEntry.Hours);
+                if (timeSoFar + thisTime > 24) {
                     $scope.setError("hours",  "Please make sure your daily hourly total is less than 24 hours.");
                     return false;
                 }

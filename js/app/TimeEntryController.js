@@ -1089,11 +1089,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             var currentUser = $scope.user;
             if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
                 $scope.setError("userConflict", "We're sorry but the "
-                            + "entry method" + " "
+                            + "time entry method" + " "
                             + " you've chosen is no longer available. "
-                            + "Please choose a different "
-                            + "entry method in the settings"
-                            + " or contact your company's ClickTime administrator for more details.");
+                            + "Please contact your company's ClickTime administrator for more details.");
                 if (user.RequireStartEndTime) {
                   $scope.changeTimeEntryMethod("start-end");
                   chrome.storage.sync.set({

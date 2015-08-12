@@ -744,6 +744,6 @@ input[type=time]::-webkit-inner-spin-button {
     display: none;
 }
 
-.custom-select > .dropdown-menu > ul > li:nth-child(5) {
+.custom-select > .dropdown-menu > ul > li:nth-child(6) {
     border-bottom: 1px solid lightgrey;
 }

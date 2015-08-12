@@ -1264,7 +1264,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $(".dropdown-toggle").on("click", function() {
                 if (!$scope.appended) {
                     $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li role="presentation">Recent</li>');
-                     $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li role="presentation">Recent</li>');
+                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li role="presentation">All</li>')
+                    $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li role="presentation">Recent</li>');
+                    $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li role="presentation">All</li>')
                     $scope.appended = true;
                 }
                

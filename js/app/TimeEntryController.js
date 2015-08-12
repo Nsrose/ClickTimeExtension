@@ -1253,17 +1253,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             pageReady: true
         })
 
-        $(function () {
-            $(".dropdown-toggle").on("click", function() {
-                if (!appended) {
-                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
-                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
-                    $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
-                    $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
-                    appended = true;
-                }
-               
-            })
+        $(".dropdown-toggle").on("click", function() {
+            if (!appended) {
+                $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
+                $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
+                $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
+                $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
+                appended = true;
+            }
+           
         })
     }
     

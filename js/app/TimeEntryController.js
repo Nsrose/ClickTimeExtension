@@ -86,7 +86,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
                 || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
                 && $scope.showStartTimer && !$scope.runningStopwatch) {
-                 $("#start-stopwatch").click();
+                 $scope.startStopwatch();
             } else if ($scope.runningStopwatch) {
                 $scope.stopStopwatch();
             }
@@ -473,10 +473,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.showStartTimer = true;
-        $scope.saving = false;
+       
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
+        $scope.saving = false;
         ga('send', 'event', 'Successful Saves', 'post', 'successfully post a time entry'); // google analytics
     })
 

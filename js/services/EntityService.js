@@ -191,6 +191,16 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
        
     }
 
+    // Sort "all" section of entitylists alphabetically
+    function sorter (a, b) {
+        if (a.DisplayName > b.DisplayName) {
+            return 1;
+        } else if (a.DisplayName == b.DisplayName) {
+            return 0;
+        }
+        return -1;
+    }
+
     // Get an interleaved list of client/job pairs
     this.getJobClients = function (session, checkLocal, callback) {
         if (checkLocal) {
@@ -212,6 +222,9 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
                             entityList.push(jobClient);  
                         }
                     }
+
+                    // Sort the 'all' section
+                    entityList.sort(sorter);
 
                     // Then add the recent jobClients
                     for (i in jobClientsByRecent) {
@@ -262,6 +275,9 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
                                     }
                                 }
 
+                                // Sort the 'all' section
+                                entityList.sort(sorter);
+
                                 // Then add the recent jobClients
                                 for (i in jobClientsByRecent) {
                                     r = jobClientsByRecent[i];
@@ -298,6 +314,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
                             }
                         }
                     }
+                    jobClientsList.sort(sorter);
                     var stringJobClientsList = JSON.stringify(jobClientsList);
                     chrome.storage.local.set({
                         'stringJobClientsList' : stringJobClientsList

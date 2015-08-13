@@ -4,9 +4,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //google analytics
     ga('send', 'pageview', '/main.html'); 
 
-
-
-
     //Company custom terms
     $scope.customTerms = {};
 
@@ -86,7 +83,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // start stopwatch, if there
     $(document).keypress(function(e) {
         if (e.which == 13) {
-
             if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
                 || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
                 && $scope.showStartTimer && !$scope.runningStopwatch) {
@@ -845,9 +841,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.removeSyncStorageVars = function() {
         chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
     }
-
-
-
 
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {

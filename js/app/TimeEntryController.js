@@ -1251,10 +1251,24 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
        allowRemindersSyncSetter()
     }
 
+   
+
+    function appendRecentAll() {
+        var recent = '<li style="color:grey" class="recent-add" role="presentation"><strong> Recent</strong></li>';
+        var all = '<li style="color:grey" class="all-add" role="presentation"><strong> All</strong></li>';
+        $(".recent-add").remove();
+        $(".all-add").remove();
+        $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
+        $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
+        $("#task-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
+        $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
+    }
+
+    
+
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
 
     // Once page has loaded, send a message that this was loaded.
-    $scope.appended = false;
     $scope.sendPageReady = function() {
         chrome.runtime.sendMessage({
             pageReady: true
@@ -1262,16 +1276,24 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         $(function () {
             $(".dropdown-toggle").on("click", function() {
-                if (!$scope.appended) {
-                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
-                    $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
-                    $("#task-dropdown ul[role=menu] li[role=presentation]").first().before('<li style="color:grey" role="presentation"><strong> Recent</strong></li>');
-                    $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before('<li style="color:grey" role="presentation"><strong> All</strong></li>')
-                    $scope.appended = true;
-                }
-               
+                appendRecentAll();
+                $('.dropdown-menu').each(function (i, e) {
+                    var dropdown_menu = $(e).children().first().children();
+                    dropdown_menu.on("keyup", function(e) {
+                        var text = e.target.value;
+                        console.log(text);
+                        if (text) {
+                            $(".recent-add").remove();
+                            $(".all-add").remove();
+                        } else {
+                            appendRecentAll();
+                        }
+                    })
+                })
             })
         })
+
+
     }
     
     // When this list is populated with 4 entities, the scope is ready. 

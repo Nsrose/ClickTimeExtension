@@ -88,6 +88,11 @@ Settings:
 &nbsp;&nbsp;&nbsp;&nbsp;Services: None  
 &nbsp;&nbsp;&nbsp;&nbsp;Overview: User can select which time entry method they want to use (start/end or duration) here, if those methods are available to them. Refresh lists will call the API directly to get all entities, overwriting Chrome local storage in the process. If Allow Reminders is checked, user will get reminders to enter time every 4 hours. Leave Feedback will direct user to Google form for chrome extension feedback. Sign out will log the user out.  
 
+Branches
+----------------------
+- app: for chrome packaged apps
+- jobclients: useless branch courtesey of @nsrose
+- startend: see above
 
 Team Members:  
 -----------------  

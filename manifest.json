@@ -1,9 +1,9 @@
 {
   "manifest_version" : 2,
-  "name": "Clicktime for Chrome",
+  "name": "ClickTime for Chrome",
   "version":"1.0",
 
-  "description" : "Clicktime for Chrome is the most frictionless way to enter time for ClickTime users.",
+  "description" : "ClickTime for Chrome is the most frictionless way to enter time for ClickTime users.",
 
   "background": {
     "scripts" : [

@@ -101,7 +101,9 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
         CompanyID = session.CompanyID;
         UserID = session.UserID;
         isodate = getIsoDate();
-        url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
+        //Deprecated API Call (no more date parameter)
+        // url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
+        url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries";
         APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
             .then(function (response) {
                 callback(response.data);

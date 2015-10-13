@@ -607,7 +607,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             if (!validateTimeEntry(timeEntry)) {
-                console.log(timeEntry);
                 $scope.$broadcast("timeEntryError");
                 return;
             } else {
@@ -617,7 +616,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
                     var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    console.log(successMessageTotalRaw);
                     var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
                     var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
@@ -1275,7 +1273,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     var dropdown_menu = $(e).children().first().children();
                     dropdown_menu.on("keyup", function(e) {
                         var text = e.target.value;
-                        console.log(text);
                         if (text) {
                             $(".recent-add").remove();
                             $(".all-add").remove();

@@ -279,6 +279,15 @@ h4 {
 	text-align: center;
 }
 
+#bottomFooterPrintPage {
+	background-color: #1F1F1F;
+	position: absolute;
+	width: 100%;
+	height: 56px;
+	margin-top: 3600px;
+	text-align: center;
+}
+
 #footer-text {
 	font-family: lato, san-serif;
 	color: #767676;

@@ -106,6 +106,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
         url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries";
         APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
             .then(function (response) {
+                // console.log(response.data);
                 callback(response.data);
             })
     }

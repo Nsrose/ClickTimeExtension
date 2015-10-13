@@ -13,19 +13,18 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
     // requestMethod - GET or POST
     // data - data for POST requests
     this.apiCall = function (requestURL, email, password, requestMethod, data) {
-        var credentials = btoa(email + ":" + password);
-
-        console.log(version);
         
+        var credentials = btoa(email + ":" + password);
+    
         var request = {
             method: requestMethod,
             url: requestURL,
             headers: {
                 'Authorization' : 'Basic ' + credentials,
-                'client': JSON.stringify({
+                'client': btoa(JSON.stringify({
                     'appname': 'chromeExtension',
                     'version': version
-                })
+                }))
             },
             data: data,
             timeout: TIMEOUT

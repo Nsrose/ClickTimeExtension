@@ -9,7 +9,6 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
             .then(function (response) {
                 if (response.data == null) {
                     bootbox.alert("We're sorry, there was an error fetching the time entries.");
-                    console.log(url);
                 }
 
                 return response;

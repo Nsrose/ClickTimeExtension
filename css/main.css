@@ -128,7 +128,7 @@ a {
 .feedback-link {
     position: absolute;
     left: 18px;
-    top: 415px;
+    bottom: 10px;
     text-decoration: underline;
     font-weight: bold;
 }

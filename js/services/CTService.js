@@ -201,13 +201,9 @@ myApp.service('CTService', function() {
 
         var returnString = "";
         var unsplitTotal = successMessageTotalRaw;
-        console.log(unsplitTotal);
         var splitTotal = unsplitTotal.split(":");
-        console.log(splitTotal);
         var hoursFormatted = splitTotal[0];
         var minutesFormatted = splitTotal[1];
-
-        console.log(minutesFormatted);
 
         if (parseInt(hoursFormatted) < 1) {
 

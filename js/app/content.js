@@ -110,9 +110,10 @@ var imgURL = chrome.extension.getURL("../../img/smallLogo.png");
 calendarHTML += "<img src=" + imgURL + "></div>";
 
 
-$(document).ready(function() {
-    window.setTimeout(function() {
-        appendLogoGoogleCalendar(calendarHTML);
-    }, 3000);
+// Google Calendar Integration - Uncomment to activate
+// $(document).ready(function() {
+//     window.setTimeout(function() {
+//         appendLogoGoogleCalendar(calendarHTML);
+//     }, 3000);
 
-})
+// })

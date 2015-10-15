@@ -10,8 +10,9 @@ a {
 #main {
   min-width: 556px;
   width: 556px;
-  min-height: 380px;
-  height: 380px;
+  min-height: 450px;
+  max-height: 450px;
+  height: 450px;
 
   -webkit-user-select: none;
   -moz-user-select: none;

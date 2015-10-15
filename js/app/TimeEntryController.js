@@ -1087,6 +1087,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         var afterGetUser = function (user) {
             var currentUser = $scope.user;
+
+            console.log('currentUser');
             if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
                 $scope.setError("userConflict", "We're sorry but the "
                             + "time entry method" + " "
@@ -1413,6 +1415,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         var afterGetUser = function (user) {
+            if (user.RequireStopwatch) {
+                $scope.$parent.RequireStopwatch = true;
+                $scope.logout();
+            }
+
             $scope.user = user;
             $scope.doneLoading.push('user');
             if ($scope.doneLoading.length >= 4) {

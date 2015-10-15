@@ -12,6 +12,9 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     // Error for DCAA/ Sub Job modules 
     $scope.DCAASubJobError = false;
 
+    // Error for users requiring Stopwatch
+    $scope.RequireStopwatch = false;
+
     // API base change upon opening:
     chrome.storage.sync.get('apiBaseURL', function (items) {
     	if ('apiBaseURL' in items) {

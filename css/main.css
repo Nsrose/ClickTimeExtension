@@ -700,10 +700,11 @@ input[type="text"]:disabled {
     visibility: hidden;
 }
 
-#dcaa-sub-job-error-text {
+#dcaa-sub-job-error-text, #require-stopwatch-error-text {
     bottom: 0;
     left: 12px;
 }
+
 .feedback-container {
     margin-left: 24px;
     margin-top: 53px;

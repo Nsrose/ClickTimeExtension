@@ -46,14 +46,16 @@ a {
 
 .label.label-success {
     background-color: #565f9a;
-    margin-left: 4px;
     width: 45px;
     height: 22px;
     font-size: 12px;
     box-sizing: border-box;
     border: 1px solid #f5f5f5;
     border-radius: 2px;
-    padding-top: 4px;
+    padding-top: 3.5px;
+    position: absolute;
+    left: 215px;
+    top: 13px;
 }
 
 .clear {
@@ -66,7 +68,7 @@ a {
     margin-left: auto;
     margin-right: auto;
     z-index: 999;
-    margin-top: 40%;
+    margin-top: 48%;
 }
 
 #loading-mask {
@@ -74,8 +76,7 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-
-    height: 100%;
+    height: 539px;
     background-color: white;
     z-index: 700;
 }
@@ -187,7 +188,7 @@ a.dropdown-toggle.ng-scope {
     height: 45px;
     width: 448px;
     margin-left: 23.6px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     background: #ffffff;
 /*    background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);*/
 /*    background: -webkit-linear-gradient(top, #fafafa 0%,#ebebeb 100%);*/
@@ -215,6 +216,11 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 
 .custom-select > .dropdown-menu > ul > li > a:hover {
     background: #337ab7;
+}
+
+.custom-select > a.dropdown-toggle > b:before {
+    font-size: 14px;
+    top: 6px;
 }
 
 .dropdown-menu.ng-scope {
@@ -304,7 +310,7 @@ input[type="text"].time-entry-form-hours {
 
 .notes-field-container {
     display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .fieldtitle {
@@ -312,7 +318,7 @@ input[type="text"].time-entry-form-hours {
     font-weight: bold;
     margin-left: 23.6px;
     margin-top: 0px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .fieldtitle.time-entry, #time-entry-form-end-title, #time-entry-field-hours-title, #field-title-timer {
@@ -864,6 +870,11 @@ input[type="email"], input[type="password"] {
     box-sizing: border-box;
     border: 1px solid #b4b4b4;
     border-radius: 4px;
+    padding-left: 12px;
+}
+
+input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-input-placeholder {
+    padding-left: 12px;
 }
 
 #forgot-password-link {
@@ -880,7 +891,7 @@ input[type="email"], input[type="password"] {
 #sign-in-button {
     position: absolute;
     right: 23px;
-    bottom: 65px;
+    bottom: 100px;
     height: 52px;
     width: 179px;
     font-size: 18px;
@@ -895,22 +906,29 @@ input[type="email"], input[type="password"] {
 
 .login-error-messaging-text {
     position: absolute;
-    color: #ff0000;
+    color: #de6a66;
     padding: 0;
     margin-bottom: 0px;
-    width: 90%;
+    font-size: 15px;
+    font-weight: bold;
 }
 
-#invalid-login {
+#email-error {
+    left: 155px;
+    top: 4px;
+}
+
+#password-error {
+    left: 120px;
+    top: 92px;
+}
+
+.critical-login-error {
+    position: absolute;
     width: 400px;
-    margin-top: 29px;
-    margin-left: 20px;
+    left: 23px;
+    top: 400px;
 }
-
-input[type="text"] {
-}
-
-
 
 .system-message {
     width: 520px;

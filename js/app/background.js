@@ -219,8 +219,8 @@ function createWindow(timeString) {
       url: chrome.extension.getURL('../templates/main.html'),
       type: 'popup',
       focused: true,
-      width: 495,
-      height: 631
+      width: 510,
+      height: 640
       }, function (window) {
           windowID = window.id;
           showPopupArrow = false

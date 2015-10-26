@@ -1,12 +1,12 @@
-@font-face {
+/*@font-face {
     font-family: 'HelveticaNeue';
     src: url('HelveticaNeue.ttf');
     font-weight: normal;
     font-style: normal;
-}
+}*/
 
 body {
-  font-family: 'HelveticaNeue', 'Helvetica', sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 
 a {

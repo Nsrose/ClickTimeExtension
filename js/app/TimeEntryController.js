@@ -508,13 +508,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     			$scope.showHourEntryField = true;
     			$scope.showStopwatch = false;
     			$scope.showStartEndTimes = false;
-                $('#notes-field').css({'width': '390px', 'max-width': '390px'});
+                $('#notes-field').css({'width': '448px', 'max-width': '448px'});
     			break;
     		case "start-end":
     			$scope.showHourEntryField = false;
     			$scope.showStartEndTimes = true;
     			$scope.showStopwatch = false;
-                $('#notes-field').css({'width': '234px', 'max-width': '234px'});
+                $('#notes-field').css({'width': '448px', 'max-width': '448px'});
     			break;
     		default:
     			bootbox.alert("Invalid time entry method");
@@ -1452,7 +1452,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.runningStopwatch = false;
 
                             
-                            $('#notes-field').css({'width': '234px', 'max-width': '234px'});
+                            $('#notes-field').css({'width': '448px', 'max-width': '448px'});
                         } else {
                             // There is a running stopwatch, but it isn't abandoned
                             var now = new Date();

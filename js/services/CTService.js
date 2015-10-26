@@ -241,32 +241,32 @@ myApp.service('CTService', function() {
         if (!hrs || hrs == 0) {
             if (min && min != 0) {
                 if (min > 1) {
-                    return min + " mins recorded today";
+                    return min + " mins tracked today";
                 } else {
-                    return min + " min recorded today";
+                    return min + " min tracked today";
                 }
             } else {
-                return "No time recorded yet today";
+                return "No time tracked yet today";
             }
         } else if (hrs > 1) {
            if (min && min != 0) {
                 if (min > 1) {
-                    return hrs + " hrs and " + min + " mins recorded today";
+                    return hrs + " hrs and " + min + " mins tracked today";
                 } else {
-                    return hrs + " hrs and " + min + " min recorded today";
+                    return hrs + " hrs and " + min + " min tracked today";
                 }
             } else {
-                return hrs + " hrs recorded today";
+                return hrs + " hrs tracked today";
             }
         } else {
             if (min && min != 0) {
                 if (min > 1) {
-                    return hrs + " hr and " + min + " mins recorded today";
+                    return hrs + " hr and " + min + " mins tracked today";
                 } else {
-                    return hrs + " hr and " + min + " min recorded today";
+                    return hrs + " hr and " + min + " min tracked today";
                 }
             } else {
-                return hrs + " hr recorded today";
+                return hrs + " hr tracked today";
             }
         }
     }

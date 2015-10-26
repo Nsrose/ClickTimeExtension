@@ -1,11 +1,11 @@
-<div class="login-screen-column" id="login-screen-left-column">
-    <h2 id="login-header-text">Sign in to your account</h2>
+<div class="login-screen-column" id="login-main-container">
+    <h2 id="login-header-text">Please sign in</h2>
     <div id="loading-mask" ng-show="rerouting">
         <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
     </div>
 
-    <form name="loginForm">
-        <p class="login-fields">Email<br>
+    <form id="login-form" name="loginForm">
+        <p class="login-fields">Email Address<br>
             <input type="email" name="email" autofocus ng-model="user.email" required id="email-input" ng-focus="clearError('email')" ng-blur="unfocus('email')"><br>
             
         </p>
@@ -28,6 +28,9 @@
                 <span ng-show="loginForm.password.$error.maxlength"><!-- Maximum password length is 24 characters. --></span>
             </span>
         </div>
+
+        <a id="forgot-password-link" href="http://login.clicktime.com/forms/forgot-password-form" target="_blank">Forgot your password?</a>
+
     </form>
     
     <button id="sign-in-button" ng-click="login(user)">Sign In</button>
@@ -39,19 +42,12 @@
 
      <span class="login-error-messaging-text" id="require-stopwatch-error-text" ng-show="RequireStopwatch">We're sorry, but ClickTime for Chrome does not currently support users required to use a stopwatch.</span>
 
-    <div id="forgot-password-link">
-        <a href="http://login.clicktime.com/forms/forgot-password-form" target="_blank">Forgot your username or password?</a>
-    </div>
-
 </div>
 
-<div class="login-screen-column" id="login-screen-right-column">
-    <div id="no-account-message">
-            <h2 id="new-user-messaging-header">New to ClickTime?</h2>
-            <p>Hello! Thanks for stopping by. Head over to our <a id="marketing-site-link"href="http://www.clicktime.com/forms/free-trial" target="_blank">website</a> to learn more and sign up for a free trial.</p>
-    </div>
+<div class="login-screen-column" id="login-bottom-container">
 
-   
+        <span id="new-user-messaging-header">New to ClickTime?</span>
+        <a id="marketing-site-link"href="http://www.clicktime.com/forms/free-trial" target="_blank">Sign up for a free trial here</a>
 
     <div id="environment-options" ng-show="showEnvironmentChange" custom-select ng-model="environment" ng-options="e for e in environmentOptions" ng-click="changeEnvironment(environment)">
     </div>

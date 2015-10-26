@@ -8,10 +8,11 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   }
 
   $scope.$on("refresh", function() {
-    $('#refresh-status').text('Lists refreshed!');
+    console.log('refresh!!!');
+    $('#refresh-status').html('<img src="../img/success_check.png" id="refresh-check">Lists refreshed!');
     setTimeout(function() {
        $('#refresh-status').text('');
-    }, 750);
+    }, 2000);
   })
 
   // need to add event handlers via angular

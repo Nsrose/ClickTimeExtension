@@ -46,7 +46,7 @@ a {
 
 .label.label-success {
     background-color: #565f9a;
-    width: 45px;
+    width: 50px;
     height: 22px;
     font-size: 12px;
     box-sizing: border-box;
@@ -54,8 +54,8 @@ a {
     border-radius: 2px;
     padding-top: 3.5px;
     position: absolute;
-    left: 215px;
-    top: 13px;
+    left: 207px;
+    top: 12px;
 }
 
 .clear {
@@ -202,7 +202,7 @@ a.dropdown-toggle.ng-scope {
 }
 
 a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
-    border: 2px solid #A5C7FE !important;
+    border: 1px solid #428bca;
     border-radius: 2px;
 }
 
@@ -247,6 +247,10 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     border-radius: 2px;
     resize: none;
     color: #555555;
+}
+
+#notes-field:focus{
+    border: 1px solid #428bca;
 }
 
 .time-entry-item {
@@ -755,7 +759,7 @@ input[type="checkbox" i] {
     margin-left: 14px;
     padding-top: 8px;
     color: #8ebc89;
-    margin-top: 27px;
+    margin-top: 29px;
 
     background: none;
     border: none;
@@ -925,15 +929,19 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 
 .critical-login-error {
     position: absolute;
-    width: 400px;
+    width: 449px;
     left: 23px;
-    top: 400px;
+    top: 395px;
+    font-size: 12px;
 }
 
 .system-message {
-    width: 520px;
-    margin-left: 18px;
-    color: red;
+    position: absolute;
+    width: 449px;
+    left: 23.6px;
+    top: 408px;
+    color: #de6a66;
+    font-size: 12px;
 }
 
 #environment-options {
@@ -964,11 +972,10 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     top: 60px;
     visibility: hidden;
 }
-
+/*
 #dcaa-sub-job-error-text, #require-stopwatch-error-text {
     bottom: 0;
-    left: 12px;
-}
+}*/
 
 /*.feedback-container {
     margin-left: 24px;

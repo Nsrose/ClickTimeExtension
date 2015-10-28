@@ -82,10 +82,10 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   })
 
   // when toggling, update defaultTimeEntryMethod in local storage
-  $(".btn-group > .btn").click(function() {
+  $(".entry-method-toggle").click(function() {
      // visuals
     //$(this).addClass("active").siblings().removeClass("active");
-    $(this).siblings().prop('checked', false);
+    $(this).parent().siblings().children().prop('checked', false);
     //storage set
     chrome.storage.sync.get('timeEntryMethod', function (items) {
       if ('timeEntryMethod' in items) {

@@ -27,8 +27,12 @@
     <div class="settings-column" id="settings-column-left">
         <div ng-class="{'no-display': requireStartEndTime }" id="time-entry-method-container" class="btn-group">
             <h5 id="entry-method-toggle-text">Time Entry Method</h5>
-            <button id="duration" type="button" class="btn btn-custom">Duration</button>
-            <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button>
+<!--             <button id="duration" type="button" class="btn btn-custom">Duration</button>
+            <button id="start-end" type="button" class="btn btn-custom">Start & End Times</button> -->
+
+            <label><input id="duration" type="radio" name="duration" value="1" class="btn btn-custom entry-method-toggle">Duration</label>
+            
+            <label><input id="start-end" type="radio" name="start-end" value="2" class="btn btn-custom entry-method-toggle">Start & End Times</label>
             <p id="warning">Note: Changing your default time entry method will erase any unsaved time entries</p>
         </div>
 
@@ -36,7 +40,7 @@
 
 
         <div id="checkbox-wrapper">
-        <label id='reminder-toggle-text'><input id="reminder-toggle" type="checkbox"> Remind me to track<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;my time</label>
+        <label id='reminder-toggle-text'><input id="reminder-toggle" type="checkbox"> Remind me to track<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;my time</label>
         </div>
     </div>
 

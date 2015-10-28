@@ -54,6 +54,8 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
     })
   })
 
+
+
   // gets initial defaultTimeEntryMethod to display
   chrome.storage.local.get('user', function(items) {
     // if there's no choice based on settings, hide element
@@ -65,9 +67,13 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
         chrome.storage.sync.get('timeEntryMethod', function(items) {
           if ('timeEntryMethod' in items) {
             if (items.timeEntryMethod.method == 'duration') {
-              $('#duration').addClass('active').siblings().removeClass('active');
+              //$('#duration').addClass('active').siblings().removeClass('active');
+              $('#duration').prop('checked', true);
+              $('#start-end').prop('checked', false);
             } else if (items.timeEntryMethod.method == 'start-end') {
-              $('#start-end').addClass('active').siblings().removeClass('active');
+              //$('#start-end').addClass('active').siblings().removeClass('active');
+              $('#start-end').prop('checked', true);
+              $('#duration').prop('checked', false);
             }
           }
         })
@@ -78,19 +84,20 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   // when toggling, update defaultTimeEntryMethod in local storage
   $(".btn-group > .btn").click(function() {
      // visuals
-    $(this).addClass("active").siblings().removeClass("active");
+    //$(this).addClass("active").siblings().removeClass("active");
+    $(this).siblings().prop('checked', false);
     //storage set
     chrome.storage.sync.get('timeEntryMethod', function (items) {
       if ('timeEntryMethod' in items) {
         var userID = items.timeEntryMethod.UserID;
-        if ($('#duration').hasClass('active')) {
+        if ($('#duration').is(':checked')) {
           chrome.storage.sync.set({
             'timeEntryMethod': {
               UserID: userID,
               method: 'duration'
             }
           })
-        } else if ($('#start-end').hasClass('active')) {
+        } else if ($('#start-end').is(':checked')) {
           chrome.storage.sync.set({
             'timeEntryMethod': {
               UserID: userID,
@@ -101,4 +108,59 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
       }
     })
   })
+
+  ////////////REVERT TO THE BELOW CODE IF FUCKED UP/////////////////////
+
+  // // gets initial defaultTimeEntryMethod to display
+  // chrome.storage.local.get('user', function(items) {
+  //   // if there's no choice based on settings, hide element
+  //   if ('user' in items) {
+  //     if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
+  //       $scope.requireStartEndTime = true;
+  //     } else {
+  //       //query the local storage for last-set method
+  //       chrome.storage.sync.get('timeEntryMethod', function(items) {
+  //         if ('timeEntryMethod' in items) {
+  //           if (items.timeEntryMethod.method == 'duration') {
+  //             $('#duration').addClass('active').siblings().removeClass('active');
+  //           } else if (items.timeEntryMethod.method == 'start-end') {
+  //             $('#start-end').addClass('active').siblings().removeClass('active');
+  //           }
+  //         }
+  //       })
+  //     }
+  //   }
+  // })
+
+  // // when toggling, update defaultTimeEntryMethod in local storage
+  // $(".btn-group > .btn").click(function() {
+  //    // visuals
+  //   $(this).addClass("active").siblings().removeClass("active");
+  //   //storage set
+  //   chrome.storage.sync.get('timeEntryMethod', function (items) {
+  //     if ('timeEntryMethod' in items) {
+  //       var userID = items.timeEntryMethod.UserID;
+  //       if ($('#duration').hasClass('active')) {
+  //         chrome.storage.sync.set({
+  //           'timeEntryMethod': {
+  //             UserID: userID,
+  //             method: 'duration'
+  //           }
+  //         })
+  //       } else if ($('#start-end').hasClass('active')) {
+  //         chrome.storage.sync.set({
+  //           'timeEntryMethod': {
+  //             UserID: userID,
+  //             method: 'start-end'
+  //           }
+  //         });
+  //       }
+  //     }
+  //   })
+  // })
+
+
+
+
+
 }])

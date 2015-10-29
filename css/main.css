@@ -165,11 +165,10 @@ a {
 }
 
 .total-hours-log {
-    float: right;
-    margin-right: 25px;
-    margin-top: 2px;
+    margin-top: 8px;
     margin-bottom: 8px;
-    font-size: 18px;
+    font-size: 16px;
+    text-align: center;
 }
 
 .total-hours-log a {
@@ -199,6 +198,7 @@ a.dropdown-toggle.ng-scope {
     font-size: 18px;
     padding-top: 7px;
     padding-left: 17px;
+    font-size: 14px;
 }
 
 a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
@@ -276,11 +276,12 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 }
 
 #time-entry-form-start, #time-entry-form-end {
-    width: 130px;
+    width: 180px;
     font-size: 23px;
     border:  1px solid #bcbcbc;
     padding: 0 0 0 8px;
     margin-right: 2px;
+    text-align: center;
 }
 
 input[type="text"].time-entry-form-hours {
@@ -296,10 +297,6 @@ input[type="text"].time-entry-form-hours {
 
 #time-entry-item-start::-webkit-input-placeholder, #time-entry-item-end::-webkit-input-placeholder {
     padding-right: 0;
-}
-
-#time-entry-form-start, #time-entry-form-end {
-    width: 180px;
 }
 
 #time-entry-item-end {
@@ -318,7 +315,7 @@ input[type="text"].time-entry-form-hours {
 }
 
 .fieldtitle {
-    font-size: 19px;
+    font-size: 14px;
     font-weight: bold;
     margin-left: 23.6px;
     margin-top: 0px;
@@ -339,14 +336,25 @@ input[type="text"].time-entry-form-hours {
     background-color: #222222; 
     color: #fdfdfd; 
     border: 1px solid #222222; 
-    max-width: 1000px;
-    height: 22px;
+    width: 200px;
+    height: auto;
     font-size: 11px;
 }
 
 .tooltip.in {
     opacity: 1.0;
     overflow: visible;
+}
+
+.tooltip.fade.bottom.in {
+    top: 20px !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible;
+}
+
+#tooltip-feedback {
+    top: 100px;
 }
 
 .entry-content {
@@ -408,7 +416,7 @@ input[type="text"].time-entry-form-hours {
 
 #login-form {
     position: absolute;
-    top: 114px;
+    top: 75px;
     left: 0;
     height: 341px;
     width: 495px;
@@ -471,12 +479,16 @@ input[type="text"].time-entry-form-hours {
 
 #login-bottom-container, #bottom-button-bar, #settings-bottom-container {
     position: absolute;
-    top: 457px;
+    bottom: 0px;
     height: 82px;
     width: 495px;
     box-sizing: border-box;
     background: #f4f4f4;
     border: 1px solid #e9e9e9;
+}
+
+#login-bottom-container {
+    height: 70px;
 }
 
 #stopwatchIcon{
@@ -536,7 +548,7 @@ input[type="text"].time-entry-form-hours {
     top: -47px;
     text-align: center;
     line-height: 18px;
-    font-size: 18px;
+    font-size: 16px;
     left: 305px;
     background: none;
     position: absolute;
@@ -545,7 +557,8 @@ input[type="text"].time-entry-form-hours {
     color: #fdfdfd;
     box-sizing: border-box;
     border: 1px solid #ffffff;
-    border-radius: 4px;
+    border-radius: 2px;
+    padding-top: 7px;
 }
 
 .modal-footer .btn+.btn {
@@ -559,18 +572,18 @@ input[type='radio'] {
 
 label {
     font-weight: normal;
+    display: block;
 }
 
-#time-entry-method-container {
-    font-size: 18px;
-}
+/*#time-entry-method-container {
+}*/
 
 .entry-method-toggle {
     clear: both;
 }
 
 #duration {
-    width: 16px;
+    width: 14px;
     margin-left: 24px;
 }
 
@@ -579,7 +592,7 @@ label {
 }
 
 #start-end {
-    width: 16px;
+    width: 14px;
     margin-left: 24px;
     margin-top: -2px;
 }
@@ -596,7 +609,6 @@ label {
 
 #settings-title-text {
     font-size: 24px;
-    font-weight: bold;
     width: 200px;
     position: absolute;
     margin-right: 0;
@@ -605,7 +617,6 @@ label {
 
 #entry-method-toggle-text {
     margin-bottom: 8px;
-    font-size: 19px;
     font-weight: bold;
 }
 
@@ -619,7 +630,7 @@ label {
 }
 
 #reminder-toggle-text {
-    font-size: 18px;
+    font-size: 14px;
     display: block;
     padding-top: 6px;
     font-weight: 400;
@@ -666,7 +677,7 @@ label {
     left: 124px;
     top: 26px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: normal;
     width: 140px;
     height: 20px;
     margin-left: 11px;
@@ -691,7 +702,7 @@ input[type="text"]:disabled {
 }
 
 input[type=checkbox] {
-  -webkit-transform: scale(1.35);
+  -webkit-transform: scale(1.0);
 }
 
 input[type="checkbox" i] {
@@ -784,13 +795,13 @@ input[type="checkbox" i] {
 
 #refresh-check {
     max-height: 16px;
-    height: auto;
+    height: 11px;
     margin-right: 6px;
 }
 
 #success-messaging-text {
     font-weight: normal;
-    font-size: 18px;
+    font-size: 14px;
     width: auto;
     max-width: 250px;
     margin-left: 4px;
@@ -801,7 +812,7 @@ input[type="checkbox" i] {
 
 #edit-entry-link {
     width: 90px;
-    font-size: 18px;
+    font-size: 14px;
     margin-right: 0px;
     margin-top: 0px;
     line-height: 18px;
@@ -818,8 +829,10 @@ input[type="checkbox" i] {
 }
 
 .error-messaging p{
-    margin-top: -15px;
+    bottom: 127px;
+    left: 23px;
     position: absolute;
+    color: #de6a66;
 }
 
 /*.login-screen-column {
@@ -841,18 +854,18 @@ input[type="checkbox" i] {
 
 #new-user-messaging-header {
     position: absolute;
-    left: 49.3px;
-    top: 29px;
-    font-size: 19px;
+    left: 24px;
+    top: 26px;
+    font-size: 16px;
     font-weight: bold;
 }
 
 
 #marketing-site-link {
     position: absolute;
-    top: 30px;
-    left: 229.3px;
-    font-size: 18px;
+    top: 25px;
+    left: 177px;
+    font-size: 16px;
     color: #428bca;
     text-decoration: underline;    
 }
@@ -860,9 +873,6 @@ input[type="checkbox" i] {
 
 #login-header-text {
     position: absolute;
-    font-size: 24px;
-    font-weight: bold;
-    top: 21.5px;
     left: 24px;
 }
 
@@ -871,7 +881,7 @@ input[type="checkbox" i] {
     width: 448px;
     margin-left: 23px;
     margin-bottom: 12px;
-    font-size: 19px;
+    font-size: 14px;
     font-weight: bold;
 
 }
@@ -894,7 +904,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 #forgot-password-link {
     width: 250px;
     margin-top: -4px;
-    font-size: 18px;
+    font-size: 14px;
     text-decoration: underline;
     position: absolute;
     left: 23px;
@@ -905,16 +915,12 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 #sign-in-button {
     position: absolute;
     right: 23px;
-    bottom: 100px;
-    height: 52px;
-    width: 179px;
-    font-size: 18px;
+    bottom: 160px;
     font-weight: bold;
     color: #555555;
     box-sizing: border-box;
     border: 1px solid #d6d6d6;
     background: -webkit-linear-gradient(top, #fcfcfc 0%,#eaeaea 100%);
-    border-radius: 4px;
     text-align: center;
 }
 
@@ -923,18 +929,22 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     color: #de6a66;
     padding: 0;
     margin-bottom: 0px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
 }
 
+#email-input, #password-input {
+    font-weight: normal;
+}
+
 #email-error {
-    left: 155px;
-    top: 4px;
+    left: 130px;
+    top: 0px;
 }
 
 #password-error {
-    left: 120px;
-    top: 92px;
+    left: 99px;
+    top: 89px;
 }
 
 .critical-login-error {
@@ -1035,9 +1045,10 @@ input[type=time]::-webkit-inner-spin-button {
     right: 22px;
     text-decoration: underline;
     color: #428bca;
-    font-size: 18px;
+    font-size: 16px;
     height: 45px;
     width: 170px;
+    top: 2px;
 }
 
 .fa-question-circle {
@@ -1056,9 +1067,10 @@ input[type=time]::-webkit-inner-spin-button {
     margin-right: 22px;
     margin-bottom: 17px;
     margin-top: 0;
-    font-size: 18px;
+    font-size: 16px;
     box-sizing: border-box;
-    border: 1px solid #6a6a6a;
+    background: -webkit-linear-gradient(top, #fcfcfc 0%,#eaeaea 100%);
+    border: 1px solid #d6d6d6;
 }
 
 #settings-help {
@@ -1066,12 +1078,10 @@ input[type=time]::-webkit-inner-spin-button {
 }
 
 #sign-out {
-    box-sizing: border-box;
-    background: -webkit-linear-gradient(top, #fcfcfc 0%,#eaeaea 100%);
-    border: 1px solid #d6d6d6;
     position: absolute;
     margin: 0;
     top: 18px;
-    right: 23px;
+    right: 30px;
     text-align: center;
+    font-size: 18px;
 }

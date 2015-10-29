@@ -11,8 +11,8 @@
 
         <div ng-class="{'top-bumper' : requireStartEndTime}" class="settings-controls" ng-controller="TimeEntryController" id="refresh-container">
 
-            <div ng-click="refresh()" my-tooltip="#tooltip" data-placement="top" class="btn btn-custom settings-width" id="refresh-button">
-                Refresh my lists<i class="fa fa-question-circle"></i>
+            <div ng-click="refresh()" class="btn btn-custom settings-width" id="refresh-button">
+                Refresh my lists<i my-tooltip="#tooltip" data-placement="bottom" class="fa fa-question-circle"></i>
             </div>
             
             <span id="tooltip" ng-hide="true">Refresh data for your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists</span>
@@ -40,7 +40,7 @@
 
 
         <div id="checkbox-wrapper">
-        <label id='reminder-toggle-text'><input id="reminder-toggle" type="checkbox"> Remind me to track<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;my time</label>
+        <label id='reminder-toggle-text'><input id="reminder-toggle" type="checkbox"> Remind me to track my time</label>
         </div>
     </div>
 
@@ -59,10 +59,15 @@
         </a>
 
         <a href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank">
-            <button class="feedback-container btn btn-custom settings-button" id="feedback"><i class="fa fa-bullhorn"></i>&nbsp;
+            <button class="feedback-container btn btn-custom settings-button" id="feedback" my-tooltip="#tooltip-feedback" data-placement="bottom"><i class="fa fa-bullhorn"></i>&nbsp;
                 Feedback
             </button>
+            <span id="tooltip-feedback" ng-hide="true">Tell us what you think!</span>
         </a>
+
+        
+
+
     </div>
 
     <div id="settings-bottom-container">

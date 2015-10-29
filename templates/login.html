@@ -1,5 +1,5 @@
 <div class="login-screen-column" id="login-main-container">
-    <h2 id="login-header-text">Please sign in</h2>
+    <h3 id="login-header-text">Please Sign In</h3>
     <div id="loading-mask" ng-show="rerouting">
         <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
     </div>
@@ -33,7 +33,7 @@
 
     </form>
     
-    <button id="sign-in-button" ng-click="login(user)">Sign In</button>
+    <button id="sign-in-button" class='btn btn-lg' ng-click="login(user)">Sign In</button>
     <span class="login-error-messaging-text" ng-show="loginError">    
         <span class="critical-login-error" id="invalid-login"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;Sorry, the email address or password you entered is not recognized. Please try again.</span>
     </span>

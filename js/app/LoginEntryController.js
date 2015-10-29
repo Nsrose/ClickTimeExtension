@@ -96,6 +96,7 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         }
         if (!user.email || !user.password) {
             $scope.loginError = true;
+            $('#email-input').css('border', '1px solid #de6a66');
             return;
         }
         $scope.rerouting = true;

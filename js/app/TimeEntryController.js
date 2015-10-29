@@ -405,40 +405,40 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.generalError = true;
         switch (errorField) {
             case "hours":
-                $("#time-entry-form-hours").css("border", "1px solid red");
-                $("#time-entry-field-hours-title").css("color", "red");
+                $("#time-entry-form-hours").css("border", "1px solid #de6a66");
+                $("#time-entry-field-hours-title").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "notes":
-                $("#notes-field").css("border", "1px solid red");
-                $("#fieldtitle-notes").css("color", "red");
+                $("#notes-field").css("border", "1px solid #de6a66");
+                $("#fieldtitle-notes").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;
             case "startTime":
-                $("#time-entry-form-start").css("border", "1px solid red");
-                $("#time-entry-form-start-title").css("color", "red");
+                $("#time-entry-form-start").css("border", "1px solid #de6a66");
+                $("#time-entry-form-start-title").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "endTime":
-                $("#time-entry-form-end").css("border", "1px solid red");
-                $("#time-entry-form-end-title").css("color", "red");
+                $("#time-entry-form-end").css("border", "1px solid #de6a66");
+                $("#time-entry-form-end-title").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "startEndTimes":
-                $("#time-entry-form-start").css("border", "1px solid red");
-                $("#time-entry-form-end").css("border", "1px solid red");
-                $("#time-entry-form-start-title").css("color", "red");
-                $("#time-entry-form-end-title").css("color", "red");
+                $("#time-entry-form-start").css("border", "1px solid #de6a66");
+                $("#time-entry-form-end").css("border", "1px solid #de6a66");
+                $("#time-entry-form-start-title").css("color", "#de6a66");
+                $("#time-entry-form-end-title").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "jobClient":
-                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid red");
-                $("#fieldtitle-jobclient").css("color", "red");
+                $("#jobClient-dropdown > a.dropdown-toggle").css("border", "1px solid #de6a66");
+                $("#fieldtitle-jobclient").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "task":
-                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid red");
-                $("#fieldtitle-task").css("color", "red");
+                $("#task-dropdown > a.dropdown-toggle").css("border", "1px solid #de6a66");
+                $("#fieldtitle-task").css("color", "#de6a66");
                 ga('send', 'event', 'User Error', 'post', 'Missing or conflicting job/task'); 
                 break;
             case "jobConflict":

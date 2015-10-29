@@ -10,9 +10,9 @@ html, body {
     overflow-x: hidden;
 }
 
-/*.shift {
+.shift {
 	margin-top: 350px;
-}*/
+}
 
 .header {
 	position: relative;
@@ -27,7 +27,7 @@ a {
 }
 
 h1 {
-	position: relative;
+	position: absolute;
 	font-family: lato, san-serif;
 	font-weight: 300;
 	font-size: 115px;
@@ -42,7 +42,7 @@ h1 {
 
 h2 {
 	font-family: lato, san-serif;
-	position: relative;
+	position: absolute;
 	font-size: 50px;
 	font-weight: 400;
 	margin-top: 25px;
@@ -66,46 +66,42 @@ p {
 	font-size: 16px;
 }
 
-img {
-	margin-left: 30px;
-}
-
 .divider {
-	position: relative;
+	position: absolute;
 	background-color: #999;
 	height: 1px;
 	width: 90%;
 	margin-left: 30px;
 }
 
-/*#title {
-	position: relative;
+#title {
+	position: absolute;
 	margin-left: 30px;
 }
 
 #header1 {
-	position: relative;
+	position: absolute;
 	margin-top: 125px;
 }
 
 #p1 {
-	position: relative;
+	position: absolute;
 	margin-top: 160px;
 }
 
 #p12 {
-	position: relative;
+	position: absolute;
 	margin-top: 245px;
 }
 
 #img1 {
-	position: relative;
+	position: absolute;
 	margin-top: 210px;
 	margin-left: 210px;
 }
 
 #arrow {
-	position: relative;
+	position: absolute;
 	margin-left: 800px;
 	margin-top: 180px;
 	width: 125px;
@@ -113,7 +109,7 @@ img {
 }
 
 #settings {
-	position: relative;
+	position: absolute;
 	margin-left: 210px;
 	margin-top: 315px;
 }
@@ -123,17 +119,17 @@ img {
 }
 
 #header2 {
-	position: relative;
+	position: absolute;
 	margin-top: 375px;
 }
 
 #p2 {
-	position: relative;
+	position: absolute;
 	margin-top: 415px;
 }
 
 #img2 {
-	position: relative;
+	position: absolute;
 	margin-top: 460px;
 	margin-left: 110px;
 }
@@ -143,38 +139,38 @@ img {
 }
 
 #header3 {
-	position: relative;
+	position: absolute;
 	margin-top: 875px;
 }
 
 #p3 {
-	position: relative;
+	position: absolute;
 	margin-top: 925px;
 }
 
 #p32 {
-	position: relative;
+	position: absolute;
 	margin-top: 1000px;
 }
 
 #img3 {
-	position: relative;
+	position: absolute;
 	margin-top: 1035px;
 	margin-left: 220px;
 }
 
 #p33 {
-	position: relative;
+	position: absolute;
 	margin-top: 1375px;
 }
 
 #p34 {
-	position: relative;
+	position: absolute;
 	margin-top: 1415px;
 }
 
 #img32 {
-	position: relative;
+	position: absolute;
 	margin-top: 1450px;
 	margin-left: 115px;
 }
@@ -184,33 +180,33 @@ img {
 }
 
 #header4 {
-	position: relative;
+	position: absolute;
 	margin-top: 1850px;
 }
 
 #p4 {
-	position: relative;
+	position: absolute;
 	margin-top: 1900px;
 }
 
 #p42 {
-	position: relative;
+	position: absolute;
 	margin-top: 1975px;
 }
 
 #p43 {
-	position: relative;
+	position: absolute;
 	margin-top: 2025px;
 }
 
 #img4 {
-	position: relative;
+	position: absolute;
 	margin-top: 2090px;
 	margin-left: 235px;
 }
 
 #p44 {
-	position: relative;
+	position: absolute;
 	margin-top: 2425px;
 }
 
@@ -219,36 +215,36 @@ img {
 }
 
 #header5 {
-	position: relative;
+	position: absolute;
 	margin-top: 2525px;
 }
 
 #p5 {
-	position: relative;
+	position: absolute;
 	margin-top: 2570px;
 }
 
 #p52 {
-	position: relative;
+	position: absolute;
 	margin-top: 2625px;
 }
 
 #img5 {
-	position: relative;
+	position: absolute;
 	margin-top: 2690px;
 	margin-left: 235px;
 }
 
 #p53 {
-	position: relative;
+	position: absolute;
 	margin-top: 3030px;
 }
 
 #img52 {
-	position: relative;
+	position: absolute;
 	margin-top: 3050px;
 	margin-left: 235px;
-}*/
+}
 
 #topFooter {
 	position: absolute;
@@ -259,7 +255,7 @@ img {
 }
 
 h4 {
-	position: relative;
+	position: absolute;
 	margin-top: 3550px;
 	font-family: lato, san-serif;
 	color: white;

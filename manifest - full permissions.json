@@ -1,7 +1,7 @@
 {
   "manifest_version" : 2,
   "name": "ClickTime for Chrome",
-  "version":"1.0.0.21",
+  "version":"1.0",
 
   "description" : "ClickTime for Chrome is the most frictionless way to enter time for ClickTime users.",
 
@@ -30,7 +30,7 @@
   "content_scripts" : [
     {
       "matches" : [
-        "https://*.clicktime.com/*"
+        "<all_urls>"
       ],
       "js" : ["js/lib/jquery-1.11.3.min.js", "js/app/content.js"],
       "run_at": "document_start"
@@ -44,10 +44,14 @@
     "img/*"
   ],
   
-  "permissions": [  
+  "permissions": [ 
+    "http://*/*", 
+    "https://*/*", 
     "unlimitedStorage", 
     "storage", 
     "contextMenus", 
+    "cookies", 
+    "tabs", 
     "notifications"
   ],
 

@@ -1,10 +1,3 @@
-/*@font-face {
-    font-family: 'HelveticaNeue';
-    src: url('HelveticaNeue.ttf');
-    font-weight: normal;
-    font-style: normal;
-}*/
-
 body {
   font-family: 'Arial', sans-serif;
 }
@@ -123,7 +116,6 @@ a {
     box-sizing: border-box;
     border: 1px solid #bcbcbc !important;
     background: #464e84;
-    /*background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);*/
 }
 
 #header-banner {
@@ -189,8 +181,6 @@ a.dropdown-toggle.ng-scope {
     margin-left: 23.6px;
     margin-bottom: 10px;
     background: #ffffff;
-/*    background: -webkit-linear-gradient(top, #ffffff 0%,#f7f7f7 100%);*/
-/*    background: -webkit-linear-gradient(top, #fafafa 0%,#ebebeb 100%);*/
     box-sizing: border-box;
     border: 1px solid #b4b4b4;
     border-radius: 2px;
@@ -241,7 +231,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     max-height: 61px;
     margin-left: 23.6px;
     margin-top: 0px;
-/*    margin-right: 15px;*/
     box-sizing: border-box;
     border: 1px solid #b4b4b4;
     border-radius: 2px;
@@ -255,7 +244,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 
 .time-entry-item {
     display: inline-block;
-/*    float: right;*/
     clear: both;
     margin-bottom: 20px;
     margin-left: 23.6px;
@@ -302,12 +290,6 @@ input[type="text"].time-entry-form-hours {
 #time-entry-item-end {
     margin-left: 82px;
 }
-
-
-/*input, textarea {
-    padding-right: 6px;
-}*/
-
 
 .notes-field-container {
     display: inline-block;
@@ -390,12 +372,6 @@ input[type="text"].time-entry-form-hours {
     text-align: center !important;
 }
 
-/*.btn-group>.btn.active {
-    background-color: #d4d4d4;
-    border: 1px solid #bcbcbc !important;
-    text-align: center;
-}
-*/
 .modal-footer .btn.btn-default {
     margin-left: 12px;
     font-size: 16px;
@@ -416,7 +392,7 @@ input[type="text"].time-entry-form-hours {
 
 #login-form {
     position: absolute;
-    top: 75px;
+    top: 90px;
     left: 0;
     height: 341px;
     width: 495px;
@@ -500,8 +476,6 @@ input[type="text"].time-entry-form-hours {
     height: 45px;
     width: 146px;
     font-size: 18px;
-/*    background: #38aa67;
-    border: 1px solid #339d5e;*/
     font-weight: 500;
     color: #fdfdfd;
     border-radius: 4px;
@@ -575,9 +549,6 @@ label {
     display: block;
 }
 
-/*#time-entry-method-container {
-}*/
-
 .entry-method-toggle {
     clear: both;
 }
@@ -639,10 +610,6 @@ label {
 #checkbox-wrapper {
     background: #ffffff;
 }
-
-/*.top-bumper {
-    margin-top: 27px;
-}*/
 
 .fa.fa-bullhorn, .fa.fa-info-circle, .fa.fa-phone, .fa.fa-file {
     margin-left: 8px;
@@ -732,8 +699,6 @@ input[type="checkbox" i] {
     margin-right: -2px;
     margin-bottom: 0px;
     margin-top: -8px;
-/*    background: #ffffff;
-    border: 1px solid #bcbcbc !important;*/
 }
 
 #time-entry-form-timer::-webkit-input-placeholder {
@@ -741,19 +706,6 @@ input[type="checkbox" i] {
 }
 
 #running-stopwatch-gif {
-/*    display: inline-block;
-    float: right;
-    margin-right: 20px;
-    width: 130px;
-    height: 44px;
-    font-size: 24px;
-    background-color: #e4e4e4;
-    border: 1px solid #bcbcbc;
-    border-radius: 1px;
-    padding: 5px;
-    padding-left: 17px;
-    padding-right: 0px;*/
-
     width: 130px;
     height: 40px;
     font-size: 32px;
@@ -773,10 +725,6 @@ input[type="checkbox" i] {
     display: inline-block;
     width: 383px;
     height: 42px;
-/*    background-color: #eef5ed;
-    border: 1px solid #8EBC89;
-    border-left-width: 5px;
-    border-radius: 3px;*/
     margin-left: 14px;
     padding-top: 8px;
     color: #8ebc89;
@@ -835,23 +783,6 @@ input[type="checkbox" i] {
     color: #de6a66;
 }
 
-/*.login-screen-column {
-    margin-left: 12px;
-    max-width: 220px;
-}
-
-#login-screen-left-column {
-    float: left;
-}
-
-#login-screen-right-column {
-    width: 260px;
-    float: right;
-    margin-left: 60px;
-    margin-right: 20px;
-}*/
-
-
 #new-user-messaging-header {
     position: absolute;
     left: 24px;
@@ -902,7 +833,6 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 }
 
 #forgot-password-link {
-    width: 250px;
     margin-top: -4px;
     font-size: 14px;
     text-decoration: underline;
@@ -915,7 +845,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 #sign-in-button {
     position: absolute;
     right: 23px;
-    bottom: 160px;
+    bottom: 145px;
     font-weight: bold;
     color: #555555;
     box-sizing: border-box;
@@ -951,7 +881,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     position: absolute;
     width: 449px;
     left: 23px;
-    top: 395px;
+    top: 50px;
     font-size: 12px;
 }
 

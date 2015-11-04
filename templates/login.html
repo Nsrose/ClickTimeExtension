@@ -4,6 +4,14 @@
         <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
     </div>
 
+    <span class="login-error-messaging-text" ng-show="loginError">    
+        <span class="critical-login-error" id="invalid-login"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;Sorry, the email address or password you entered is not recognized. Please try again.</span>
+    </span>
+
+     <span class="login-error-messaging-text critical-login-error" id="dcaa-sub-job-error-text" ng-show="DCAASubJobError"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;We're sorry, ClickTime for Chrome does not currently support companies that use Sub-Jobs or require DCAA compliance.</span>
+
+     <span class="login-error-messaging-text critical-login-error" id="require-stopwatch-error-text" ng-show="RequireStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;We're sorry, ClickTime for Chrome does not currently support users required to use a stopwatch.</span>
+
     <form id="login-form" name="loginForm">
         <p class="login-fields">Email Address<br>
             <input type="email" name="email" autofocus ng-model="user.email" required id="email-input" ng-focus="clearError('email')" ng-blur="unfocus('email')"><br>
@@ -34,13 +42,8 @@
     </form>
     
     <button id="sign-in-button" class='btn btn-lg' ng-click="login(user)">Sign In</button>
-    <span class="login-error-messaging-text" ng-show="loginError">    
-        <span class="critical-login-error" id="invalid-login"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;Sorry, the email address or password you entered is not recognized. Please try again.</span>
-    </span>
 
-     <span class="login-error-messaging-text critical-login-error" id="dcaa-sub-job-error-text" ng-show="DCAASubJobError"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;We're sorry, but ClickTime for Chrome does not currently support companies that use Sub-Jobs or require DCAA compliance. Please contact your company's ClickTime administrator for further information.</span>
-
-     <span class="login-error-messaging-text critical-login-error" id="require-stopwatch-error-text" ng-show="RequireStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;We're sorry, but ClickTime for Chrome does not currently support users required to use a stopwatch.</span>
+    
 
 </div>
 

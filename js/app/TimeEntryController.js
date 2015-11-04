@@ -530,6 +530,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         } 
     })
 
+    // Google analytics tracking for link back to Day View
+    $('#total-hours-log-link').on('click', function() {
+        ga('send', 'event', 'Time Entry Page', 'click', 'total-hours-link-to-timesheet');
+    })
+
+    // Google analytics tracking for link back to Day View
+    $('#edit-entry-link').on('click', function() {
+        ga('send', 'event', 'Time Entry Page', 'click', 'edit-entry-link');
+    })
+
     /* First, refresh all entity lists. (see below) Then, validate the entry.
        If successful, broadcast a success. If failed, show an error. */
     $scope.saveTimeEntry = function (session, timeEntry) {

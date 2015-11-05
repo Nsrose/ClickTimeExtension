@@ -1,5 +1,6 @@
 body {
   font-family: 'Arial', sans-serif;
+  color: #555555;
 }
 
 a {
@@ -329,9 +330,8 @@ input[type="text"].time-entry-form-hours {
 }
 
 .tooltip.fade.bottom.in {
-    top: 20px !important;
-    width: auto !important;
-    height: auto !important;
+    width: auto;
+    height: auto;
     overflow: visible;
 }
 
@@ -352,13 +352,7 @@ input[type="text"].time-entry-form-hours {
 }
 
 
-.btn-success:hover {
-    background-color: #38aa67;
-    border-color: #339d5e;
-}
-
-
-.btn-danger:hover {
+/*.btn-danger:hover {
     background-color: #38aa67 !important;
     border-color: #339d5e !important;
     border: 1px solid #339d5e !important;
@@ -370,7 +364,9 @@ input[type="text"].time-entry-form-hours {
     border-color: #339d5e;
     border: 1px solid #339d5e;
     text-align: center !important;
-}
+}*/
+
+
 
 .modal-footer .btn.btn-default {
     margin-left: 12px;
@@ -431,6 +427,7 @@ input[type="text"].time-entry-form-hours {
 .settings-btn {
     display: block;
     width: 250px;
+    background: -webkit-linear-gradient(top, #fcfcfc 0%,#eaeaea 100%);
 }
 
 #settings-horizontal-line-spacer {
@@ -492,8 +489,13 @@ input[type="text"].time-entry-form-hours {
     background: #38aa67 !important;
 }
 
+.btn-success:hover {
+    background: -webkit-linear-gradient(top, #78cc80 0%,#62ba62 100%);
+    border-color: #339d5e;
+}
 
-#save-time-entry:active, #start-stopwatch:active, #stop-stopwatch:active {
+
+/*#save-time-entry:active, #start-stopwatch:active, #stop-stopwatch:active {
     background: #38aa67 !important;
     border: 1px solid #339d5e !important;
     background-color: #38aa67 !important;
@@ -503,7 +505,14 @@ input[type="text"].time-entry-form-hours {
     background: #38aa67 !important;
     border: 1px solid #339d5e !important;
     background-color: #38aa67 !important;
+}*/
+
+
+#stop-stopwatch:hover, #stop-stopwatch:active {
+    background: -webkit-linear-gradient(top, #78cc80 0%,#62ba62 100%);
+    border-color: #339d5e;
 }
+
 
 .btn-custom {
     height: 32px;
@@ -533,6 +542,10 @@ input[type="text"].time-entry-form-hours {
     border: 1px solid #ffffff;
     border-radius: 2px;
     padding-top: 7px;
+}
+
+#back-to-homepage:hover {
+    background: #5b639a;
 }
 
 .modal-footer .btn+.btn {
@@ -736,9 +749,10 @@ input[type="checkbox" i] {
 
 #success-check {
     max-width: 100%;
-    height: auto;
+    height: 12px;
     margin-left: 16px;
     margin-right: 0px;
+    margin-top: -2px;
 }
 
 #refresh-check {
@@ -748,7 +762,7 @@ input[type="checkbox" i] {
 }
 
 #success-messaging-text {
-    font-weight: normal;
+    font-weight: bold;
     font-size: 14px;
     width: auto;
     max-width: 250px;
@@ -777,8 +791,8 @@ input[type="checkbox" i] {
 }
 
 .error-messaging p{
-    bottom: 127px;
-    left: 23px;
+    top: 385px;
+    left: 23.6px;
     position: absolute;
     color: #de6a66;
 }
@@ -860,7 +874,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     padding: 0;
     margin-bottom: 0px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 #email-input, #password-input {
@@ -887,7 +901,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 
 .system-message {
     position: absolute;
-    width: 449px;
+    width: 385px;
     left: 23.6px;
     top: 408px;
     color: #de6a66;
@@ -922,23 +936,6 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     top: 60px;
     visibility: hidden;
 }
-/*
-#dcaa-sub-job-error-text, #require-stopwatch-error-text {
-    bottom: 0;
-}*/
-
-/*.feedback-container {
-    margin-left: 24px;
-    margin-top: 53px;
-    margin-bottom: 0px;
-    width: 220px;
-    text-align: left;
-}*/
-
-/*#feedback {
-    background: #5e659d;
-    color: #ffffff;
-}*/
 
 input[type="time"] {
     -webkit-appearance: none;
@@ -956,7 +953,6 @@ input[type=time]::-webkit-inner-spin-button {
 .notification-button {
     width: 20px;
     height: 20px;
-    /* float: right; */
     clear: both;
 }
 
@@ -999,13 +995,13 @@ input[type=time]::-webkit-inner-spin-button {
     margin-top: 0;
     font-size: 16px;
     box-sizing: border-box;
-    background: -webkit-linear-gradient(top, #fcfcfc 0%,#eaeaea 100%);
     border: 1px solid #d6d6d6;
 }
 
 #settings-help {
     margin-top: 10px;
 }
+
 
 #sign-out {
     position: absolute;
@@ -1014,4 +1010,31 @@ input[type=time]::-webkit-inner-spin-button {
     right: 30px;
     text-align: center;
     font-size: 18px;
+}
+
+.settings-btn:hover, #feedback:hover, #clear-time-entry:hover, #cancel-abandoned-stopwatch:hover {
+    background: #f4f4f4;
+}
+
+#notes-error-text {
+    position: absolute;
+    color: #de6a66;
+    padding: 0;
+    margin: 0;
+    left: 72px;
+    top: 196px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+input.ng-invalid {
+    border: 1px solid #de6a66;
+}
+
+input.ng-untouched {
+    border: 1px solid #b4b4b4;
+}
+
+input:focus {
+    border: 1px solid #428bca;
 }

@@ -698,7 +698,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         if ($scope.user.RequireComments && (timeEntry.Comment == undefined || 
             timeEntry.Comment == "")) {
-            $scope.setError("notes", "Oops! Please enter some notes in order to save this entry.");
+            $scope.notesError = true;
+            $scope.setError("notes", "");
             return;
         }
 
@@ -714,10 +715,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             var hourDiff = CTService.difference(timeEntry.ISOEndTime, timeEntry.ISOStartTime, $scope.company.MinTimeIncrement);
             if (hourDiff <=0 ) {
-                $scope.setError("startEndTimes",  "Please enter an end time later than your start time.");
+                $scope.setError("startEndTimes", "Please enter an end time later than your start time.");
                 return false;
             } else if (hourDiff > 24) {
-                $scope.setError("startEndTimes",  "Please make sure your daily hourly total is less than 24 hours.");
+                $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
                 return false;
             } else if (!timeEntry.Hours) {
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
@@ -730,7 +731,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
                 var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
                 if (timeSoFar + hourDiff > 24) {
-                    $scope.setError("startEndTimes",  "Please make sure your daily hourly total is less than 24 hours.");
+                    $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
                     return false;
                 }
             }
@@ -764,7 +765,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
                 var thisTime = CTService.toDecimal(timeEntry.Hours);
                 if (timeSoFar + thisTime > 24) {
-                    $scope.setError("hours",  "Please make sure your daily hourly total is less than 24 hours.");
+                    $scope.setError("hours", "Please make sure your daily hourly total is less than 24 hours.");
                     return false;
                 }
             }
@@ -772,6 +773,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         return true;
     }
+
+    $('#notes-field').on('click', function() {
+        $scope.notesError = false;
+        $scope.$apply();
+    })
 
     // Cancel an abandoned stopwatch
     $scope.cancelAbandonedStopwatch = function() {

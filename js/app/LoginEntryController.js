@@ -78,7 +78,6 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
 
     $("#password-input").keypress(function(e) {
      
-
         if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
             $scope.login($scope.user);
         }
@@ -92,11 +91,14 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     $scope.login = function(user) {
         if (!user) {
             $scope.loginError = true;
+            $('#email-input').css('border', '1px solid #de6a66');
+            $('#password-input').css('border', '1px solid #de6a66');
             return;
         }
         if (!user.email || !user.password) {
             $scope.loginError = true;
             $('#email-input').css('border', '1px solid #de6a66');
+            $('#password-input').css('border', '1px solid #de6a66');
             return;
         }
         $scope.rerouting = true;

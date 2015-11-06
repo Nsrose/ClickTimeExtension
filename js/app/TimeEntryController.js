@@ -412,6 +412,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "notes":
                 $("#notes-field").css("border", "1px solid #de6a66");
                 $("#fieldtitle-notes").css("color", "#de6a66");
+                $scope.generalError = false;
                 ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;
             case "startTime":
@@ -668,6 +669,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + 
                             d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
                         })
+                    } else if (response.data['Detail'] == 'The day is locked') {
+                        $scope.setError(null, "Sorry, your time entry cannot be saved because your timesheet is locked. Please contact your ClickTime administrator for further details.");
+                        if (!$scope.abandonedStopwatch) {
+                            $scope.$broadcast("timeEntryError");
+                        }
                     } else {
                         $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
                         if (!$scope.abandonedStopwatch) {

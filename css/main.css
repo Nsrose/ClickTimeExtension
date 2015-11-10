@@ -902,8 +902,8 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 .system-message {
     position: absolute;
     width: 385px;
-    left: 23.6px;
-    top: 408px;
+    left: 24px;
+    top: 390px;
     color: #de6a66;
     font-size: 12px;
 }
@@ -975,6 +975,16 @@ input[type=time]::-webkit-inner-spin-button {
     height: 45px;
     width: 170px;
     top: 2px;
+}
+
+#refresh-button:active, #duration, #start-end {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+#refresh-button:active, #total-hours-log-link:active {
+    color: #37709b;
 }
 
 .fa-question-circle {

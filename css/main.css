@@ -792,7 +792,8 @@ input[type="checkbox" i] {
 
 .error-messaging p{
     top: 385px;
-    left: 23.6px;
+    left: 24px;
+    width: 444px;
     position: absolute;
     color: #de6a66;
 }

@@ -29,7 +29,7 @@
 
     <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an abandoned entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
 
-    <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}} / {{customTerms.jobTermSingHigh}}</div>
+    <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.jobTermSingHigh}}</div>
     <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>
 
     <div class="fieldtitle" id="fieldtitle-task">{{customTerms.taskTermSingHigh}}</div>

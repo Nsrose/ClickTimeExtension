@@ -1110,7 +1110,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         var afterGetUser = function (user) {
             var currentUser = $scope.user;
 
-            console.log('currentUser');
             if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
                 $scope.setError("userConflict", "We're sorry but the "
                             + "time entry method" + " "
@@ -1151,19 +1150,52 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.$parent.DCAASubJobError = true;
                 $scope.logout();
             }
-            $scope.customTerms = {
-                'clientTermSingLow' : company.ClientTermSingular,
-                'clientTermPlurLow' : company.ClientTermPlural,
-                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+
+            // $scope.customTerms = {
+            //     'clientTermSingLow' : company.ClientTermSingular,
+            //     'clientTermPlurLow' : company.ClientTermPlural,
+            //     'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+            //     'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
+            //     'jobTermSingLow' : company.JobTermSingular,
+            //     'jobTermPlurLow' : company.JobTermPlural,
+            //     'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+            //     'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+            //     'taskTermSingLow' : company.TaskTermSingular,
+            //     'taskTermPlurLow' : company.TaskTermPlural,
+            //     'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+            //     'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            // }
+
+            if (company.DisplayClientSelector == true) {
+                $scope.customTerms = {
+                    'clientTermSingLow' : company.ClientTermSingular + ' / ',
+                    'clientTermPlurLow' : company.ClientTermPlural + ' / ',
+                    'clientTermSingHigh' : company.ClientTermSingular.capitalize() + ' / ',
+                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize() + ' / ',
+                    'jobTermSingLow' : company.JobTermSingular,
+                    'jobTermPlurLow' : company.JobTermPlural,
+                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                    'taskTermSingLow' : company.TaskTermSingular,
+                    'taskTermPlurLow' : company.TaskTermPlural,
+                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+                }
+            } else if (company.DisplayClientSelector == false) {
+                $scope.customTerms = {
+                    'clientTermSingLow' : '',
+                    'clientTermPlurLow' : '',
+                    'clientTermSingHigh' : '',
+                    'clientTermPlurHigh' : '',
+                    'jobTermSingLow' : company.JobTermSingular,
+                    'jobTermPlurLow' : company.JobTermPlural,
+                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                    'taskTermSingLow' : company.TaskTermSingular,
+                    'taskTermPlurLow' : company.TaskTermPlural,
+                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+                }
             }
           
             $scope.doneRefresh.push("company");
@@ -1223,7 +1255,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     'UserID' : UserID
                 }
             }, function() {
-                console.log('method is ' + method)
+                // console.log('method is ' + method)
                 $scope.changeTimeEntryMethod(method);
                 updateDurationDisplay();
                 chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
@@ -1507,20 +1539,53 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.logout();
             }
             $scope.company = company;
-            $scope.customTerms = {
-                'clientTermSingLow' : company.ClientTermSingular,
-                'clientTermPlurLow' : company.ClientTermPlural,
-                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            // $scope.customTerms = {
+            //     'clientTermSingLow' : company.ClientTermSingular,
+            //     'clientTermPlurLow' : company.ClientTermPlural,
+            //     'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+            //     'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
+            //     'jobTermSingLow' : company.JobTermSingular,
+            //     'jobTermPlurLow' : company.JobTermPlural,
+            //     'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+            //     'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+            //     'taskTermSingLow' : company.TaskTermSingular,
+            //     'taskTermPlurLow' : company.TaskTermPlural,
+            //     'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+            //     'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            // }
+
+            if (company.DisplayClientSelector == true) {
+                $scope.customTerms = {
+                    'clientTermSingLow' : company.ClientTermSingular + ' / ',
+                    'clientTermPlurLow' : company.ClientTermPlural + ' / ',
+                    'clientTermSingHigh' : company.ClientTermSingular.capitalize() + ' / ',
+                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize() + ' / ',
+                    'jobTermSingLow' : company.JobTermSingular,
+                    'jobTermPlurLow' : company.JobTermPlural,
+                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                    'taskTermSingLow' : company.TaskTermSingular,
+                    'taskTermPlurLow' : company.TaskTermPlural,
+                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+                }
+            } else if (company.DisplayClientSelector == false) {
+                $scope.customTerms = {
+                    'clientTermSingLow' : '',
+                    'clientTermPlurLow' : '',
+                    'clientTermSingHigh' : '',
+                    'clientTermPlurHigh' : '',
+                    'jobTermSingLow' : company.JobTermSingular,
+                    'jobTermPlurLow' : company.JobTermPlural,
+                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                    'taskTermSingLow' : company.TaskTermSingular,
+                    'taskTermPlurLow' : company.TaskTermPlural,
+                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+                }
             }
+
             $scope.doneLoading.push('company');
             if ($scope.doneLoading.length >= 4) {
                 $scope.sendPageReady();

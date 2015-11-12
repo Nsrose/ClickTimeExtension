@@ -1168,10 +1168,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
             if (company.DisplayClientSelector == true) {
                 $scope.customTerms = {
-                    'clientTermSingLow' : company.ClientTermSingular + ' / ',
-                    'clientTermPlurLow' : company.ClientTermPlural + ' / ',
-                    'clientTermSingHigh' : company.ClientTermSingular.capitalize() + ' / ',
-                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize() + ' / ',
+                    'clientSlash' : ' / ',
+                    'clientTermSingLow' : company.ClientTermSingular,
+                    'clientTermPlurLow' : company.ClientTermPlural,
+                    'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
                     'jobTermSingLow' : company.JobTermSingular,
                     'jobTermPlurLow' : company.JobTermPlural,
                     'jobTermSingHigh' : company.JobTermSingular.capitalize(),
@@ -1556,10 +1557,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
             if (company.DisplayClientSelector == true) {
                 $scope.customTerms = {
-                    'clientTermSingLow' : company.ClientTermSingular + ' / ',
-                    'clientTermPlurLow' : company.ClientTermPlural + ' / ',
-                    'clientTermSingHigh' : company.ClientTermSingular.capitalize() + ' / ',
-                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize() + ' / ',
+                    'clientSlash' : ' / ',
+                    'clientTermSingLow' : company.ClientTermSingular,
+                    'clientTermPlurLow' : company.ClientTermPlural,
+                    'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
                     'jobTermSingLow' : company.JobTermSingular,
                     'jobTermPlurLow' : company.JobTermPlural,
                     'jobTermSingHigh' : company.JobTermSingular.capitalize(),

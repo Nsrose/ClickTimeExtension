@@ -125,23 +125,24 @@ a {
 
 
 .header-icon {
-    margin-left: 15px;
+    margin-left: 0px;
     float: right;
+    width: 40px;
 }
-
 
 .header-item {
     cursor: pointer;
     position: absolute;
     left: 400px;
     top: -39px;
-    width: 70px;
+    width: 80px;
 }
 
 
 .fa-cog, .fa-external-link {
     color: #f1f1f1;
     font-size: 20px;
+    padding-left: 10px;
 }
 
 
@@ -861,7 +862,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
     position: absolute;
     right: 23px;
     bottom: 145px;
-    font-weight: bold;
+    font-weight: normal;
     color: #555555;
     box-sizing: border-box;
     border: 1px solid #d6d6d6;
@@ -1023,7 +1024,11 @@ input[type=time]::-webkit-inner-spin-button {
     font-size: 18px;
 }
 
-.settings-btn:hover, #feedback:hover, #clear-time-entry:hover, #cancel-abandoned-stopwatch:hover {
+.settings-btn:hover,
+#feedback:hover, 
+#clear-time-entry:hover,
+#cancel-abandoned-stopwatch:hover,
+#sign-in-button:hover {
     background: #f4f4f4;
 }
 

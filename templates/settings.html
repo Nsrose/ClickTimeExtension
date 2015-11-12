@@ -12,10 +12,10 @@
         <div ng-class="{'top-bumper' : requireStartEndTime}" class="settings-controls" ng-controller="TimeEntryController" id="refresh-container">
 
             <div ng-click="refresh()" class="btn btn-custom settings-width" id="refresh-button">
-                Refresh my lists<i my-tooltip="#tooltip" data-placement="bottom" class="fa fa-question-circle"></i>
+                Refresh my lists<i my-tooltip="#tooltip-refresh-lists" data-placement="bottom" class="fa fa-question-circle"></i>
             </div>
             
-            <span id="tooltip" ng-hide="true">Refresh data for your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists</span>
+            <span id="tooltip-refresh-lists" ng-hide="true">Refresh data for your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists</span>
             
         </div>
 

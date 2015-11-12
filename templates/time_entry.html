@@ -1,12 +1,17 @@
 <div class="header-item">
 
     <span ng-cloak ng-show="showPopupArrow" class="header-icon" ng-click="openPopup()">
-        <i class="fa fa-external-link"></i>
+        <i class="fa fa-external-link" my-tooltip="#tooltip-popout" data-placement="bottom"></i>
     </span>
 
+    <span id="tooltip-popout" ng-hide="true">Popout Window</span>
+
     <span class="header-icon" ng-click="settingsPage()">
-        <i class="fa fa-cog"></i>
+        <i class="fa fa-cog" my-tooltip="#tooltip-settings" data-placement="bottom"></i>
     </span>
+
+    <span id="tooltip-settings" ng-hide="true">Settings, Help, and Feedback</span>
+
 </div>
 
 <div id="loading-mask" ng-hide="pageReady">
@@ -21,7 +26,9 @@
             </button>
     </a></div> -->
 
-    <div class="total-hours-log"><a id='total-hours-log-link' href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
+    <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
+
+     <span id="tooltip-total-hours-link" ng-hide="true">Go To My Timesheet</span>
 
     <div class="clear"></div>
 
@@ -29,7 +36,7 @@
 
     <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an abandoned entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
 
-    <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.jobTermSingHigh}}</div>
+    <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.clientSlash}}{{customTerms.jobTermSingHigh}}</div>
     <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>
 
     <div class="fieldtitle" id="fieldtitle-task">{{customTerms.taskTermSingHigh}}</div>

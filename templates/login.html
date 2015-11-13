@@ -12,10 +12,9 @@
 
      <span class="login-error-messaging-text critical-login-error" id="require-stopwatch-error-text" ng-show="RequireStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;We're sorry, ClickTime for Chrome does not currently support users required to use a stopwatch.</span>
 
-    <form id="login-form" name="loginForm">
+    <form id="login-form" name="loginForm" ng-submit="login(user)" >
         <p class="login-fields">Email Address<br>
             <input type="email" name="email" autofocus ng-model="user.email" required id="email-input" ng-focus="clearError('email')" ng-blur="unfocus('email')"><br>
-            
         </p>
 
         <div class="login-error-messaging-text" id="email-error">
@@ -38,13 +37,8 @@
         </div>
 
         <a id="forgot-password-link" href="http://login.clicktime.com/forms/forgot-password-form" target="_blank">Forgot your password?</a>
-
+        <input id="sign-in-button" class='btn btn-lg' type="submit" value="Sign In">
     </form>
-    
-    <button id="sign-in-button" class='btn btn-lg' ng-click="login(user)">Sign In</button>
-
-    
-
 </div>
 
 <div class="login-screen-column" id="login-bottom-container">

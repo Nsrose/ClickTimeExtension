@@ -69,20 +69,6 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
         $scope.$emit('environmentChange', environment);
     }
 
-    $("#email-input").keypress(function(e) {
-
-        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
-            $scope.login($scope.user);
-        }
-    })
-
-    $("#password-input").keypress(function(e) {
-     
-        if (e.which == 13 && this.value != "" && (typeof this.value != 'undefined')) {
-            $scope.login($scope.user);
-        }
-    })
-
     function loginHelper() {
         $location.path("/time_entry");
         $scope.$apply();

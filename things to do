@@ -1,0 +1,6 @@
+css refactoring (do later)
+put promises in TimeEntryController.js
+remove unncessary scope variables everywhere
+TimeEntryController.js!!!
+angularize settings.js
+calendar functionality (do last) 

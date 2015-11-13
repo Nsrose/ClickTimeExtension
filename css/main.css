@@ -206,6 +206,17 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-top: -60px;
 }
 
+#environment-options .dropdown-menu, #environment-options .dropdown-menu.ng-scope {
+    min-width: 100px;
+    width: 100px;
+    margin-top: -227px;
+    left: 9px;
+}
+
+
+
+
+
 .custom-select > .dropdown-menu > ul > li > a:hover {
     background: #337ab7;
 }
@@ -217,6 +228,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 
 .dropdown-menu.ng-scope {
     width: 448px;
+    /*width: 100px;*/
     max-width: 448px;
 }
 
@@ -861,7 +873,7 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 #sign-in-button {
     position: absolute;
     right: 23px;
-    bottom: 145px;
+    bottom: 88px;
     font-weight: normal;
     color: #555555;
     box-sizing: border-box;
@@ -915,6 +927,8 @@ input[type="email"]::-webkit-input-placeholder, input[type="password"]::-webkit-
 }
 #environment-options a.dropdown-toggle {
     width: 100px;
+    bottom: 171px;
+    left: 9px;
 }
 
 #environment-button {

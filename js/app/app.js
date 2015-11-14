@@ -21,8 +21,6 @@ var CHROME_SYNC_STORAGE_VARS = [
 
 // Default timeout ms
 var TIMEOUT = 10000;
-// The number of scope variables that need to be rendered before removing the loading mask
-var NUM_SCOPE_VARS = 6;
 
 // Time before user is automatically logged out
 var TOKEN_EXPIRE_HOURS = 24;

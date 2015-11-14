@@ -27,10 +27,13 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     	}
     })
 
+    // Secret environment change button
+    // If count == 4, display the dropdown
     $scope.environmentButton = {
     	'count' : 0
     }
 
+    // Increase environment button count
     $scope.updateButton = function() {
     	$scope.environmentButton.count += 1;
     	if ($scope.environmentButton.count >= 4) {
@@ -38,10 +41,14 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     	}
     }
 
+    // Listen for environment change
     $scope.$on('environmentChange', function (event, environment) {
     	$scope.changeEnvironment(environment);
     })
 
+
+    // Change the api base url based on environment change by sending the change to 
+    // the background script
     $scope.changeEnvironment = function (environment) {
     	if (environment in $apiBases) {
     		$apiBase.url = $apiBases[environment];

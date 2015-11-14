@@ -32,7 +32,7 @@ var timer;
         and that wasn't worth it to register so many dependencies just for one
         function to work.  
 */
-var getElapsedTime = function (callback) {
+function getElapsedTime(callback) {
   chrome.storage.sync.get('stopwatch', function (items) {
     if ('stopwatch' in items) {
       var now = new Date();
@@ -62,7 +62,7 @@ var getElapsedTime = function (callback) {
   })  
 }   
 
-var updateBadge = function() {
+function updateBadge() {
     var badgeHrs, badgeMin, badgeSec;
     chrome.browserAction.setBadgeText({text: "0:00"});
     timer = setInterval(function() {
@@ -106,7 +106,7 @@ var updateBadge = function() {
 }
 
 // updates the badge at every hour after 10 to be 10+, 11+ ... etc
-var updateBadgeHours = function() {
+function updateBadgeHours() {
     var badgeHrs;
     timer = setInterval(function() {
         // every hour after 10
@@ -119,7 +119,7 @@ var updateBadgeHours = function() {
 
  /* test function for updateBadgeHours. Is never called unless you are 
     testing with seconds */ 
- var updateBadgeSeconds = function() {
+function updateBadgeSeconds() {
      var badgeSec;
      timer = setInterval(function() {
          // every second after 10
@@ -130,7 +130,7 @@ var updateBadgeHours = function() {
      }, 1000);
  }
 
-var stopBadge = function() {
+function stopBadge() {
     clearInterval(timer);
     chrome.browserAction.setBadgeText({text: ""});
 }
@@ -151,7 +151,7 @@ var notificationInterval;
     - user allows it
     - user is logged in
     - there isn't a running stopwatch. */
-var createNotifications = function(pollPeriod) {
+function createNotifications(pollPeriod) {
     notificationInterval = setInterval(function() {
        chrome.storage.sync.get(['session', 'allowReminders', 'stopwatch'], function(items) {
             if ((('allowReminders' in items) && (items.allowReminders.permission)) && 
@@ -167,13 +167,13 @@ var createNotifications = function(pollPeriod) {
    stop generation of new notifications, 
    clear any notifications in tray
 */
-var stopNotifications = function() {
+function stopNotifications() {
     clearInterval(notificationInterval);
     chrome.notifications.clear('enterTimeNotification');
 }
 
 /* Create a new notification and send, for demonstration purposes.*/
-var sendOneNotification = function() {
+function sendOneNotification() {
     chrome.notifications.create('enterTimeNotification', options);
 }
 

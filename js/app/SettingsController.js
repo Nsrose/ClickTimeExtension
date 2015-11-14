@@ -8,7 +8,6 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   }
 
   $scope.$on("refresh", function() {
-    // console.log('refresh!!!');
     $('#refresh-status').html('<img src="../img/success_check.png" id="refresh-check">Lists refreshed!');
     setTimeout(function() {
        $('#refresh-status').text('');

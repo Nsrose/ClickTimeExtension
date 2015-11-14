@@ -19,7 +19,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 		$scope.running = elapsedObj.running;
 		if (elapsedObj.running) {
 			timerPromise = $interval(function() {
-				$scope.getElapsedTime();
+				getElapsedTime();
 			})
 		}
 		$scope.$apply();
@@ -38,26 +38,27 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     $scope.running = false;
 
     $scope.$on("timeEntryError", function() {
-    	$scope.clear();
+    	clear();
     })
 
     $scope.$on("timeEntrySuccess", function() {
-    	$scope.clear();
+    	clear();
     })
 
     $scope.$on("clearStopwatch", function() {
-        $scope.clear();
+        clear();
     })
 
     $scope.$on("startStopwatch", function() {
-        $scope.start();
+        // $scope.start();
+        start();
     })
 
     $scope.$on("stopStopwatch", function() {
-        $scope.stop();
+        stop();
     })
 
-    $scope.clear = function() {
+    function clear() {
     	$scope.elapsedSec = "00";
     	$scope.elapsedMin = "00";
 		$scope.elapsedHrs = "00";
@@ -71,7 +72,8 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
         })
     }
 
-    $scope.start = function () {
+
+    function start() {
         if (!timerPromise) {
             StopwatchService.markStartTime(function (start) {
                 //make sure to erase any existing success messaging
@@ -83,13 +85,13 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                 $scope.$parent.runningStopwatch = true;
                 chrome.extension.getBackgroundPage().updateBadge();
                 timerPromise = $interval(function() {
-                    $scope.getElapsedTime();
+                    getElapsedTime();
                 }, 31);
             })
         }
     }
 
-    $scope.stop = function() {        
+    function stop() {       
     	if (timerPromise) {
             $scope.$parent.$broadcast("stoppedStopwatch");
             StopwatchService.markEndTime (function () {
@@ -103,7 +105,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
         }
     }
 
-    $scope.getElapsedTime = function () {
+    function getElapsedTime() {
         StopwatchService.getElapsedTime(function (elapsedObj) {
             $scope.$parent.runningStopwatch = true;
             secDisp = elapsedObj.elapsedSec % 60 + '';

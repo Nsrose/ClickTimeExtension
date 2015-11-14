@@ -65,15 +65,20 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     // Secret options menu
     $scope.environmentOptions = ['dev99', 'qa', 'stage', 'live'];
 
+    // Dropdown menu with environments has been clicked, and the environment should change
     $scope.changeEnvironment = function (environment) {
         $scope.$emit('environmentChange', environment);
     }
 
+
+    // Redirect to the time entry page.
     function loginHelper() {
         $location.path("/time_entry");
         $scope.$apply();
     }
 
+
+    // Validate the user credentials, and if valid, populate data and redirect to time entry.
     $scope.login = function(user) {
         if (!user) {
             $scope.loginError = true;
@@ -110,6 +115,9 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             $location.path("/login");
         })
     }
+
+
+    // Deal with offline cases. If offline, display a message and prevent time entry/login.
     var offlineBox;
     window.addEventListener('offline', function(e) {
         offlineBox = bootbox.dialog({

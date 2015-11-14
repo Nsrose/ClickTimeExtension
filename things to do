@@ -4,3 +4,6 @@ remove unncessary scope variables everywhere
 TimeEntryController.js!!!
 angularize settings.js
 calendar functionality (do last) 
+make a static base URL, like STATIC_URL instead "../" stuff
+	like TEMPLATE_URL
+

@@ -7,6 +7,8 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
     $location.path("/time_entry");
   }
 
+
+  // Display lists refreshed messsage on the settings page
   $scope.$on("refresh", function() {
     $('#refresh-status').html('<img src="../img/success_check.png" id="refresh-check">Lists refreshed!');
     setTimeout(function() {

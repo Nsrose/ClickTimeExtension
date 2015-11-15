@@ -83,13 +83,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // start stopwatch, if there
     $(document).keypress(function(e) {
         if (e.which == 13) {
-            if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
-                || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
-                && $scope.showStartTimer && !$scope.runningStopwatch) {
-                 $scope.startStopwatch();
-            } else if ($scope.runningStopwatch) {
-                $scope.stopStopwatch();
+            if (!($("#notes-field").is(':focus'))) {
+                if (!$scope.saving && ($scope.showHourEntryField && !$scope.timeEntry.Hours)
+                    || ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime))
+                    && $scope.showStartTimer && !$scope.runningStopwatch) {
+                     $scope.startStopwatch();
+                } else if ($scope.runningStopwatch) {
+                    $scope.stopStopwatch();
+                }
             }
+            
         }
     })
 

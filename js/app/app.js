@@ -25,7 +25,7 @@ var TIMEOUT = 10000;
 // Time before user is automatically logged out
 var TOKEN_EXPIRE_HOURS = 24;
 
-// Default empty hour field
+// Default value for empty hours
 var DEFAULT_EMPTY_HOURS = null;
 
 var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap'])

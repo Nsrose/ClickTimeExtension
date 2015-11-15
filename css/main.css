@@ -318,7 +318,8 @@ input[type="text"].time-entry-form-hours {
     margin-bottom: 4px;
 }
 
-.fieldtitle.time-entry, #time-entry-form-end-title, #time-entry-field-hours-title, #field-title-timer {
+
+.fieldtitle.time-entry {
     color: #555555;
     margin-left: 0px;
 }
@@ -1067,4 +1068,10 @@ input.ng-untouched {
 
 input:focus {
     border: 1px solid #428bca;
+}
+.field-error {
+    border: 1px solid #de6a66;
+}
+.text-error {
+    color: #de6a66 !important;
 }

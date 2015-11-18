@@ -213,10 +213,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     left: 9px;
 }
 
-
-
-
-
 .custom-select > .dropdown-menu > ul > li > a:hover {
     background: #337ab7;
 }
@@ -228,7 +224,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
 
 .dropdown-menu.ng-scope {
     width: 448px;
-    /*width: 100px;*/
     max-width: 448px;
 }
 
@@ -364,23 +359,6 @@ input[type="text"].time-entry-form-hours {
     padding-bottom: 50px;
     font-size: x-small;
 }
-
-
-/*.btn-danger:hover {
-    background-color: #38aa67 !important;
-    border-color: #339d5e !important;
-    border: 1px solid #339d5e !important;
-    text-align: center !important;
-}
-
-.btn-danger {
-    background-color: #38aa67;
-    border-color: #339d5e;
-    border: 1px solid #339d5e;
-    text-align: center !important;
-}*/
-
-
 
 .modal-footer .btn.btn-default {
     margin-left: 12px;

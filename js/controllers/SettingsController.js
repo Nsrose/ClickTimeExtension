@@ -3,111 +3,94 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
   //google analytics
   ga('send', 'pageview', '/settings.html')
 
+  //routing
   $scope.timeEntryPage = function () {
     $location.path("/time_entry");
   }
-
 
   // Display lists refreshed messsage on the settings page
   $scope.$on("refresh", function() {
     $('#refresh-status').html('<img src="../img/success_check.png" id="refresh-check">Lists refreshed!');
     setTimeout(function() {
-       $('#refresh-status').text('');
+       $('#refresh-status').html('');
     }, 2000);
   })
 
-  // need to add event handlers via angular
-
-  // gets initial allowReminders value to display
-  chrome.storage.sync.get('allowReminders', function(items) {
-    if (('allowReminders' in items) && (items.allowReminders.permission)) {
-      $('#reminder-toggle').prop('checked', true);
-    } else {
-      $('#reminder-toggle').prop('checked', false);
+  //cache userID upon login 
+  var userID; 
+  chrome.storage.sync.get('timeEntryMethod', function (items) {
+    if ('timeEntryMethod' in items) {
+      userID = items.timeEntryMethod.UserID;
     }
   })
+  
+  //cache poll period
+  var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
 
-  // when toggling, update Allow Reminders value in local storage
-  $('#reminder-toggle').click(function() {
-    chrome.storage.sync.get('allowReminders', function(items) {
-      if ('allowReminders' in items) {
-        var userID = items.allowReminders.UserID;
-        if ($('#reminder-toggle').is(':checked')) { 
-          chrome.storage.sync.set({
-            'allowReminders': {
-              UserID: userID, 
-              permission: true
-            }
-          });
-          var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD
-          chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-        } else {
-          chrome.storage.sync.set({
-            'allowReminders': {
-              UserID: userID, 
-              permission: false
-            }
-          }, function () {
-            chrome.extension.getBackgroundPage().stopNotifications();
-          });
-        }
-      }
-    })
-  })
-
-
-
-  // gets initial defaultTimeEntryMethod to display
+  // if user can't choose time entry method because their manager restricts, hide element
   chrome.storage.local.get('user', function(items) {
-    // if there's no choice based on settings, hide element
     if ('user' in items) {
       if (items.user.data.RequireStartEndTime || items.user.data.RequireStopwatch) {
         $scope.requireStartEndTime = true;
-      } else {
-        //query the local storage for last-set method
-        chrome.storage.sync.get('timeEntryMethod', function(items) {
-          if ('timeEntryMethod' in items) {
-            if (items.timeEntryMethod.method == 'duration') {
-              //$('#duration').addClass('active').siblings().removeClass('active');
-              $('#duration').prop('checked', true);
-              $('#start-end').prop('checked', false);
-            } else if (items.timeEntryMethod.method == 'start-end') {
-              //$('#start-end').addClass('active').siblings().removeClass('active');
-              $('#start-end').prop('checked', true);
-              $('#duration').prop('checked', false);
-            }
-          }
-        })
       }
     }
   })
 
-  // when toggling, update defaultTimeEntryMethod in local storage
-  $(".entry-method-toggle").click(function() {
-     // visuals
-    //$(this).addClass("active").siblings().removeClass("active");
-    $(this).parent().siblings().children().prop('checked', false);
-    //storage set
-    chrome.storage.sync.get('timeEntryMethod', function (items) {
-      if ('timeEntryMethod' in items) {
-        var userID = items.timeEntryMethod.UserID;
-        if ($('#duration').is(':checked')) {
-          chrome.storage.sync.set({
-            'timeEntryMethod': {
-              UserID: userID,
-              method: 'duration'
-            }
-          })
-        } else if ($('#start-end').is(':checked')) {
-          chrome.storage.sync.set({
-            'timeEntryMethod': {
-              UserID: userID,
-              method: 'start-end'
-            }
-          });
-        }
+///////////////////Allow reminders settings ///////////////////////////
+
+  // pull from backend
+  chrome.storage.sync.get('allowReminders', function(items) {
+    if ('allowReminders' in items) {
+      $scope.reminderToggle = {
+        checked: items.allowReminders.permission
       }
-    })
+    }
   })
 
+  // gets backend to change on scope change
+  $scope.$watch("reminderToggle.checked | json", function(newValue, oldValue) {
+    //branch check so that you only set it after get call above
+    if (typeof oldValue != 'undefined') {
+      chrome.storage.sync.set({
+        'allowReminders': {
+          UserID: userID, 
+          permission: $scope.reminderToggle.checked
+        }
+      });
+      
+      // notifications
+      if ($scope.reminderToggle.checked) {
+        chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
+      } else {
+        chrome.extension.getBackgroundPage().stopNotifications();
+      }
+    }
+  });
+
+////////////////////time entry settings //////////////////////////////
+  
+  // do pulls only if you have ability to change permissions
+  if (!$scope.requireStartEndTime) {
+    // pulls from backend. puts into model
+    chrome.storage.sync.get('timeEntryMethod', function(items) {
+      if ('timeEntryMethod' in items) {
+        $scope.timeEntryMethod = {
+          method: items.timeEntryMethod.method
+        };
+      }
+    });
+
+    // gets backend to change on scope change
+    $scope.$watch("timeEntryMethod.method | json", function(newValue, oldValue) {
+      //branch check so that you only set it after get call above
+      if (typeof oldValue != 'undefined') {
+        chrome.storage.sync.set({
+          'timeEntryMethod': {
+            UserID: userID,
+            method: $scope.timeEntryMethod.method
+          }
+        })
+      }
+    });
+  }
 }])

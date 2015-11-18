@@ -576,10 +576,6 @@ label {
     display: block;
 }
 
-.entry-method-toggle {
-    clear: both;
-}
-
 #duration {
     width: 14px;
     margin-left: 24px;
@@ -632,10 +628,6 @@ label {
     display: block;
     padding-top: 6px;
     font-weight: 400;
-}
-
-#checkbox-wrapper {
-    background: #ffffff;
 }
 
 .fa.fa-bullhorn, .fa.fa-info-circle, .fa.fa-phone, .fa.fa-file {

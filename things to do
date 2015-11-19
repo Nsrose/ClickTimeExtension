@@ -6,4 +6,3 @@ calendar functionality (do last)
 desktop app functionality (do last)
 make a static base URL, like STATIC_URL instead "../" stuff
 	like TEMPLATE_URL
-get rid of keypress / other jquery things

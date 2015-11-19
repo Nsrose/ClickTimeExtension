@@ -5,10 +5,10 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     ga('send', 'pageview', '/login.html')
     
     $scope.rerouting = false;
+
     // Get the session, if it exists, go to time entry. Otherwise, stay here.
     chrome.storage.sync.get('session', function(items) {
         if ('session' in items) {
-            // Session variable exists
             var session = items.session.data;
             if (session != null) {
                 var now = new Date();
@@ -26,7 +26,7 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
                 }
                 // session has expired.
                 chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
-                chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
+                chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function() {
                     chrome.browserAction.setBadgeText({text:""});
                 })
             }
@@ -115,25 +115,4 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
             $location.path("/login");
         })
     }
-
-
-    // Deal with offline cases. If offline, display a message and prevent time entry/login.
-    var offlineBox;
-    window.addEventListener('offline', function(e) {
-        offlineBox = bootbox.dialog({
-            message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
-            show: true,
-            backdrop: true,
-            closeButton: false,
-            animate: true,
-            className: "no-internet-modal",
-        });
-    }, false);
-    
-    setInterval(function(){ 
-        window.addEventListener('online', function(e) {
-            offlineBox.modal('hide');
-        }, false);
-    }, 3000);
-
 }])

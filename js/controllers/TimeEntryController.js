@@ -1691,23 +1691,4 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
     EntityService.getSession(afterGetSession);
 
-
-    // Show offline message if you don't have internet
-    var offlineBox;
-    window.addEventListener('offline', function(e) {
-        offlineBox = bootbox.dialog({
-            message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
-            show: true,
-            backdrop: true,
-            closeButton: false,
-            animate: true,
-            className: "no-internet-modal",
-        });
-    }, false);
-    
-    setInterval(function(){ 
-        window.addEventListener('online', function(e) {
-            offlineBox.modal('hide');
-        }, false);
-    }, 3000);
 }])

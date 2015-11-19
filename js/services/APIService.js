@@ -6,6 +6,34 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
     var manifest = chrome.runtime.getManifest();
     var version = manifest.version;
 
+    // internet connectivity bootbox display
+    var offlineBox;
+
+    /* listens for internet. 
+        note: this code only runs when the chrome extension is open.
+        due to the ephermeral nature of chrome extensions, extension will probably not be open most of the time.
+        the solution is to detect connectivity errors in every new API call (see function "this.apiCall")
+    */
+    window.addEventListener('offline', function(e) {
+        me.reportNoInternet();
+    }, false);
+    
+    window.addEventListener('online', function(e) {
+        offlineBox.modal('hide');
+    }, false);
+
+    // tell you there's no internet
+    this.reportNoInternet = function() {
+        offlineBox = bootbox.dialog({
+            message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
+            show: true,
+            backdrop: true,
+            closeButton: false,
+            animate: true,
+            className: "no-internet-modal",
+        });
+    }
+
     // Standard API call method. Params:
     // requestURL - URL to make a reques to.
     // email - user email
@@ -43,9 +71,9 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
             }
             me.reportError(email, password, errorObj);
             if (data == null) {
-                console.log("timeout");
-                return null;
-            }
+                // your internet is bogus go fix it
+                me.reportNoInternet();
+            } 
             bootbox.alert(data);
             return data;
         });

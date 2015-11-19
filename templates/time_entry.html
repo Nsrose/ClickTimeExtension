@@ -1,5 +1,4 @@
 <div class="header-item">
-
     <span ng-cloak ng-show="showPopupArrow" class="header-icon" ng-click="openPopup()">
         <i class="fa fa-external-link" my-tooltip="#tooltip-popout" data-placement="bottom"></i>
     </span>
@@ -19,13 +18,6 @@
 </div>
 
 <div id="time-entry-main-container" ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
-
-<!--     <div class='feedback-link'><a href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank">Tell Us What You Think
-            <button class="feedback-container btn btn-custom settings-button icon-group" id="feedback"><i class="fa fa-bullhorn"></i>&nbsp;
-                Leave Feedback
-            </button>
-    </a></div> -->
-
     <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
 
      <span id="tooltip-total-hours-link" ng-hide="true">Go To My Timesheet</span>
@@ -43,7 +35,6 @@
     <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch" id="task-dropdown" ng-focus="clearError('task')">
     </div>
 
-
     <!-- Notes field -->
     <form name="entry" class="notes-field-container">
         <div class="fieldtitle" id="fieldtitle-notes">Notes</div>
@@ -57,7 +48,7 @@
         <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input time-entry-form-hours" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-disabled="runningStopwatch" maxlength="5" placeholder="00:00">
+                <input class="time-entry-form-input time-entry-form-hours" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch" maxlength="5" placeholder="00:00">
             </div>
             <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
         </div>
@@ -66,7 +57,7 @@
         <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-form-start-title">Start Time</div>
             <div class="time-entry-form">
-               <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
+               <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
 
             </div>
         </div>
@@ -75,27 +66,23 @@
         <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
             <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')"  ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
             </div>
         </div>
-
     </div>
 
-
-
-    <div class="time-entry-container" ng-show="abandonedStopwatch">
-        
+    <div class="time-entry-container" ng-show="abandonedStopwatch">   
         <div class="time-entry-item" id="time-entry-item-start">
             <div class="fieldtitle time-entry">Start Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" required="required">
+                <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" required="required">
             </div>
         </div>
 
         <div class="time-entry-item" id="time-entry-item-end">
             <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
             <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" required="required">
+                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-focus="swapAction('endTime')" required="required">
             </div>
         </div>
 
@@ -159,10 +146,6 @@
 
     <div class="hidden" ng-controller="StopwatchController">
     </div>
-
-    
-
-
 </div>
 
 <br>
@@ -170,11 +153,3 @@
 
 <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} so you can begin tracking time.
 </div>
-
-
-   
-
-    
-
-
-

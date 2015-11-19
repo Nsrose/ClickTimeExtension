@@ -1,4 +1,4 @@
-myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http', 
+myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http',
                                 function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     
     //google analytics
@@ -100,36 +100,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.sendNotification = function () {
         chrome.extension.getBackgroundPage().sendOneNotification();
     }
-
-    // Save time entry if focused on hours and enter
-    $("#time-entry-form-hours").keypress(function(e) {
-        if (e.which == 13) {
-            $("#time-entry-form-hours").blur();
-            $("#save-time-entry").click();
-        }
-    })
-
-    // Save time entry if focused on start/end and enter
-    $("#time-entry-form-start").keypress(function(e) {
-        if (e.which == 13) {
-            $("#time-entry-form-start").blur();
-            $("#time-entry-form-end").blur();
-            $("#save-time-entry").click();
-        }
-    })
-
-    // Save time entry if focused on start/end and enter
-    $("#time-entry-form-end").keypress(function(e) {
-        if (e.which == 13) {
-            if ($scope.timeEntry.ISOStartTime && $scope.timeEntry.ISOEndTime) {
-                $("#time-entry-form-start").blur();
-                $("#time-entry-form-end").blur();
-                $("#save-time-entry").click();
-            }
-            
-        }
-    })
-
 
     // Update in progress entry notes on blur
     $scope.updateNotes = function() {

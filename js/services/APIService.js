@@ -73,8 +73,9 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
             if (data == null) {
                 // your internet is bogus go fix it
                 me.reportNoInternet();
-            } 
-            bootbox.alert(data);
+            } else {
+                bootbox.alert(data);
+            }
             return data;
         });
        

@@ -201,8 +201,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
     }
 
     // Get an interleaved list of client/job pairs
-    // COME BACK TO ME
-    this.getJobClients = function (session, checkLocal, callback) {
+    this.getJobClients = function (session, checkLocal) {
         var deferred = $q.defer();
         if (checkLocal) {
             chrome.storage.local.get(['stringJobClientsList', 'jobClientsByRecent'], function (items) {
@@ -232,7 +231,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                         r = jobClientsByRecent[i];
                         entityList.unshift(r);
                     }
-                    callback(entityList);
+                    deferred.resolve(entityList)
                 } else {
                     // Job Clients don't exist in local storage. Need to call API.
                     api('Jobs', session.UserEmail, session.Token, 'GET')
@@ -284,7 +283,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                                     r = jobClientsByRecent[i];
                                     entityList.unshift(r);
                                 }
-                                callback(entityList);
+                                deferred.resolve(entityList)
                             })
                         })
                     })
@@ -320,7 +319,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     chrome.storage.local.set({
                         'stringJobClientsList' : stringJobClientsList
                     }, function () {
-                        callback(jobClientsList);
+                        deferred.resolve(jobClientsList)
                     })
                 })
             })

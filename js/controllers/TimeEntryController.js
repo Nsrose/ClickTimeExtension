@@ -1571,16 +1571,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             }
         }
-
-        EntityService.getJobClients(session, true).then(afterGetJobClients); //COME BACK TO ME
-
-        EntityService.getTasks(session, true, afterGetTasks);
-        EntityService.getUser(session, true, afterGetUser);
-        EntityService.getCompany(session, true, afterGetCompany);
-        EntityService.getTimeEntries(session, afterGetTimeEntries);
-
+        EntityService.getJobClients(session, true).then(afterGetJobClients);
+        EntityService.getTasks(session, true).then(afterGetTasks);
+        EntityService.getUser(session, true).then(afterGetUser);
+        EntityService.getCompany(session, true).then(afterGetCompany);
+        EntityService.getTimeEntries(session).then(afterGetTimeEntries);
     }
-
     EntityService.getSession()
         .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
+      // can we have 5 promises execute parallely? 
 }])

@@ -39,7 +39,7 @@
     <form name="entry" class="notes-field-container">
         <div class="fieldtitle" id="fieldtitle-notes">Notes</div>
         <span ng-show='notesError' id="notes-error-text">Oops! Please enter some notes in order to save this entry.</span>
-        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()"></textarea><br> 
+        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()" ng-click="notesError = false"></textarea><br> 
     </form>
 
     <!-- Time entry form -->
@@ -114,7 +114,7 @@
 
 
         <!-- Abandoned Stopwatch actions -->
-        <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveAbandonedStopwatch()" ng-show="abandonedStopwatch">Save</button>
+        <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-show="abandonedStopwatch">Save</button>
 
         <button id="cancel-abandoned-stopwatch" class="btn btn-default action-button" ng-click="cancelAbandonedStopwatch()" ng-show="abandonedStopwatch">Cancel</button>
 

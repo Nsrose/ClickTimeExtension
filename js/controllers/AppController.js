@@ -64,5 +64,10 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     	}
     }
 
-
+    $scope.clearSuccessfulMessage = function() {
+        if ($scope.generalSuccess == true) {
+            $scope.generalSuccess = false;
+            $scope.$apply();
+        }
+    }
 }])

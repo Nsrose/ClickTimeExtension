@@ -4,6 +4,16 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //google analytics
     ga('send', 'pageview', '/main.html'); 
 
+    // Google analytics tracking for link back to Day View
+    $('#total-hours-log-link').on('click', function() {
+        ga('send', 'event', 'Time Entry Page', 'click', 'total-hours-link-to-timesheet');
+    })
+
+    // Google analytics tracking for link back to Day View
+    $('#edit-entry-link').on('click', function() {
+        ga('send', 'event', 'Time Entry Page', 'click', 'edit-entry-link');
+    })
+
     //Company custom terms
     $scope.customTerms = {};
 
@@ -18,10 +28,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // True if a stopwatch is running
     $scope.runningStopwatch = false;
+
     // True if a stopwatch has expired from yesterday or before
     $scope.abandonedStopwatch = false;
+
     // True if a time entry has expired from yesterday or before
     $scope.abandonedEntry = false;
+
     // Whether to show pop out icon
     $scope.showPopupArrow = chrome.extension.getBackgroundPage().showPopupArrow;
 
@@ -40,7 +53,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     // Function to test sending an error to API
-    $scope.testError = function() {
+    function tesetError() {
         APIService.reportError($scope.Session.UserEmail,
             $scope.Session.Token,
             {'Message' : 'Hey there I am an error',
@@ -49,7 +62,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             });
     }
     
-
     /////////////////////////////////////////////////////////////////////////
 
     /* Listen for update from the following things:
@@ -66,12 +78,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.showStartTimer = false;
                 $scope.$apply();
             }
-
             if (request.showPopupArrow == false) {
                 $scope.showPopupArrow = false;
                 $scope.$apply();
             }
-
             if (request.refresh) {
                 $scope.$apply();
             }
@@ -91,7 +101,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.clearError("notes");
             TimeEntryService.updateInProgressEntry("Comment", $scope.timeEntry.Comment);
         }
-        
     }
 
     // Focus on notes and clear errors
@@ -138,7 +147,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
     
-     
     // For the stopwatch display on start/end times:
     $scope.endTimePromise = undefined;
 
@@ -166,8 +174,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry('startEndTimes',
                     [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
             }, 1000);
-        }
-       
+        }    
     }
 
     // Clear the successful save message
@@ -176,7 +183,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.generalSuccess = false;
             $scope.$apply();
         }
-
     }
 
     // Stop a stopwatch and end a timer promise
@@ -194,12 +200,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.timerDisplay = "00:00:00";
         $interval.cancel($scope.endTimePromise);
     }
-
-    // Save an abandoned stopwatch
-    $scope.saveAbandonedStopwatch = function() {
-        $scope.saveTimeEntry($scope.Session, $scope.timeEntry);
-    }
-
 
     // Display fields for running stopwatch
     $scope.elapsedHrs = 0;
@@ -446,20 +446,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearStopwatch();
     }
 
-    // Clear successful message upon clicking anywhere on the extension
-    $('#main').on('click', function() {
-        if ($scope.generalSuccess == true) {
-            $scope.generalSuccess = false;
-            $scope.$apply();
-        } 
-    })
-
-     $('#notes-field').on('click', function() {
-        $scope.notesError = false;
-        $scope.$apply();
-    })
-
-     /* Update the hour display if you're using duration as your time entry method*/
+    /* Update the hour display if you're using duration as your time entry method*/
     function updateDurationDisplay() {
         if ($scope.timeEntryMethod == "duration") {
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -500,18 +487,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     			break;
     	}
     }
-
-    
-
-    // Google analytics tracking for link back to Day View
-    $('#total-hours-log-link').on('click', function() {
-        ga('send', 'event', 'Time Entry Page', 'click', 'total-hours-link-to-timesheet');
-    })
-
-    // Google analytics tracking for link back to Day View
-    $('#edit-entry-link').on('click', function() {
-        ga('send', 'event', 'Time Entry Page', 'click', 'edit-entry-link');
-    })
 
     /** Prevalidate a time entry. We have to convert the scope's timeEntry into a suitable
         clickTimeEntry that can actually be POSTed to the API. This requires some conversion
@@ -667,11 +642,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             })
 
         })
-    }    
+    }
 
-
-
-    
     // True iff time entry is valid. Will also throw red error messages.
     function validateTimeEntry(timeEntry) {
 
@@ -766,8 +738,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         return true;
     }
 
-   
-
     // Cancel an abandoned stopwatch
     $scope.cancelAbandonedStopwatch = function() {
         $scope.$broadcast("clearStopwatch");
@@ -839,8 +809,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
                 chrome.browserAction.setBadgeText({text:""});
             })
-        }
-        
+        }        
     }
 
     // Rmove sync storage variables from chrome
@@ -916,9 +885,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         // set allowReminder
        allowRemindersSyncSetter()
     }
-
-
-
 
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {
@@ -1273,11 +1239,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         return deferred.promise;
     }
 
-    
-
-
-    
-   
     // Hacky function to display the horizontal line between 'Recent' and 'All' in the entity dropdowns
     function appendRecentAll() {
         var recent = '<li style="color:grey" class="recent-add" role="presentation"><strong> Recent</strong></li>';
@@ -1289,8 +1250,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $("#task-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
         $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
     }
-
-    
 
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
 
@@ -1317,8 +1276,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             })
         })
-
-
     }
     
     // When this list is populated with 4 entities, the scope is ready. 
@@ -1641,8 +1598,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
         EntityService.getTimeEntries(session, afterGetTimeEntries);
-        
     }
+
     EntityService.getSession(afterGetSession);
 
 }])

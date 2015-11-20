@@ -20,7 +20,7 @@ var CHROME_SYNC_STORAGE_VARS = [
 ];
 
 // Default timeout ms
-var TIMEOUT = 10000;
+var TIMEOUT = 30000;
 
 // Time before user is automatically logged out
 var TOKEN_EXPIRE_HOURS = 24;

@@ -41,7 +41,6 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
     // requestMethod - GET or POST
     // data - data for POST requests
     this.apiCall = function (requestURL, email, password, requestMethod, data) {
-        
         var credentials = btoa(email + ":" + password);
     
         var request = {
@@ -71,8 +70,7 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
             }
             me.reportError(email, password, errorObj);
             if (data == null) {
-                // your internet is bogus go fix it
-                me.reportNoInternet();
+                console.log("Error getting data");
             } else {
                 bootbox.alert(data);
             }

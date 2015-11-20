@@ -194,7 +194,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     function clearSuccessMessage() {
         if ($scope.generalSuccess == true) {
             $scope.generalSuccess = false;
-            $scope.$apply();
         }
     }
 
@@ -1027,7 +1026,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
-            $scope.$apply();
+            // $scope.$apply();
         }
 
         function afterGetTasks(tasksList) {
@@ -1062,7 +1061,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.timeEntry.TaskID = $scope.task.TaskID;
                     }
                     TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                    $scope.$apply();
+                   // $scope.$apply();
                 } else {
                     var currentJob = $scope.timeEntry.job;
                     if ($scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
@@ -1096,7 +1095,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
                             TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);                    
-                            $scope.$apply();
+                           // $scope.$apply();
                         } else {
                             $scope.allTasks = tasksList;
                             if ($scope.jobClient) {
@@ -1127,7 +1126,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
                             TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                            $scope.$apply();
+                            //$scope.$apply();
                         }
                     }
                 }
@@ -1172,7 +1171,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
-            $scope.$apply();
+            // $scope.$apply();
         }
 
         function afterGetCompany(company) {
@@ -1221,13 +1220,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             $scope.$parent.$broadcast("pageReady");
-            $scope.$apply();
+            // $scope.$apply();
         }
        
-        EntityService.getJobClients($scope.Session, false, afterGetJobClients);
-        EntityService.getTasks($scope.Session, false, afterGetTasks);
-        EntityService.getUser($scope.Session, false, afterGetUser);
-        EntityService.getCompany($scope.Session, false, afterGetCompany);
+        EntityService.getJobClients($scope.Session, false).then(afterGetJobClients);
+        EntityService.getTasks($scope.Session, false).then(afterGetTasks);
+        EntityService.getUser($scope.Session, false).then(afterGetUser);
+        EntityService.getCompany($scope.Session, false).then(afterGetCompany);
 
         return deferred.promise;
     }
@@ -1266,6 +1265,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         Then get all entities. */
     function afterGetSession(session) {
         // Default empty entry
+        $scope.Session = session;
         var dateString = CTService.getDateString();
 
         $scope.timeEntry = {

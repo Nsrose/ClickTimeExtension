@@ -141,7 +141,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     } 
                 } else {
                     // Tasks don't exist in local storage. Need to call API
-                    return api('Tasks', session.UserEmail, session.Token, 'GET')
+                    api('Tasks', session.UserEmail, session.Token, 'GET')
                     .then (function (response) {
                         chrome.storage.local.set({
                             'tasksList' : response,
@@ -175,7 +175,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
         } else {
             CompanyID = session.CompanyID;
             UserID = session.UserID;
-            return api('Tasks', session.UserEmail, session.Token, 'GET')
+            api('Tasks', session.UserEmail, session.Token, 'GET')
                 .then (function (response) {
                     chrome.storage.local.set({
                         'tasksList' : response,
@@ -336,7 +336,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     }
                 } else {
                     // User doesn't exist in local storage. Need to call API.
-                    return api('User', session.UserEmail, session.Token, 'GET')
+                    api('User', session.UserEmail, session.Token, 'GET')
                     .then(function (response) {
                         chrome.storage.local.set({
                             'user' : response,
@@ -350,7 +350,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
         } else {
             CompanyID = session.CompanyID;
             UserID = session.UserID;
-            return api('User', session.UserEmail, session.Token, 'GET')
+            api('User', session.UserEmail, session.Token, 'GET')
             .then(function (response) {
                 chrome.storage.local.set({
                     'user' : response,
@@ -376,7 +376,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     }
                 } else {
                     // Compnay doesn't exist in local storage. Need to call API.
-                    return api('Company', session.UserEmail, session.Token, 'GET')
+                    api('Company', session.UserEmail, session.Token, 'GET')
                     .then(function (response) {
                         chrome.storage.local.set({
                             'company' : response,
@@ -390,7 +390,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
         } else {
             CompanyID = session.CompanyID;
             UserID = session.UserID;
-            return api('Company', session.UserEmail, session.Token, 'GET')
+            api('Company', session.UserEmail, session.Token, 'GET')
             .then(function (response) {
                 chrome.storage.local.set({
                     'company' : response,

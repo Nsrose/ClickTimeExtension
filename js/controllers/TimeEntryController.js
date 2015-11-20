@@ -1281,6 +1281,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             "TaskID":""
         }
 
+        $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
+            || EntityService.SecurityLevel == 'admin';
+
+        $scope.HasEmptyEntities = false;
+
         // Go fetch the in progress entry and fill out scope fields, if necessary
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
             if (inProgressEntry.Date) {
@@ -1318,11 +1323,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.timeEntry.ISOEndTime = inProgressEntry.ISOEndTime;
             }
         })
-
-        $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
-            || EntityService.SecurityLevel == 'admin';
-
-        $scope.HasEmptyEntities = false;
 
         function afterGetTasks(tasksList) {
             $scope.allTasks = tasksList;
@@ -1579,5 +1579,5 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
     EntityService.getSession()
         .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
-      // can we have 5 promises execute parallely? 
+      
 }])

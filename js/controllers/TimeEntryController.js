@@ -1008,8 +1008,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var currentTask = $scope.task;
                 if (currentTask && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
                     var permittedTaskIDs = currentJob.PermittedTasks.split(",");
-                    if (!EntityService.hasTaskID(permittedTaskIDs, c
-                        urrentTask.TaskID)) {
+                    if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
                         $scope.setError("taskConflict", "We're sorry but the "
                                 + $scope.customTerms.taskTermSingLow + " "
                                 + currentTask.DisplayName + " you've chosen is no longer available. "

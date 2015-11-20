@@ -88,8 +88,6 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
         		}, function() {
         			callback(newEntry);
         		})
-
-
 			}
 		})
 	}

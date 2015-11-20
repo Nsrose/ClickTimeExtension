@@ -1,6 +1,6 @@
 // Services for accessing entities
 // These will only work once the session is open
-myApp.service('EntityService', function ($http, APIService, CTService, $apiBase) {
+myApp.service('EntityService', function ($http, APIService, CTService, $apiBase, $q) {
     // The users session
     var Session = null;
     var UserName = null;
@@ -16,32 +16,32 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
 
     // Function to get the session of a user
     // callback will be called on the session
-    this.getSession = function (callback) {
-    	chrome.storage.sync.get('session', function (items) {
-    		if ('session' in items) {
-    			session = items.session.data;
-    			if (session != null) {
-    				// Session was found
-    				Session = session;
-    				UserName = session.UserName;
-	                UserID = session.UserID;
-	                CompanyID = session.CompanyID;
-	                UserEmail = session.UserEmail;
-	                Token = session.Token;
-	                SecurityLevel = session.SecurityLevel;
+    this.getSession = function () {
+        var deferred = $q.defer();     
+        chrome.storage.sync.get('session', function (items) {
+            if ('session' in items) {
+                session = items.session.data;
+                if (session != null) {
+                    // Session was found
+                    Session = session;
+                    UserName = session.UserName;
+                    UserID = session.UserID;
+                    CompanyID = session.CompanyID;
+                    UserEmail = session.UserEmail;
+                    Token = session.Token;
+                    SecurityLevel = session.SecurityLevel;
                     baseURL = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID;
-	                callback(session);
-    			} else {
-    				// Session couldn't be found
-			        bootbox.alert('Session could not be found');
-			        return;
-    			}
-    		} else {
-    			// Session couldn't be found
-			    bootbox.alert('Session could not be found');
-			    return;
-    		}
-    	})
+                    deferred.resolve(session);
+                } else {
+                    // error: Session couldn't be found
+                    deferred.reject();
+                }
+            } else {
+                // error: Session couldn't be found
+                deferred.reject();
+            }
+        })
+        return deferred.promise;
     }
 
     // Function for making async API calls.
@@ -201,7 +201,9 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
     }
 
     // Get an interleaved list of client/job pairs
+    // COME BACK TO ME
     this.getJobClients = function (session, checkLocal, callback) {
+        var deferred = $q.defer();
         if (checkLocal) {
             chrome.storage.local.get(['stringJobClientsList', 'jobClientsByRecent'], function (items) {
                 if ('stringJobClientsList' in items) {
@@ -323,6 +325,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
                 })
             })
         }
+        return deferred.promise; 
     }
 
     // Returns the User

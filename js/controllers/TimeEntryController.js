@@ -1265,9 +1265,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     /** Get the session, from sync storage if it exists, otherwise call the API.
         Then get all entities. */
     function afterGetSession(session) {
-        $scope.$parent.Session = session;
         // Default empty entry
         var dateString = CTService.getDateString();
+
         $scope.timeEntry = {
             "BreakTime":0.00,
             "Comment":"",
@@ -1495,7 +1495,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.$emit("pageReady");
             }
             $scope.$apply();
-
         }
 
         function afterGetTimeEntries(timeEntries) {
@@ -1573,13 +1572,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
         }
 
-        EntityService.getJobClients(session, true, afterGetJobClients);
+        EntityService.getJobClients(session, true).then(afterGetJobClients); //COME BACK TO ME
+
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);
         EntityService.getCompany(session, true, afterGetCompany);
         EntityService.getTimeEntries(session, afterGetTimeEntries);
+
     }
 
-    EntityService.getSession(afterGetSession);
-
+    EntityService.getSession()
+        .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
 }])

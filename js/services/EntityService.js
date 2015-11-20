@@ -30,11 +30,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase)
 	                Token = session.Token;
 	                SecurityLevel = session.SecurityLevel;
                     baseURL = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID;
-
 	                callback(session);
-
-
-
     			} else {
     				// Session couldn't be found
 			        bootbox.alert('Session could not be found');

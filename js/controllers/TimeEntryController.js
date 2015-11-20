@@ -14,6 +14,19 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         ga('send', 'event', 'Time Entry Page', 'click', 'edit-entry-link');
     })
 
+    // Hacky function to display the horizontal line between 'Recent' and 'All' in the entity dropdowns
+    // display only
+    function appendRecentAll() {
+        var recent = '<li style="color:grey" class="recent-add" role="presentation"><strong> Recent</strong></li>';
+        var all = '<li style="color:grey" class="all-add" role="presentation"><strong> All</strong></li>';
+        $(".recent-add").remove();
+        $(".all-add").remove();
+        $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
+        $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
+        $("#task-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
+        $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
+    }
+    
     //Company custom terms
     $scope.customTerms = {};
 
@@ -219,7 +232,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         TimeEntryService.removeInProgressEntry();
     }
 
-
     // Validate and round hour input field on blur.
     $scope.roundHour = function (time, timeToIncrement) {
         $scope.generalError = false;
@@ -255,8 +267,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             TimeEntryService.updateInProgressEntry('Hours', $scope.timeEntry.Hours, function () {
                 TimeEntryService.updateInProgressEntry('inProgress', true);
             });
-        }
-        
+        }      
     }
 
     // Validate start end times on blur.
@@ -291,8 +302,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
                 }
             }
-        }
-        
+        }       
     }
 
     // Clear in progress start end times
@@ -303,7 +313,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearAllErrors();
         TimeEntryService.removeInProgressEntry();
     }
-
 
     // Clear all template errors
     $scope.clearAllErrors = function () {
@@ -558,9 +567,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
-        $scope.doneRefresh.length = 0; // necessary to have both before and after refresh because just in case
+        doneRefresh.length = 0; // necessary to have both before and after refresh because just in case
         $scope.refresh().then(function() {
-            $scope.doneRefresh.length = 0;
+            doneRefresh.length = 0;
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,
@@ -933,7 +942,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     })
 
     // If populated with 4 entites, then scope is done refreshing:
-    $scope.doneRefresh = [];
+    var doneRefresh = [];
 
     // Refresh function
     /** Force an update to all entity lists from the API. Do not check local storage first.
@@ -966,7 +975,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.removeLocalStorageVars(toRemove);
 
         function afterGetJobClients(jobClientsList) {
-
             var currentJobClient = {
                 'job' : $scope.timeEntry.job,
                 'client' : $scope.timeEntry.client,
@@ -1000,7 +1008,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 var currentTask = $scope.task;
                 if (currentTask && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
                     var permittedTaskIDs = currentJob.PermittedTasks.split(",");
-                    if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
+                    if (!EntityService.hasTaskID(permittedTaskIDs, c
+                        urrentTask.TaskID)) {
                         $scope.setError("taskConflict", "We're sorry but the "
                                 + $scope.customTerms.taskTermSingLow + " "
                                 + currentTask.DisplayName + " you've chosen is no longer available. "
@@ -1015,8 +1024,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.HasEmptyEntities = true;
             }
 
-            $scope.doneRefresh.push("jobClients");
-            if ($scope.doneRefresh.length >= 4) {
+            doneRefresh.push("jobClients");
+            if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
             $scope.$apply();
@@ -1124,8 +1133,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     }
                 }
             }
-            $scope.doneRefresh.push("tasks");
-            if ($scope.doneRefresh.length >= 4) {
+            doneRefresh.push("tasks");
+            if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
         }
@@ -1160,8 +1169,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.user = user;
 
-            $scope.doneRefresh.push("user");
-            if ($scope.doneRefresh.length >= 4) {
+            doneRefresh.push("user");
+            if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
             $scope.$apply();
@@ -1173,21 +1182,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.$parent.DCAASubJobError = true;
                 $scope.logout();
             }
-
-            // $scope.customTerms = {
-            //     'clientTermSingLow' : company.ClientTermSingular,
-            //     'clientTermPlurLow' : company.ClientTermPlural,
-            //     'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-            //     'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-            //     'jobTermSingLow' : company.JobTermSingular,
-            //     'jobTermPlurLow' : company.JobTermPlural,
-            //     'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-            //     'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-            //     'taskTermSingLow' : company.TaskTermSingular,
-            //     'taskTermPlurLow' : company.TaskTermPlural,
-            //     'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-            //     'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-            // }
 
             if (company.DisplayClientSelector == true) {
                 $scope.customTerms = {
@@ -1222,8 +1216,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
             }
           
-            $scope.doneRefresh.push("company");
-            if ($scope.doneRefresh.length >= 4) {
+            doneRefresh.push("company");
+            if (doneRefresh.length >= 4) {
                 deferred.resolve();
             }
 
@@ -1237,18 +1231,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         EntityService.getCompany($scope.Session, false, afterGetCompany);
 
         return deferred.promise;
-    }
-
-    // Hacky function to display the horizontal line between 'Recent' and 'All' in the entity dropdowns
-    function appendRecentAll() {
-        var recent = '<li style="color:grey" class="recent-add" role="presentation"><strong> Recent</strong></li>';
-        var all = '<li style="color:grey" class="all-add" role="presentation"><strong> All</strong></li>';
-        $(".recent-add").remove();
-        $(".all-add").remove();
-        $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
-        $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
-        $("#task-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
-        $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
     }
 
     ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
@@ -1279,7 +1261,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
     
     // When this list is populated with 4 entities, the scope is ready. 
-    $scope.doneLoading = [];
+    var doneLoading = [];
 
     /** Get the session, from sync storage if it exists, otherwise call the API.
         Then get all entities. */
@@ -1360,8 +1342,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
-                $scope.doneLoading.push('tasks');
-                if ($scope.doneLoading.length >= 4) {
+                doneLoading.push('tasks');
+                if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
@@ -1378,8 +1360,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.task = filteredTasks[0];
                         $scope.timeEntry.task = inProgressEntry.task;
                         $scope.timeEntry.TaskID = inProgressEntry.TaskID;
-                        $scope.doneLoading.push('tasks');
-                        if ($scope.doneLoading.length >= 4) {
+                        doneLoading.push('tasks');
+                        if (doneLoading.length >= 4) {
                             $scope.sendPageReady();
                             $scope.$emit("pageReady");
                         }
@@ -1394,8 +1376,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     $scope.timeEntry.TaskID = $scope.task.TaskID;
                 }
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
-                $scope.doneLoading.push('tasks');
-                if ($scope.doneLoading.length >= 4) {
+                doneLoading.push('tasks');
+                if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
@@ -1410,8 +1392,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             $scope.user = user;
-            $scope.doneLoading.push('user');
-            if ($scope.doneLoading.length >= 4) {
+            doneLoading.push('user');
+            if (doneLoading.length >= 4) {
                 $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
@@ -1508,8 +1490,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
             }
 
-            $scope.doneLoading.push('company');
-            if ($scope.doneLoading.length >= 4) {
+            doneLoading.push('company');
+            if (doneLoading.length >= 4) {
                 $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
@@ -1543,8 +1525,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if ($scope.jobClients.length == 0) {
                 $scope.HasEmptyEntities = true;
                 $scope.jobClient = undefined;
-                $scope.doneLoading.push("jobClients");
-                if ($scope.doneLoading.length >= 4) {
+                doneLoading.push("jobClients");
+                if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
                     $scope.$emit("pageReady");
                 }
@@ -1564,8 +1546,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.timeEntry.job = inProgressEntry.job;
                             $scope.timeEntry.JobID = inProgressEntry.JobID;
                             $scope.timeEntry.client = inProgressEntry.client;
-                            $scope.doneLoading.push("jobClients");
-                            if ($scope.doneLoading.length >= 4) {
+                            doneLoading.push("jobClients");
+                            if (doneLoading.length >= 4) {
                                 $scope.sendPageReady();
                                 $scope.$emit("pageReady");
                             }
@@ -1581,8 +1563,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
                         TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
                     });
-                    $scope.doneLoading.push("jobClients");
-                    if ($scope.doneLoading.length >= 4) {
+                    doneLoading.push("jobClients");
+                    if (doneLoading.length >= 4) {
                         $scope.sendPageReady();
                         $scope.$emit("pageReady");
                     }
@@ -1590,9 +1572,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 
                 })
             }
-
-            
         }
+
         EntityService.getJobClients(session, true, afterGetJobClients);
         EntityService.getTasks(session, true, afterGetTasks);
         EntityService.getUser(session, true, afterGetUser);

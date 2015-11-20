@@ -1318,7 +1318,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.timeEntry.ISOEndTime = inProgressEntry.ISOEndTime;
             }
         })
-       
+
         $scope.IsManagerOrAdmin = EntityService.SecurityLevel == 'manager'
             || EntityService.SecurityLevel == 'admin';
 
@@ -1396,7 +1396,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
-            $scope.$apply();
             updateTimeEntryMethodInStorage();      
             chrome.storage.sync.get(['stopwatch'], function (items) {
                 // Check for abandoned stopwatch
@@ -1494,7 +1493,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.sendPageReady();
                 $scope.$emit("pageReady");
             }
-            $scope.$apply();
         }
 
         function afterGetTimeEntries(timeEntries) {
@@ -1571,11 +1569,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             }
         }
+
         EntityService.getJobClients(session, true).then(afterGetJobClients);
         EntityService.getTasks(session, true).then(afterGetTasks);
         EntityService.getUser(session, true).then(afterGetUser);
         EntityService.getCompany(session, true).then(afterGetCompany);
         EntityService.getTimeEntries(session).then(afterGetTimeEntries);
+
     }
     EntityService.getSession()
         .then(afterGetSession, function() {bootbox.alert('Session could not be found');})

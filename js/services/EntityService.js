@@ -93,23 +93,23 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
         return today;
     }
 
-    this.getTimeEntries = function (session, callback) {
+    this.getTimeEntries = function (session) {
+        var deferred = $q.defer();
         CompanyID = session.CompanyID;
         UserID = session.UserID;
         isodate = getIsoDate();
-        //Deprecated API Call (no more date parameter)
-        // url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries?date=" + isodate;
         url = $apiBase.url + "Companies/" + CompanyID + "/Users/" + UserID + "/TimeEntries";
         APIService.apiCall(url, session.UserEmail, session.Token, 'GET')
             .then(function (response) {
-                // console.log(response.data);
-                callback(response.data);
+                deferred.resolve(response.data)
             })
+        return deferred.promise;
     }
 
     // Get tasks list for this session and save to local storage
     // Calls the callback on the tasksList
-    this.getTasks = function (session, checkLocal, callback) {
+    this.getTasks = function (session, checkLocal) {
+        var deferred = $q.defer();
         if (checkLocal) {
             chrome.storage.local.get(['tasksList', 'tasksByRecent'], function (items) {
                 if ('tasksList' in items) {
@@ -137,8 +137,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                             r = tasksByRecent[i];
                             entityList.unshift(r);
                         }
-                        console.log("Fetched tasks list from local storage");
-                        callback(entityList);
+                        deferred.resolve(entityList)
                     } 
                 } else {
                     // Tasks don't exist in local storage. Need to call API
@@ -168,8 +167,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                                 r = tasksByRecent[i];
                                 entityList.unshift(r);
                             }
-                            console.log("Set tasks list to local storage");
-                            callback(entityList);
+                            deferred.resolve(entityList)
                         })
                     })
                 }
@@ -182,12 +180,11 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     chrome.storage.local.set({
                         'tasksList' : response,
                     }, function () {
-                        console.log("Set tasks list to local storage");
-                        callback(response.data);
+                        deferred.resolve(response.data)
                     })
                 })
         }
-       
+        return deferred.promise;
     }
 
     // Sort "all" section of entitylists alphabetically
@@ -231,7 +228,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                         r = jobClientsByRecent[i];
                         entityList.unshift(r);
                     }
-                    deferred.resolve(entityList)
+                    deferred.resolve(entityList);
                 } else {
                     // Job Clients don't exist in local storage. Need to call API.
                     api('Jobs', session.UserEmail, session.Token, 'GET')
@@ -328,15 +325,14 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
     }
 
     // Returns the User
-    this.getUser = function (session, checkLocal, callback) {
+    this.getUser = function (session, checkLocal) {
+        var deferred = $q.defer();     
         if (checkLocal) {
             chrome.storage.local.get('user', function (items) {
                 if ('user' in items) {
                     var user = items.user.data;
-
                     if (user != null) {
-                        console.log("Fetched user object from local storage");
-                        callback(user);
+                        deferred.resolve(user);
                     }
                 } else {
                     // User doesn't exist in local storage. Need to call API.
@@ -346,8 +342,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                             'user' : response,
                         }, function () {
                             var user = response.data;
-                            console.log("Set user object to local storage");
-                            callback(user);
+                            deferred.resolve(user);
                         })
                     })
                 }
@@ -361,23 +356,23 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     'user' : response,
                 }, function () {
                     var user = response.data;
-                    console.log("Set user object to local storage");
-                    callback(user);
+                    deferred.resolve(user);
                 })
             })
         }
+        return deferred.promise; 
     }
 
     // Returns the Company
-    this.getCompany = function (session, checkLocal, callback) {
+    this.getCompany = function (session, checkLocal) {
+        var deferred = $q.defer();     
         if (checkLocal) {
             chrome.storage.local.get('company', function (items) {
                 if ('company' in items) {
                     var company = items.company.data;
 
                     if (company != null) {
-                        console.log("Fetched company object from local storage");
-                        callback(company);
+                        deferred.resolve(company)
                     }
                 } else {
                     // Compnay doesn't exist in local storage. Need to call API.
@@ -387,8 +382,7 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                             'company' : response,
                         }, function () {
                             var company = response.data;
-                            console.log("Set company object to local storage");
-                            callback(company);
+                            deferred.resolve(company)
                         })
                     })
                 }
@@ -402,14 +396,13 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
                     'company' : response,
                 }, function () {
                     var company = response.data;
-                    console.log("Set company object to local storage");
-                    callback(company);
+                    deferred.resolve(company)
                 })
             })
         }
+        return deferred.promise;
     }
 
-   
     // Returns true iff list conatins the jobClient object.
     var containsJobClient = function (list, jobClient) {
         for (i in list) {

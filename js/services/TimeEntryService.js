@@ -91,7 +91,7 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 			}
 		})
 	}
-
+	
 	// Change property in inProgressEntry to value.
 	this.updateInProgressEntry = function (property, value, callback) {
 		chrome.storage.sync.get('inProgressEntry', function (items) {

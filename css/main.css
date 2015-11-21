@@ -133,9 +133,9 @@ a {
 .header-item {
     cursor: pointer;
     position: absolute;
-    left: 400px;
+    left: 323px;
     top: -39px;
-    width: 80px;
+    width: 157px;
 }
 
 
@@ -1015,6 +1015,13 @@ input[type=time]::-webkit-inner-spin-button {
 #cancel-abandoned-stopwatch:hover,
 #sign-in-button:hover {
     background: #f4f4f4;
+}
+
+#feedback-main-screen {
+    color: white;
+    float: right;
+    margin-right: 11px;
+    text-decoration: underline;
 }
 
 #notes-error-text {

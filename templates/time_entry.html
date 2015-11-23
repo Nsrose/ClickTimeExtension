@@ -25,13 +25,13 @@
 <div id="time-entry-main-container" ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
     <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
 
-     <span id="tooltip-total-hours-link" ng-hide="true">Go To My Timesheet</span>
+     <span id="tooltip-total-hours-link" ng-hide="true">Go to Day View</span>
 
     <div class="clear"></div>
 
-    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an abandoned stopwatch. Please save, edit, or cancel the stopwatch entry.</div>
+    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from a previous day. Please save, edit, or cancel the stopwatch entry.</div>
 
-    <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an abandoned entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
+    <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
 
     <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.clientSlash}}{{customTerms.jobTermSingHigh}}</div>
     <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>

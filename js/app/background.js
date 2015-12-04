@@ -401,7 +401,7 @@ function refreshFromApi(session) {
             })  
         }      
     })
- }
+}
 
 chrome.runtime.onStartup.addListener(function() {
     chrome.storage.sync.get('session', function (items) {
@@ -412,3 +412,24 @@ chrome.runtime.onStartup.addListener(function() {
         }
     })
 })
+
+///////////////////////internet //////////////////////////
+
+/* listens for internet. 
+*/
+var isOnline = true;
+window.addEventListener('offline', function(e) {
+  console.log('im offline')
+  isOnline = false;
+  chrome.runtime.sendMessage({
+    internetConnected: false
+  });
+}, false);
+
+window.addEventListener('online', function(e) {
+  console.log('im online')
+  isOnline = true;
+  chrome.runtime.sendMessage({
+    internetConnected : true
+  })
+}, false);

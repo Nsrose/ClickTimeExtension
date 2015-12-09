@@ -33,7 +33,10 @@ var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap'])
 		dev99: "https://dev99.clicktime.com:8443/api/1.3/",
 		live: "https://app.clicktime.com/api/1.3/",
 		stage: 'https://appstage.clicktime.com/api/1.3/',
-		qa: 'https://apptest1.clicktime.com/api/1.3/'
+		qa: 'https://appqa.clicktime.com/api/1.3/',
+		test1: 'https://apptest1.clicktime.com/api/1.3/',
+		itest: 'https://appirinatest.clicktime.com/api/1.3/',
+		otest: 'https://apposhertest.clicktime.com/api/1.3/'
 	})
 	.constant("$apiBase", {
 		url: "https://app.clicktime.com/api/1.3/"

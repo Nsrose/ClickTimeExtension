@@ -1,160 +1,162 @@
-<div class="header-item">
-    <span ng-cloak ng-show="showPopupArrow" class="header-icon" ng-click="openPopup()">
-        <i class="fa fa-external-link" my-tooltip="#tooltip-popout" data-placement="bottom"></i>
-    </span>
-
-    <span id="tooltip-popout" ng-hide="true">Popout Window</span>
-
-    <span class="header-icon" ng-click="settingsPage()">
-        <i class="fa fa-cog" my-tooltip="#tooltip-settings" data-placement="bottom"></i>
-    </span>
-
-    <span id="tooltip-settings" ng-hide="true">Settings and Help</span>
-
-    <a id="feedback-main-screen" href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank" my-tooltip="#tooltip-feedback" data-placement="bottom">
-            Feedback
-            <span id="tooltip-feedback" ng-hide="true">Tell us what you think!</span>
-    </a>
-
-</div>
-
-<div id="loading-mask" ng-hide="pageReady">
-    <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
-</div>
-
-<div id="time-entry-main-container" ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
-    <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
-
-     <span id="tooltip-total-hours-link" ng-hide="true">Go to Day View</span>
-
-    <div class="clear"></div>
-
-    <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from a previous day. Please save, edit, or cancel the stopwatch entry.</div>
-
-    <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
-
-    <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.clientSlash}}{{customTerms.jobTermSingHigh}}</div>
-    <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>
-
-    <div class="fieldtitle" id="fieldtitle-task">{{customTerms.taskTermSingHigh}}</div>
-    <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch" id="task-dropdown" ng-focus="clearError('task')">
-    </div>
-
-    <!-- Notes field -->
-    <form name="entry" class="notes-field-container">
-        <div class="fieldtitle" id="fieldtitle-notes">Notes</div>
-        <span ng-show='notesError' id="notes-error-text">Oops! Please enter some notes in order to save this entry.</span>
-        <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()" ng-click="notesError = false"></textarea><br> 
-    </form>
-
-    <!-- Time entry form -->
-    <div class="time-entry-container" ng-show="!abandonedStopwatch">
-
-        <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
-            <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
-            <div class="time-entry-form">
-                <input class="time-entry-form-input time-entry-form-hours" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch" maxlength="5" placeholder="00:00">
-            </div>
-            <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
-        </div>
-
-        <!-- Start time -->
-        <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
-            <div class="fieldtitle time-entry" id="time-entry-form-start-title">Start Time</div>
-            <div class="time-entry-form">
-               <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
-
-            </div>
-        </div>
-
-        <!-- End time -->
-        <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
-            <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
-            <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
-            </div>
-        </div>
-    </div>
-
-    <div class="time-entry-container" ng-show="abandonedStopwatch">   
-        <div class="time-entry-item" id="time-entry-item-start">
-            <div class="fieldtitle time-entry">Start Time</div>
-            <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" required="required">
-            </div>
-        </div>
-
-        <div class="time-entry-item" id="time-entry-item-end">
-            <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
-            <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-focus="swapAction('endTime')" required="required">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="clear"></div>
-
-
-    <div class="error-messaging">
-        <span style="color:red" ng-show="generalError">
-            <p class="error-messaging-text">
-            <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;{{errorMessage}}</p>
+<div ng-click="clearSuccessMessage()">
+    <div class="header-item">
+        <span ng-cloak ng-show="showPopupArrow" class="header-icon" ng-click="openPopup()">
+            <i class="fa fa-external-link" my-tooltip="#tooltip-popout" data-placement="bottom"></i>
         </span>
+
+        <span id="tooltip-popout" ng-hide="true">Popout Window</span>
+
+        <span class="header-icon" ng-click="settingsPage()">
+            <i class="fa fa-cog" my-tooltip="#tooltip-settings" data-placement="bottom"></i>
+        </span>
+
+        <span id="tooltip-settings" ng-hide="true">Settings and Help</span>
+
+        <a id="feedback-main-screen" href="https://docs.google.com/forms/d/1b2yJ-LnqDH_6Mvu1u6Ml3eKidXlhewXKItJzDZyVBJY/viewform?usp=send_form" target="_blank" my-tooltip="#tooltip-feedback" data-placement="bottom">
+                Feedback
+                <span id="tooltip-feedback" ng-hide="true">Tell us what you think!</span>
+        </a>
+
     </div>
 
-    <div class="success-messaging-container" ng-show="generalSuccess">
-
-        <img src="../img/success_check.png" id="success-check">
-        <span id="success-messaging-text">{{successMessage}}</span>
-        <a id="edit-entry-link" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">Edit this entry</a>
+    <div id="loading-mask" ng-hide="pageReady">
+        <div id="spinner"><img src="../img/spinner_white.gif"  class="img-scaled"></div>
     </div>
 
-    <div id='bottom-button-bar'>
-        <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch" ng-hide="showStartTimer || runningStopwatch">Save</button>
+    <div id="time-entry-main-container" ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
+        <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
 
-        <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError"><img id='stopwatchIcon' src="../img/stopwatchicon.png">Start Timer</button>
+         <span id="tooltip-total-hours-link" ng-hide="true">Go to Day View</span>
 
-        <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch && !abandonedStopwatch">Stop &amp; Save</button>
+        <div class="clear"></div>
 
+        <div class="system-message" id="abandoned-stopwatch-message" ng-show="abandonedStopwatch"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from a previous day. Please save, edit, or cancel the stopwatch entry.</div>
 
-        <!-- Abandoned Stopwatch actions -->
-        <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-show="abandonedStopwatch">Save</button>
+        <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
 
-        <button id="cancel-abandoned-stopwatch" class="btn btn-default action-button" ng-click="cancelAbandonedStopwatch()" ng-show="abandonedStopwatch">Cancel</button>
+        <div class="fieldtitle" id="fieldtitle-jobclient">{{customTerms.clientTermSingHigh}}{{customTerms.clientSlash}}{{customTerms.jobTermSingHigh}}</div>
+        <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>
 
-        <!-- -->
-
-        <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer || abandonedEntry) && !abandonedStopwatch">Cancel</button>
-
-
-        <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && showStartEndTimes">
-
-            <div class="fieldtitle time-entry" id="field-title-timer">Recorded Time</div>
-
-            <div ng-model="timerDisplay" id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes && !abandonedStopwatch">{{timerDisplay}}</div>
+        <div class="fieldtitle" id="fieldtitle-task">{{customTerms.taskTermSingHigh}}</div>
+        <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch" id="task-dropdown" ng-focus="clearError('task')">
         </div>
 
+        <!-- Notes field -->
+        <form name="entry" class="notes-field-container">
+            <div class="fieldtitle" id="fieldtitle-notes">Notes</div>
+            <span ng-show='notesError' id="notes-error-text">Oops! Please enter some notes in order to save this entry.</span>
+            <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()" ng-click="notesError = false"></textarea><br> 
+        </form>
 
-        <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && !showStartEndTimes">
+        <!-- Time entry form -->
+        <div class="time-entry-container" ng-show="!abandonedStopwatch">
 
-            <div class="fieldtitle time-entry" id="field-title-timer">Recorded Time</div>
+            <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
+                <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
+                <div class="time-entry-form">
+                    <input class="time-entry-form-input time-entry-form-hours" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch" maxlength="5" placeholder="00:00">
+                </div>
+                <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
+            </div>
 
-            <div class="time-entry-form">
-                <input class="time-entry-form-input" id="time-entry-form-timer" type="text" name="hours" ng-model="timerDisplay" ng-disabled="true">
+            <!-- Start time -->
+            <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
+                <div class="fieldtitle time-entry" id="time-entry-form-start-title">Start Time</div>
+                <div class="time-entry-form">
+                   <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
+
+                </div>
+            </div>
+
+            <!-- End time -->
+            <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
+                <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
+                <div class="time-entry-form">
+                    <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch" required="required">
+                </div>
             </div>
         </div>
 
+        <div class="time-entry-container" ng-show="abandonedStopwatch">   
+            <div class="time-entry-item" id="time-entry-item-start">
+                <div class="fieldtitle time-entry">Start Time</div>
+                <div class="time-entry-form">
+                    <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" required="required">
+                </div>
+            </div>
+
+            <div class="time-entry-item" id="time-entry-item-end">
+                <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
+                <div class="time-entry-form">
+                    <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-focus="swapAction('endTime')" required="required">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="clear"></div>
+
+
+        <div class="error-messaging">
+            <span style="color:red" ng-show="generalError">
+                <p class="error-messaging-text">
+                <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;{{errorMessage}}</p>
+            </span>
+        </div>
+
+        <div class="success-messaging-container" ng-show="generalSuccess">
+
+            <img src="../img/success_check.png" id="success-check">
+            <span id="success-messaging-text">{{successMessage}}</span>
+            <a id="edit-entry-link" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">Edit this entry</a>
+        </div>
+
+        <div id='bottom-button-bar'>
+            <button id="save-time-entry" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-disabled="abandonedStopwatch" ng-hide="showStartTimer || runningStopwatch">Save</button>
+
+            <button id="start-stopwatch" class="btn btn-success action-button" ng-click="startStopwatch()" ng-show="showStartTimer && !runningStopwatch" ng-disabled="generalError"><img id='stopwatchIcon' src="../img/stopwatchicon.png">Start Timer</button>
+
+            <button id="stop-stopwatch" class="btn btn-danger action-button" ng-click="stopStopwatch()" ng-show="runningStopwatch && !abandonedStopwatch">Stop &amp; Save</button>
+
+
+            <!-- Abandoned Stopwatch actions -->
+            <button id="accept-stopwatch" class="btn btn-success action-button" ng-click="saveTimeEntry(Session, timeEntry)" ng-show="abandonedStopwatch">Save</button>
+
+            <button id="cancel-abandoned-stopwatch" class="btn btn-default action-button" ng-click="cancelAbandonedStopwatch()" ng-show="abandonedStopwatch">Cancel</button>
+
+            <!-- -->
+
+            <button id="clear-time-entry" class="btn btn-default action-button" ng-click="clearTimeEntry()" ng-show="(runningStopwatch || !showStartTimer || abandonedEntry) && !abandonedStopwatch">Cancel</button>
+
+
+            <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && showStartEndTimes">
+
+                <div class="fieldtitle time-entry" id="field-title-timer">Recorded Time</div>
+
+                <div ng-model="timerDisplay" id="running-stopwatch-gif" ng-show="runningStopwatch && showStartEndTimes && !abandonedStopwatch">{{timerDisplay}}</div>
+            </div>
+
+
+            <div class="time-entry-item" id="time-entry-item-stopwatch" ng-show="runningStopwatch && !showStartEndTimes">
+
+                <div class="fieldtitle time-entry" id="field-title-timer">Recorded Time</div>
+
+                <div class="time-entry-form">
+                    <input class="time-entry-form-input" id="time-entry-form-timer" type="text" name="hours" ng-model="timerDisplay" ng-disabled="true">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="notification-button" ng-click="sendNotification()"></div>
+
+        <div class="hidden" ng-controller="StopwatchController">
+        </div>
     </div>
 
-    <div class="notification-button" ng-click="sendNotification()"></div>
+    <br>
+    <div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
 
-    <div class="hidden" ng-controller="StopwatchController">
+    <div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} so you can begin tracking time.
     </div>
-</div>
-
-<br>
-<div class="emptylistmessage" ng-show="IsManagerOrAdmin && HasEmptyEntities">You first need to add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} to begin tracking <a href="https://app.clicktime.com/?dest=App/Dashboard" target="_blank">time</a>.</div>
-
-<div class="emptylistmessage" ng-show="!IsManagerOrAdmin && HasEmptyEntities">Please contact your manager or administrator and have them add at least one {{customTerms.clientTermSingLow}}, {{customTerms.jobTermSingLow}}, and {{customTerms.taskTermSingLow}} so you can begin tracking time.
 </div>

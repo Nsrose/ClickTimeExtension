@@ -24,7 +24,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $("#jobClient-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
         $("#jobClient-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
         $("#task-dropdown ul[role=menu] li[role=presentation]").first().before(recent);
-        $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)
+        $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)    
     }
     
     //Company custom terms
@@ -196,6 +196,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.generalSuccess = false;
         }
     }
+
+    // for use in template
+    $scope.clearSuccessMessage = clearSuccessMessage;
 
     // Stop a stopwatch and end a timer promise
     $scope.stopStopwatch = function() {
@@ -472,6 +475,27 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     ////// Time entry ////// 
 
+    // utility method
+    function afterGetTimeEntries(timeEntries) {
+        var totalHours = 0;
+        var timeEntries = timeEntries[0].TimeEntries;
+        var arrayLength = timeEntries.length;
+        for (var i = 0; i < arrayLength; i++) {
+            totalHours += timeEntries[i].Hours;
+        }
+        var splitHrs = (totalHours + '').split(".");
+        var hrs = parseInt(splitHrs[0]);
+        var min = null;
+        if (splitHrs.length == 2) {
+            var min = parseFloat('0.' + splitHrs[1]);
+            min = Math.floor(min * 60);
+        }
+        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
+        $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+        $scope.totalHrs = hrs;
+        $scope.totalMin = min;
+    }
+
     // Time entry methods
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
@@ -561,7 +585,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         callback(clickTimeEntry);
     }
 
-    /* First, refresh all entity lists. (see below) Then, validate the entry.
+    /* First, refresh all entity lists. Then, validate the entry.
        If successful, broadcast a success. If failed, show an error. */
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
@@ -586,66 +610,48 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 if (!clickTimeEntry) {
                     return;
                 }
-
                 if (!validateTimeEntry(timeEntry)) {
                     $scope.$broadcast("timeEntryError");
                     return;
                 } else {
                     $scope.pageReady = false;
                     TimeEntryService.saveTimeEntry(session, clickTimeEntry)
-                    .then(function (response) {
-                        var d = new Date();
-                        TimeEntryService.removeInProgressEntry();
-                        var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                        var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
-                        var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
-
-                        $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
-                        $scope.generalSuccess = true;
-                        $scope.$broadcast("timeEntrySuccess");
-                        EntityService.updateRecentEntities(timeEntry);
-                        EntityService.getTimeEntries($scope.Session, function (timeEntries) {
-                            var totalHours = 0;
-                            var timeEntries = timeEntries[0].TimeEntries;
-                            var arrayLength = timeEntries.length;
-                            for (var i = 0; i < arrayLength; i++) {
-                                totalHours += timeEntries[i].Hours;
-                            }
-                            var splitHrs = (totalHours + '').split(".");
-                            var hrs = parseInt(splitHrs[0]);
-                            var min = null;
-                            if (splitHrs.length == 2) {
-                                var min = parseFloat('0.' + splitHrs[1]);
-                                min = Math.floor(min * 60);
-                            }
-                            $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-                            $scope.totalHrs = hrs;
-                            $scope.totalMin = min;
-                            $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-                        });
-                    })
-                    .catch(function (response) {
-                        if (response.data == null) {
+                        .then(function (response) {
                             var d = new Date();
-                            $scope.$broadcast("timeEntryError");
                             TimeEntryService.removeInProgressEntry();
-                            TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
-                                $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + 
-                                d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
-                            })
-                        } else if (response.data['Detail'] == 'The day is locked') {
-                            $scope.setError(null, "Sorry, your time entry cannot be saved because your timesheet is locked. Please contact your ClickTime administrator for further details.");
-                            if (!$scope.abandonedStopwatch) {
+                            var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
+                            var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
+                            var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
+
+                            $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
+                            $scope.generalSuccess = true;
+                            $scope.$broadcast("timeEntrySuccess");
+                            EntityService.updateRecentEntities(timeEntry);
+                            EntityService.getTimeEntries($scope.Session).then(afterGetTimeEntries);
+                            $scope.$apply();
+                        })
+                        .catch(function (response) {
+                            if (response.data == null) {
+                                var d = new Date();
                                 $scope.$broadcast("timeEntryError");
+                                TimeEntryService.removeInProgressEntry();
+                                TimeEntryService.storeTimeEntry(clickTimeEntry, function() {
+                                    $scope.setError(null, 'Currently unable to upload entry. Entry saved locally at ' + 
+                                    d.toTimeString() + '. Your entry will be uploaded once a connection can be established');
+                                })
+                            } else if (response.data['Detail'] == 'The day is locked') {
+                                $scope.setError(null, "Sorry, your time entry cannot be saved because your timesheet is locked. Please contact your ClickTime administrator for further details.");
+                                if (!$scope.abandonedStopwatch) {
+                                    $scope.$broadcast("timeEntryError");
+                                }
+                            } else {
+                                $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
+                                if (!$scope.abandonedStopwatch) {
+                                    $scope.$broadcast("timeEntryError");
+                                }
                             }
-                        } else {
-                            $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
-                            if (!$scope.abandonedStopwatch) {
-                                $scope.$broadcast("timeEntryError");
-                            }
-                        }
-                        $scope.pageReady = true;
-                    });
+                            $scope.pageReady = true;
+                        });
                 }
             })
 
@@ -940,6 +946,33 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+    ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
+
+    // Once page has loaded, send a message that this was loaded.
+    $scope.sendPageReady = function() {
+        chrome.runtime.sendMessage({
+            pageReady: true
+        })
+
+        $(function () {
+            $(".dropdown-toggle").on("click", function() {
+                appendRecentAll();
+                $('.dropdown-menu').each(function (i, e) {
+                    var dropdown_menu = $(e).children().first().children();
+                    dropdown_menu.on("keyup", function(e) {
+                        var text = e.target.value;
+                        if (text) {
+                            $(".recent-add").remove();
+                            $(".all-add").remove();
+                        } else {
+                            appendRecentAll();
+                        }
+                    })
+                })
+            })
+        })
+    }
+
     // If populated with 4 entites, then scope is done refreshing:
     var doneRefresh = [];
 
@@ -1230,33 +1263,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         return deferred.promise;
     }
-
-    ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
-
-    // Once page has loaded, send a message that this was loaded.
-    $scope.sendPageReady = function() {
-        chrome.runtime.sendMessage({
-            pageReady: true
-        })
-
-        $(function () {
-            $(".dropdown-toggle").on("click", function() {
-                appendRecentAll();
-                $('.dropdown-menu').each(function (i, e) {
-                    var dropdown_menu = $(e).children().first().children();
-                    dropdown_menu.on("keyup", function(e) {
-                        var text = e.target.value;
-                        if (text) {
-                            $(".recent-add").remove();
-                            $(".all-add").remove();
-                        } else {
-                            appendRecentAll();
-                        }
-                    })
-                })
-            })
-        })
-    }
     
     // When this list is populated with 4 entities, the scope is ready. 
     var doneLoading = [];
@@ -1495,26 +1501,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
         }
 
-        function afterGetTimeEntries(timeEntries) {
-            var totalHours = 0;
-            var timeEntries = timeEntries[0].TimeEntries;
-            var arrayLength = timeEntries.length;
-            for (var i = 0; i < arrayLength; i++) {
-                totalHours += timeEntries[i].Hours;
-            }
-            var splitHrs = (totalHours + '').split(".");
-            var hrs = parseInt(splitHrs[0]);
-            var min = null;
-            if (splitHrs.length == 2) {
-                var min = parseFloat('0.' + splitHrs[1]);
-                min = Math.floor(min * 60);
-            }
-            $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-            $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-            $scope.totalHrs = hrs;
-            $scope.totalMin = min;
-        }
-
         function afterGetJobClients(jobClientsList) {
             $scope.jobClients = jobClientsList;
 
@@ -1577,6 +1563,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         EntityService.getTimeEntries(session).then(afterGetTimeEntries);
 
     }
+
     EntityService.getSession()
         .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
       

@@ -2,3 +2,4 @@
 *.swo
 js/app/content.js
 js/app/app.js
+.DS_Store

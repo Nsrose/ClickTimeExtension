@@ -1052,3 +1052,12 @@ input:focus {
 .text-error {
     color: #de6a66 !important;
 }
+
+#clockman-image {
+    height: auto;
+    width: 74%;
+}
+
+#clockman-text {
+    text-align: center;
+}

@@ -417,7 +417,7 @@ chrome.runtime.onStartup.addListener(function() {
 /* listens for internet in the background. it will always run. 
 
   you need both the variable, and the runtime listener. 
-  
+
   The runtime listener is for runtime internet failure: when your extension is open, and your internet fails
 
   the variable is to remember state for non-runtime internet failure. That is, when your extension is not open

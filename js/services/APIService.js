@@ -1,7 +1,7 @@
 // All services for making API requests. All of these require user to be logged in.
 // The apiCall function is intended to be used with promises, not callbacks.
 
-myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $apiBase) {
+myApp.service('APIService', ['$http', '$q', '$apiBase', 'InternetConnectivity', function ($http, $q, $apiBase, InternetConnectivity) {
     var me = this;
     var manifest = chrome.runtime.getManifest();
     var version = manifest.version;
@@ -14,20 +14,13 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', function ($http, $q, $ap
     // data - data for POST requests
     this.apiCall = function (requestURL, email, password, requestMethod, data) {
 
+        // if internet fails during non-runtime
         if (chrome.extension.getBackgroundPage().isOnline == false) {
-            offlineBox = bootbox.dialog({
-                message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
-                show: true,
-                backdrop: true,
-                closeButton: false,
-                animate: true,
-                className: "no-internet-modal",
-            });
+            InternetConnectivity.displayOfflineModal();
             return;
         }
-
         if (typeof offlineBox !== 'undefined') {
-            offlineBox.modal('hide');
+            InternetConnectivity.hideOfflineModal();
         }
         
         var credentials = btoa(email + ":" + password);

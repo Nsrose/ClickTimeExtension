@@ -1,5 +1,5 @@
-myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase', 
-						function ($scope, $location, $apiBases, $apiBase) {
+myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase', 'InternetConnectivity',
+						function ($scope, $location, $apiBases, $apiBase, InternetConnectivity) {
 	$scope.Session = null;
     $scope.pageReady = false;
     $scope.$on('pageReady', function() {
@@ -46,20 +46,12 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     	$scope.changeEnvironment(environment);
     })
 
-    // Listen for internet
-    var offlineBox;
+    // this has a listener for runtime internet failures
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message.internetConnected === false) {
-            offlineBox = bootbox.dialog({
-                message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
-                show: true,
-                backdrop: true,
-                closeButton: false,
-                animate: true,
-                className: "no-internet-modal",
-            });
+            InternetConnectivity.displayOfflineModal();
         } else if (message.internetConnected === true) {
-            offlineBox.modal('hide');
+            InternetConnectivity.hideOfflineModal()
         }
     });
 

@@ -8,8 +8,6 @@
   "background": {
     "scripts" : [
         "js/lib/jquery-1.11.3.min.js",
-        "/js/lib/bootstrap.min.js",
-        "js/lib/bootbox.min.js",
         "js/app/background.js"
     ]
   },

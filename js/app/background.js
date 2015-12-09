@@ -22,16 +22,10 @@ chrome.runtime.onMessage.addListener(
 */
 var timer;
 
-/* function taken from StopwatchService. 
-   FAQ: 
-   - Why not just use the service by passing it in as a param? 
-        the service stops once the chrome extension page closes. Therefore,
-        we can't rely on the service.
-   - Okay, so then register the service in the manifest as a background script.
-        Sure, that works. But then you will have to register the service here,
-        and that wasn't worth it to register so many dependencies just for one
-        function to work.  
-*/
+
+// Get the elapsed time of the stopwatch. 
+// If no running stopwatches, then this will be 0.
+// Return an object with elapsed hours, minutes, and seconds.
 function getElapsedTime(callback) {
   chrome.storage.sync.get('stopwatch', function (items) {
     if ('stopwatch' in items) {
@@ -407,7 +401,7 @@ function refreshFromApi(session) {
             })  
         }      
     })
- }
+}
 
 chrome.runtime.onStartup.addListener(function() {
     chrome.storage.sync.get('session', function (items) {
@@ -418,3 +412,24 @@ chrome.runtime.onStartup.addListener(function() {
         }
     })
 })
+
+///////////////////////internet //////////////////////////
+
+/* listens for internet. 
+*/
+var isOnline = true;
+window.addEventListener('offline', function(e) {
+  console.log('im offline')
+  isOnline = false;
+  chrome.runtime.sendMessage({
+    internetConnected: false
+  });
+}, false);
+
+window.addEventListener('online', function(e) {
+  console.log('im online')
+  isOnline = true;
+  chrome.runtime.sendMessage({
+    internetConnected : true
+  })
+}, false);

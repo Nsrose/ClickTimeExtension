@@ -46,6 +46,23 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     	$scope.changeEnvironment(environment);
     })
 
+    // Listen for internet
+    var offlineBox;
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        if (message.internetConnected === false) {
+            offlineBox = bootbox.dialog({
+                message: "We're sorry, you don't appear to have an internet connection. Please try again when you have connectivity.",       
+                show: true,
+                backdrop: true,
+                closeButton: false,
+                animate: true,
+                className: "no-internet-modal",
+            });
+        } else if (message.internetConnected === true) {
+            offlineBox.modal('hide');
+        }
+    });
+
 
     // Change the api base url based on environment change by sending the change to 
     // the background script

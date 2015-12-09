@@ -1,6 +1,6 @@
 myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interval', function ($scope, StopwatchService, $interval) {
 	
-    StopwatchService.getElapsedTime(function (elapsedObj) {
+    chrome.extension.getBackgroundPage().getElapsedTime(function (elapsedObj) {
 		var secDisp = elapsedObj.elapsedSec % 60 + '';
 		var minDisp = elapsedObj.elapsedMin % 60 + '';
 		var hrsDisp = elapsedObj.elapsedHrs + '';
@@ -24,6 +24,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 		}
 		$scope.$apply();
 	})
+
 	$scope.elapsedSec = "00";
 	$scope.elapsedMin = "00";
 	$scope.elapsedHrs = "00";
@@ -106,7 +107,7 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
     }
 
     function getElapsedTime() {
-        StopwatchService.getElapsedTime(function (elapsedObj) {
+         chrome.extension.getBackgroundPage().getElapsedTime(function (elapsedObj) {
             $scope.$parent.runningStopwatch = true;
             secDisp = elapsedObj.elapsedSec % 60 + '';
             minDisp = elapsedObj.elapsedMin % 60 + '';

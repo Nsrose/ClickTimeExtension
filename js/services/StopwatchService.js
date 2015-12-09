@@ -37,39 +37,6 @@ myApp.service("StopwatchService", function() {
 		})
 	}
 
-	// Get the elapsed time of the stopwatch. 
-	// If no running stopwatches, then this will be 0.
-	// Return an object with elapsed hours, minutes, and seconds.
-	this.getElapsedTime = function (callback) {
-		chrome.storage.sync.get('stopwatch', function (items) {
-			if ('stopwatch' in items) {
-				var now = new Date();
-				var storedWatch = items.stopwatch;
-				var startTime = new Date(storedWatch.startYear, storedWatch.startMonth, storedWatch.startDay,
-					storedWatch.startHrs, storedWatch.startMin, storedWatch.startSec);
-				var elapsedTimeMS = now - startTime;
-				var elapsedSec = Math.floor(elapsedTimeMS / 1000);
-				var elapsedMin = Math.floor(elapsedSec / 60);
-				var elapsedHrs = Math.floor(elapsedMin / 60);
-				var elapsedObj = {
-					'elapsedHrs' : elapsedHrs,
-					'elapsedMin' : elapsedMin,
-					'elapsedSec' : elapsedSec,
-					'running' : storedWatch.running
-				};
-				callback(elapsedObj);
-			} else {
-				var elapsedObj = {
-					'elapsedHrs' : 0,
-					'elapsedMin' : 0,
-					'elapsedSec' : 0,
-					'running' : false
-				};
-				callback(elapsedObj);
-			}
-		})
-	} 
-
 	// Mark end time 
 	this.markEndTime = function (callback) {
 		chrome.storage.sync.get('stopwatch', function(items) {

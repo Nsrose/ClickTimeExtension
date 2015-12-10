@@ -789,7 +789,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         return;
                     } else {
                         $location.path("/login");
-                        $scope.removeLocalStorageVars();
+                        removeLocalStorageVars();
                         $scope.removeSyncStorageVars();
                         chrome.extension.getBackgroundPage().stopNotifications();
                         chrome.extension.getBackgroundPage().stopBadge();
@@ -798,7 +798,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             } else {
                 $location.path("/login");
-                $scope.removeLocalStorageVars();
+                removeLocalStorageVars();
                 $scope.removeSyncStorageVars();
                 chrome.extension.getBackgroundPage().stopNotifications();
                 chrome.extension.getBackgroundPage().stopBadge();
@@ -808,15 +808,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
     // Remove local storage variables from chrome
-    $scope.removeLocalStorageVars = function(vars) {
+    function removeLocalStorageVars(vars) {
         if (vars) {
-            chrome.storage.local.remove(vars, function() {
-                chrome.browserAction.setBadgeText({text:""});
-            })
+            chrome.storage.local.remove(vars);
         } else {
-            chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function () {
-                chrome.browserAction.setBadgeText({text:""});
-            })
+            chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
         }        
     }
 
@@ -971,7 +967,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             'stringJobClientsList'
         ]
 
-        $scope.removeLocalStorageVars(toRemove);
+        removeLocalStorageVars(toRemove);
 
         function afterGetJobClients(jobClientsList) {
             var currentJobClient = {

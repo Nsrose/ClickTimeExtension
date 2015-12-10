@@ -789,8 +789,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         return;
                     } else {
                         $location.path("/login");
-                        removeLocalStorageVars();
-                        $scope.removeSyncStorageVars();
+                        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
+                        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
                         chrome.extension.getBackgroundPage().stopNotifications();
                         chrome.extension.getBackgroundPage().stopBadge();
                         $scope.$apply();
@@ -798,27 +798,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 })
             } else {
                 $location.path("/login");
-                removeLocalStorageVars();
-                $scope.removeSyncStorageVars();
+                chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
+                chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
                 chrome.extension.getBackgroundPage().stopNotifications();
                 chrome.extension.getBackgroundPage().stopBadge();
                 $scope.$apply();
             }
         })
-    }
-
-    // Remove local storage variables from chrome
-    function removeLocalStorageVars(vars) {
-        if (vars) {
-            chrome.storage.local.remove(vars);
-        } else {
-            chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
-        }        
-    }
-
-    // Rmove sync storage variables from chrome
-    $scope.removeSyncStorageVars = function() {
-        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
     }
 
     /* 
@@ -967,7 +953,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             'stringJobClientsList'
         ]
 
-        removeLocalStorageVars(toRemove);
+        chrome.storage.local.remove(toRemove);
 
         function afterGetJobClients(jobClientsList) {
             var currentJobClient = {

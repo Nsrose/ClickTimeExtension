@@ -6,30 +6,13 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     
     $scope.rerouting = false;
 
-    // Get the session, if it exists, go to time entry. Otherwise, stay here.
+    // if session already exists, Do not pass Go. Do not collect $200.
+    // don't log in. routes user directly to time entry page
     chrome.storage.sync.get('session', function(items) {
         if ('session' in items) {
-            var session = items.session.data;
-            if (session != null) {
-                var now = new Date();
-                var lastLoginDate = new Date(session.lastLoginYear, session.lastLoginMonth,
-                    session.lastLoginDay, session.lastLoginHrs, session.lastLoginMin, session.lastLoginSec);
-                var elapsedTimeMS = now - lastLoginDate;
-                var elapsedSec = Math.floor(elapsedTimeMS / 1000);
-                var elapsedMin = Math.floor(elapsedSec / 60);
-                var elapsedHrs = Math.floor(elapsedMin / 60);
-                if (elapsedHrs <= TOKEN_EXPIRE_HOURS) {
-                    // User does not need to login.
-                    $location.path("/time_entry");
-                    $scope.$apply();
-                    return;
-                }
-                // session has expired.
-                chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
-                chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS, function() {
-                    chrome.browserAction.setBadgeText({text:""});
-                })
-            }
+            $location.path("/time_entry");
+            $scope.$apply();
+            return;
         }
     })
 

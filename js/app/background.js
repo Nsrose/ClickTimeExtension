@@ -401,7 +401,7 @@ function refreshFromApi(session) {
             })  
         }      
     })
- }
+}
 
 chrome.runtime.onStartup.addListener(function() {
     chrome.storage.sync.get('session', function (items) {
@@ -412,3 +412,30 @@ chrome.runtime.onStartup.addListener(function() {
         }
     })
 })
+
+///////////////////////internet //////////////////////////
+/* listens for internet in the background. it will always run. 
+
+  you need both the variable, and the runtime listener. 
+
+  The runtime listener is for runtime internet failure: when your extension is open, and your internet fails
+
+  the variable is to remember state for non-runtime internet failure. That is, when your extension is not open
+  and your internet fails. Since chrome extension pages are ephemeral (doesn't function when chrome extension is not open),
+  listeners are ignored when your extension is not open. So we store the state in a variable so that the message displays 
+  upon a new instance of chrome extension opening
+*/
+var isOnline = true;
+window.addEventListener('offline', function(e) {
+  isOnline = false;
+  chrome.runtime.sendMessage({
+    internetConnected: false
+  });
+}, false);
+
+window.addEventListener('online', function(e) {
+  isOnline = true;
+  chrome.runtime.sendMessage({
+    internetConnected : true
+  })
+}, false);

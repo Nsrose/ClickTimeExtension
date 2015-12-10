@@ -1,5 +1,5 @@
-myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase', 
-						function ($scope, $location, $apiBases, $apiBase) {
+myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase', 'InternetConnectivity',
+						function ($scope, $location, $apiBases, $apiBase, InternetConnectivity) {
 	$scope.Session = null;
     $scope.pageReady = false;
     $scope.$on('pageReady', function() {
@@ -45,6 +45,15 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
     $scope.$on('environmentChange', function (event, environment) {
     	$scope.changeEnvironment(environment);
     })
+
+    // this has a listener for runtime internet failures
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        if (message.internetConnected === false) {
+            InternetConnectivity.displayOfflineModal();
+        } else if (message.internetConnected === true) {
+            InternetConnectivity.hideOfflineModal()
+        }
+    });
 
 
     // Change the api base url based on environment change by sending the change to 

@@ -63,7 +63,8 @@ myApp.controller("LoginEntryController", ['$scope', 'APIService', '$http', '$loc
     }
 
     // Secret options menu
-    $scope.environmentOptions = ['dev99', 'qa', 'stage', 'live', 'test1', 'irinatest', 'oshertest']; 
+    $scope.environmentOptions = ['dev99', 'qa', 'stage', 'test1', 'itest', 'otest', 'live'];
+
 
     // Dropdown menu with environments has been clicked, and the environment should change
     $scope.changeEnvironment = function (environment) {

@@ -1060,4 +1060,12 @@ input:focus {
 
 #clockman-text {
     text-align: center;
+    width: 65%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+}
+
+#clockman-text b {
+    font-size: 25px;
+    font-weight: 500;
 }

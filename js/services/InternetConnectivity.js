@@ -7,7 +7,7 @@ myApp.service('InternetConnectivity', function () {
 	this.displayOfflineModal = function() {
 		offlineBox = bootbox.dialog({
             message: '<div id="clockman-text" class="center-block"><img id="clockman-image" src="../../img/clockman.png"/><br><br>' +
-            		 'Shucks! We&#39re sorry, you don&#39t appear to have an internet connection. ' +
+            		 '<b>Shucks!</b><br><br> We&#39re sorry, you don&#39t appear to have an internet connection. ' +
             		 'Please try again when you have connectivity.</div>',       
             show: true,
             backdrop: true,

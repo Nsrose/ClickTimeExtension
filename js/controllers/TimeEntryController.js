@@ -525,7 +525,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         of formats. Also, this will check for preliminary errors in user input.
         Call the callback on the new clickTimeEntry
     */
-    $scope.prevalidateTimeEntry = function (timeEntry, clickTimeEntry, callback) {
+    $scope.prevalidateTimeEntry = function (timeEntry, clickTimeEntry) {
+        var deferred = $q.defer();
 
         if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
             if (!timeEntry.Hours) {
@@ -582,7 +583,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             clickTimeEntry.ISOStartTime = ISOStartTime;
             clickTimeEntry.ISOEndTime = ISOEndTime;
         }
-        callback(clickTimeEntry);
+
+        deferred.resolve(clickTimeEntry);
+        return deferred.promise;
     }
 
     /* First, refresh all entity lists. Then, validate the entry.
@@ -606,11 +609,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 "client" : timeEntry.client
             }
 
-            $scope.prevalidateTimeEntry(timeEntry, clickTimeEntry, function (clickTimeEntry) {
+            $scope.prevalidateTimeEntry(timeEntry, clickTimeEntry).then(function() {
                 if (!clickTimeEntry) {
                     return;
-                }
-                if (!validateTimeEntry(timeEntry)) {
+                } else if (!validateTimeEntry(timeEntry)) {
                     $scope.$broadcast("timeEntryError");
                     return;
                 } else {
@@ -628,7 +630,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.$broadcast("timeEntrySuccess");
                             EntityService.updateRecentEntities(timeEntry);
                             EntityService.getTimeEntries($scope.Session).then(afterGetTimeEntries);
-                            $scope.$apply();
                         })
                         .catch(function (response) {
                             if (response.data == null) {
@@ -654,7 +655,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         });
                 }
             })
-
         })
     }
 

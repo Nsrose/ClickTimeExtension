@@ -159,7 +159,8 @@ myApp.service('CTService', function() {
         //return time + ":00"; 
     }
 
-    /** Compile hrs, min, and sec to a Clicktime Hour stamp */
+    /** Compile hrs, min, and sec to a Clicktime Hour stamp.
+        Assumes all values are floats!! */
     this.compileHours = function (hrs, min, sec, timeIncrement) {
         var time = (hrs + min/60 + sec/3600) + '';
         return this.roundToNearest(time, timeIncrement);

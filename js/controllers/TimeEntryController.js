@@ -555,9 +555,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
 
         if ($scope.saveFromTimer || $scope.showStopwatch && !$scope.abandonedStopwatch) {
-            var hrs = $scope.elapsedHrs;
-            var min = $scope.elapsedMin;
-            var sec = $scope.elapsedSec;
+            var hrs = parseFloat($scope.elapsedHrs);
+            var min = parseFloat($scope.elapsedMin);
+            var sec = parseFloat($scope.elapsedSec);
             var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
             clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
             timeEntry.Hours = compiledHours;

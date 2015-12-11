@@ -100,7 +100,6 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
                 $scope.$parent.runningStopwatch  = false;
                 $interval.cancel(timerPromise);
                 timerPromise = undefined;
-                $scope.$apply();
                 chrome.extension.getBackgroundPage().stopBadge();
             })
         }

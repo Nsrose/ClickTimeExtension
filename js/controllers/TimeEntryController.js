@@ -187,7 +187,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 TimeEntryService.updateInProgressEntry('startEndTimes',
                     [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
             }, 1000);
-        }    
+        }
     }
 
     // Clear the successful save message
@@ -838,7 +838,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     'UserID' : UserID
                 }
             }, function() {
-                // console.log('method is ' + method)
                 changeTimeEntryMethod(method);
                 updateDurationDisplay();
                 chrome.extension.getBackgroundPage().createNotifications(pollPeriod);

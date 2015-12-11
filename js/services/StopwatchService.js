@@ -53,7 +53,7 @@ myApp.service("StopwatchService", function() {
 				chrome.storage.sync.set({
 					'stopwatch' : stopwatch
 				}, function() {
-					callback();
+					callback();					
 				}) 
 			}
 		})

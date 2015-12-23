@@ -824,8 +824,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         - if it's not been set before
             - allow reminders by default
 
-       Notifications are started either way. (notification permissions specified in function 
-       found in background.js).
+       Notifications are started in both cases, provided that there isn't already a notification interval running
     */
     function updateTimeEntryMethodInStorage() {
         var UserID, RequireStopwatch, RequireStartEndTime, method;
@@ -864,7 +863,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         if (RequireStartEndTime || RequireStopwatch) {
             method = 'start-end'
-            timeEntryMethodSyncSetter()
+            timeEntryMethodSyncSetter();
         } else {
             // method could be either. if s&e has never been set before, then method = duration. 
             // but if has been set before, then method is whatever you have
@@ -874,11 +873,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 } else {
                     method = 'duration'
                 }
-                timeEntryMethodSyncSetter()
+                timeEntryMethodSyncSetter();
             })
         }
         // set allowReminder
-       allowRemindersSyncSetter()
+       allowRemindersSyncSetter();
     }
 
     // Check for update to jobClient and reset permitted task list.

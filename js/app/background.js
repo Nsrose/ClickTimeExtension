@@ -22,7 +22,6 @@ chrome.runtime.onMessage.addListener(
 */
 var timer;
 
-
 // Get the elapsed time of the stopwatch. 
 // If no running stopwatches, then this will be 0.
 // Return an object with elapsed hours, minutes, and seconds.
@@ -141,20 +140,23 @@ var options = {
 //notifications function 
 var notificationInterval;
 
-/* create notifications if all conditions true:
+/* first check if interval already defined. if not, create reminder if all conditions true:
     - user allows it
     - user is logged in
-    - there isn't a running stopwatch. */
+    - there isn't a running stopwatch. 
+   every pollPeriod, generate a reminder. */
 function createNotifications(pollPeriod) {
+  if (notificationInterval === undefined) {
     notificationInterval = setInterval(function() {
        chrome.storage.sync.get(['session', 'allowReminders', 'stopwatch'], function(items) {
-            if ((('allowReminders' in items) && (items.allowReminders.permission)) && 
-                ('session' in items) && 
-                (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running)))) {
-                  chrome.notifications.create("enterTimeNotification", options);
-             }
+          if ((('allowReminders' in items) && (items.allowReminders.permission)) && 
+              ('session' in items) && 
+              (!('stopwatch' in items) || (('stopwatch' in items) && (!items.stopwatch.running)))) {
+                chrome.notifications.create("enterTimeNotification", options);
+          }
        })
-    }, pollPeriod)
+    }, pollPeriod);
+  }
 };
 
 /* 
@@ -163,8 +165,15 @@ function createNotifications(pollPeriod) {
 */
 function stopNotifications() {
     clearInterval(notificationInterval);
+    notificationInterval = undefined;
     chrome.notifications.clear('enterTimeNotification');
 }
+
+/* on notification close, create another notification later. */
+chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
+    stopNotifications();
+    createNotifications(NOTIFICATION_POLL_PERIOD);
+});
 
 /* Create a new notification and send, for demonstration purposes.*/
 function sendOneNotification() {
@@ -176,9 +185,7 @@ var timeString = null;
 // Info from latest google calendar reqeust
 var timeInfo = null;
 
-/*  
-    clicking on the body of the message will open the webapp in a window
-*/
+/*  clicking on the body of the message will open the webapp in a window */
 chrome.notifications.onClicked.addListener(function (notificationId) {
   createWindow();
 });
@@ -307,11 +314,6 @@ chrome.windows.onRemoved.addListener(function (closedWindowID) {
     }
 })
 
-/* on notification close, create another notification later. */
-chrome.notifications.onClosed.addListener(function (notificationId, byUser) {
-    stopNotifications();    
-    createNotifications(NOTIFICATION_POLL_PERIOD);
-});
 
 ////////////////////////////////////////////////////////////////////
 

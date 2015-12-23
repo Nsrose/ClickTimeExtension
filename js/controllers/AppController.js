@@ -1,13 +1,6 @@
 myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase', 'InternetConnectivity',
 						function ($scope, $location, $apiBases, $apiBase, InternetConnectivity) {
 	$scope.Session = null;
-    $scope.pageReady = false;
-    $scope.$on('pageReady', function() {
-        $scope.pageReady = true;
-    })
-    $scope.$on('pageLoading', function() {
-        $scope.pageReady = false;
-    })
 
     // Error for DCAA/ Sub Job modules 
     $scope.DCAASubJobError = false;

@@ -1,5 +1,5 @@
 myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http',
-                                function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
+    function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
     
     //google analytics
     ga('send', 'pageview', '/main.html'); 
@@ -75,7 +75,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             });
     }
     
-    /////////////////////////////////////////////////////////////////////////
+    //////////////// listeners //////////////////////////////////
 
     /* Listen for update from the following things:
         - from an integration
@@ -438,7 +438,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.showStartTimer = true;
-       
         $scope.abandonedStopwatch = false;
         $scope.abandonedEntry = false;
         $scope.pageReady = true;
@@ -471,9 +470,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
     
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    ////// Time entry ////// 
+    /////////////////////////////// Time entry ///////////////////////////////////////
 
     // utility method
     function afterGetTimeEntries(timeEntries) {
@@ -926,34 +923,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
-    ///// ONLOAD: This will get executed upon opening the chrome extension. /////////
+    //////// ONLOAD: Initialization. This will get executed upon opening the chrome extension. /////////
 
-    // Once page has loaded, send a message that this was loaded.
-    $scope.sendPageReady = function() {
-        chrome.runtime.sendMessage({
-            pageReady: true
-        })
-
-        $(function () {
-            $(".dropdown-toggle").on("click", function() {
-                appendRecentAll();
-                $('.dropdown-menu').each(function (i, e) {
-                    var dropdown_menu = $(e).children().first().children();
-                    dropdown_menu.on("keyup", function(e) {
-                        var text = e.target.value;
-                        if (text) {
-                            $(".recent-add").remove();
-                            $(".all-add").remove();
-                        } else {
-                            appendRecentAll();
-                        }
-                    })
-                })
-            })
-        })
-    }
-
-    // If populated with 4 entites, then scope is done refreshing:
+      // If populated with 4 entites, then scope is done refreshing:
     var doneRefresh = [];
 
     // Refresh function
@@ -968,9 +940,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
         
         $scope.HasEmptyEntities = false;
-
         $scope.clearAllErrors();
-        $scope.$parent.$broadcast("pageLoading");
+
+        $scope.pageReady = false;
+
         if (!$scope.saving) {
             TimeEntryService.removeInProgressEntry();
         }
@@ -1232,8 +1205,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 deferred.resolve();
             }
 
-            $scope.$parent.$broadcast("pageReady");
-            // $scope.$apply();
+            $scope.pageReady = true;
         }
        
         EntityService.getJobClients($scope.Session, false).then(afterGetJobClients);
@@ -1243,7 +1215,32 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         return deferred.promise;
     }
-    
+      // Once page has loaded, send a message that this was loaded.
+    $scope.sendPageReady = function() {
+        chrome.runtime.sendMessage({
+            pageReady: true
+        })
+
+        $(function () {
+            $(".dropdown-toggle").on("click", function() {
+                appendRecentAll();
+                $('.dropdown-menu').each(function (i, e) {
+                    var dropdown_menu = $(e).children().first().children();
+                    dropdown_menu.on("keyup", function(e) {
+                        var text = e.target.value;
+                        if (text) {
+                            $(".recent-add").remove();
+                            $(".all-add").remove();
+                        } else {
+                            appendRecentAll();
+                        }
+                    })
+                })
+            })
+        })
+    }
+
+
     // When this list is populated with 4 entities, the scope is ready. 
     var doneLoading = [];
 
@@ -1330,7 +1327,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 doneLoading.push('tasks');
                 if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
-                    $scope.$emit("pageReady");
+                    $scope.pageReady = true;
                 }
                 return;
             }
@@ -1348,7 +1345,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         doneLoading.push('tasks');
                         if (doneLoading.length >= 4) {
                             $scope.sendPageReady();
-                            $scope.$emit("pageReady");
+                            $scope.pageReady = true;
                         }
                         $scope.$apply();
                         return;
@@ -1364,7 +1361,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 doneLoading.push('tasks');
                 if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
-                    $scope.$emit("pageReady");
+                    $scope.pageReady = true;
                 }
                 $scope.$apply();
             })
@@ -1380,7 +1377,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             doneLoading.push('user');
             if (doneLoading.length >= 4) {
                 $scope.sendPageReady();
-                $scope.$emit("pageReady");
+                $scope.pageReady = true;
             }
             updateTimeEntryMethodInStorage();      
             chrome.storage.sync.get(['stopwatch'], function (items) {
@@ -1477,7 +1474,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             doneLoading.push('company');
             if (doneLoading.length >= 4) {
                 $scope.sendPageReady();
-                $scope.$emit("pageReady");
+                $scope.pageReady = true;
             }
         }
 
@@ -1490,7 +1487,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 doneLoading.push("jobClients");
                 if (doneLoading.length >= 4) {
                     $scope.sendPageReady();
-                    $scope.$emit("pageReady");
+                    $scope.pageReady = true;
                 }
                 $scope.$apply();
             } else {
@@ -1511,7 +1508,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             doneLoading.push("jobClients");
                             if (doneLoading.length >= 4) {
                                 $scope.sendPageReady();
-                                $scope.$emit("pageReady");
+                                $scope.pageReady = true;
                             }
                             $scope.$apply();
                             return;
@@ -1528,7 +1525,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     doneLoading.push("jobClients");
                     if (doneLoading.length >= 4) {
                         $scope.sendPageReady();
-                        $scope.$emit("pageReady");
+                        $scope.pageReady = true;
                     }
                     $scope.$apply();
                 
@@ -1541,9 +1538,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         EntityService.getUser(session, true).then(afterGetUser);
         EntityService.getCompany(session, true).then(afterGetCompany);
         EntityService.getTimeEntries(session).then(afterGetTimeEntries);
-
     }
 
+    // call on every page load 
     EntityService.getSession()
         .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
       

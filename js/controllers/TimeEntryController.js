@@ -590,9 +590,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.saveTimeEntry = function (session, timeEntry) {
         $scope.saving = true;
         $scope.clearAllErrors();
-        doneRefresh.length = 0; // necessary to have both before and after refresh because just in case
         $scope.refresh().then(function() {
-            doneRefresh.length = 0;
             var clickTimeEntry = {
                 "BreakTime" : timeEntry.BreakTime,
                 "Comment" : timeEntry.Comment,
@@ -926,7 +924,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     //////// ONLOAD: Initialization. This will get executed upon opening the chrome extension. /////////
 
       // If populated with 4 entites, then scope is done refreshing:
-    var doneRefresh = [];
 
     // Refresh function
     /** Force an update to all entity lists from the API. Do not check local storage first.
@@ -1008,11 +1005,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.HasEmptyEntities = true;
             }
 
-            doneRefresh.push("jobClients");
-            if (doneRefresh.length >= 4) {
-                deferred.resolve();
-            }
-            // $scope.$apply();
         }
 
         function afterGetTasks(tasksList) {
@@ -1117,10 +1109,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     }
                 }
             }
-            doneRefresh.push("tasks");
-            if (doneRefresh.length >= 4) {
-                deferred.resolve();
-            }
+
         }
 
         function afterGetUser(user) {
@@ -1153,11 +1142,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             $scope.user = user;
 
-            doneRefresh.push("user");
-            if (doneRefresh.length >= 4) {
-                deferred.resolve();
-            }
-            // $scope.$apply();
         }
 
         function afterGetCompany(company) {
@@ -1200,22 +1184,21 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
             }
           
-            doneRefresh.push("company");
-            if (doneRefresh.length >= 4) {
-                deferred.resolve();
-            }
+
 
             $scope.pageReady = true;
         }
        
-        EntityService.getJobClients($scope.Session, false).then(afterGetJobClients);
-        EntityService.getTasks($scope.Session, false).then(afterGetTasks);
-        EntityService.getUser($scope.Session, false).then(afterGetUser);
-        EntityService.getCompany($scope.Session, false).then(afterGetCompany);
-
+        $q.all([EntityService.getJobClients($scope.Session, false).then(afterGetJobClients),
+                EntityService.getTasks($scope.Session, false).then(afterGetTasks),
+                EntityService.getUser($scope.Session, false).then(afterGetUser),
+                EntityService.getCompany($scope.Session, false).then(afterGetCompany)])
+            .then(function() {
+                deferred.resolve();
+            })
         return deferred.promise;
     }
-      // Once page has loaded, send a message that this was loaded.
+
     $scope.sendPageReady = function() {
         chrome.runtime.sendMessage({
             pageReady: true
@@ -1240,9 +1223,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         })
     }
 
-
-    // When this list is populated with 4 entities, the scope is ready. 
-    var doneLoading = [];
 
     /** Get the session, from sync storage if it exists, otherwise call the API.
         Then get all entities. */
@@ -1324,11 +1304,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             if (tasksList.length == 0) {
                 $scope.HasEmptyEntities = true;
-                doneLoading.push('tasks');
-                if (doneLoading.length >= 4) {
-                    $scope.sendPageReady();
-                    $scope.pageReady = true;
-                }
+
                 return;
             }
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -1341,12 +1317,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         // If in progress entity is in the entity list
                         $scope.task = filteredTasks[0];
                         $scope.timeEntry.task = inProgressEntry.task;
-                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;
-                        doneLoading.push('tasks');
-                        if (doneLoading.length >= 4) {
-                            $scope.sendPageReady();
-                            $scope.pageReady = true;
-                        }
+                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;            
                         $scope.$apply();
                         return;
                     }           
@@ -1358,11 +1329,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     $scope.timeEntry.TaskID = $scope.task.TaskID;
                 }
                 TimeEntryService.updateInProgressEntry("task", $scope.task);
-                doneLoading.push('tasks');
-                if (doneLoading.length >= 4) {
-                    $scope.sendPageReady();
-                    $scope.pageReady = true;
-                }
                 $scope.$apply();
             })
         }
@@ -1374,11 +1340,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
 
             $scope.user = user;
-            doneLoading.push('user');
-            if (doneLoading.length >= 4) {
-                $scope.sendPageReady();
-                $scope.pageReady = true;
-            }
             updateTimeEntryMethodInStorage();      
             chrome.storage.sync.get(['stopwatch'], function (items) {
                 // Check for abandoned stopwatch
@@ -1471,11 +1432,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 }
             }
 
-            doneLoading.push('company');
-            if (doneLoading.length >= 4) {
-                $scope.sendPageReady();
-                $scope.pageReady = true;
-            }
+
         }
 
         function afterGetJobClients(jobClientsList) {
@@ -1484,11 +1441,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if ($scope.jobClients.length == 0) {
                 $scope.HasEmptyEntities = true;
                 $scope.jobClient = undefined;
-                doneLoading.push("jobClients");
-                if (doneLoading.length >= 4) {
-                    $scope.sendPageReady();
-                    $scope.pageReady = true;
-                }
+
                 $scope.$apply();
             } else {
                 TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -1505,11 +1458,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.timeEntry.job = inProgressEntry.job;
                             $scope.timeEntry.JobID = inProgressEntry.JobID;
                             $scope.timeEntry.client = inProgressEntry.client;
-                            doneLoading.push("jobClients");
-                            if (doneLoading.length >= 4) {
-                                $scope.sendPageReady();
-                                $scope.pageReady = true;
-                            }
+              
                             $scope.$apply();
                             return;
                         }           
@@ -1522,22 +1471,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
                         TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
                     });
-                    doneLoading.push("jobClients");
-                    if (doneLoading.length >= 4) {
-                        $scope.sendPageReady();
-                        $scope.pageReady = true;
-                    }
+
                     $scope.$apply();
                 
                 })
             }
         }
 
-        EntityService.getJobClients(session, true).then(afterGetJobClients);
-        EntityService.getTasks(session, true).then(afterGetTasks);
-        EntityService.getUser(session, true).then(afterGetUser);
-        EntityService.getCompany(session, true).then(afterGetCompany);
-        EntityService.getTimeEntries(session).then(afterGetTimeEntries);
+        $q.all([EntityService.getJobClients(session, true).then(afterGetJobClients),
+                    EntityService.getTasks(session, true).then(afterGetTasks),
+                    EntityService.getUser(session, true).then(afterGetUser),
+                    EntityService.getCompany(session, true).then(afterGetCompany),
+                    EntityService.getTimeEntries(session).then(afterGetTimeEntries)])
+            .then(function() {
+                $scope.sendPageReady();
+                $scope.pageReady = true;
+            })
     }
 
     // call on every page load 

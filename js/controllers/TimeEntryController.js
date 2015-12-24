@@ -468,28 +468,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
     
     /////////////////////////////// Time entry ///////////////////////////////////////
-
-    // utility method
-    function afterGetTimeEntries(timeEntries) {
-        var totalHours = 0;
-        var timeEntries = timeEntries[0].TimeEntries;
-        var arrayLength = timeEntries.length;
-        for (var i = 0; i < arrayLength; i++) {
-            totalHours += timeEntries[i].Hours;
-        }
-        var splitHrs = (totalHours + '').split(".");
-        var hrs = parseInt(splitHrs[0]);
-        var min = null;
-        if (splitHrs.length == 2) {
-            var min = parseFloat('0.' + splitHrs[1]);
-            min = Math.floor(min * 60);
-        }
-        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-        $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-        $scope.totalHrs = hrs;
-        $scope.totalMin = min;
-    }
-
+ 
     // Time entry methods
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
@@ -774,7 +753,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
 
     /// Logging out and dealing with local storage /////
 
@@ -918,9 +897,216 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
+
+    ///////// afterGetSession utility methods. It runs every page load//////////////
+    function afterGetTimeEntries(timeEntries) {
+        var totalHours = 0;
+        var timeEntries = timeEntries[0].TimeEntries;
+        var arrayLength = timeEntries.length;
+        for (var i = 0; i < arrayLength; i++) {
+            totalHours += timeEntries[i].Hours;
+        }
+        var splitHrs = (totalHours + '').split(".");
+        var hrs = parseInt(splitHrs[0]);
+        var min = null;
+        if (splitHrs.length == 2) {
+            var min = parseFloat('0.' + splitHrs[1]);
+            min = Math.floor(min * 60);
+        }
+        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
+        $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
+        $scope.totalHrs = hrs;
+        $scope.totalMin = min;
+    }
+
+    function afterGetTasks(tasksList) {
+        $scope.allTasks = tasksList;
+        if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
+            var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
+            var permittedTasks = [];
+            for (i in tasksList) {
+                var t = tasksList[i];
+                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
+                    permittedTasks.push(t);
+                }
+            }
+            $scope.tasks = permittedTasks;
+        } else {
+            $scope.tasks = tasksList;    
+        }
+        if (tasksList.length == 0) {
+            $scope.HasEmptyEntities = true;
+
+            return;
+        }
+        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+            if (inProgressEntry.task != undefined) {
+                var filteredTasks = $scope.tasks.filter(function (task) { 
+                    return task.TaskID == inProgressEntry.task.TaskID
+                })
+
+                if (filteredTasks.length > 0) {
+                    // If in progress entity is in the entity list
+                    $scope.task = filteredTasks[0];
+                    $scope.timeEntry.task = inProgressEntry.task;
+                    $scope.timeEntry.TaskID = inProgressEntry.TaskID;            
+                    $scope.$apply();
+                    return;
+                }           
+            }
+            // No in progress entity
+            $scope.task = tasksList[0];
+            if ($scope.task) {
+                $scope.timeEntry.task = $scope.task;
+                $scope.timeEntry.TaskID = $scope.task.TaskID;
+            }
+            TimeEntryService.updateInProgressEntry("task", $scope.task);
+            $scope.$apply();
+        })
+    }
+
+    function afterGetUser(user) {
+        if (user.RequireStopwatch) {
+            $scope.$parent.RequireStopwatch = true;
+            $scope.logout();
+        }
+
+        $scope.user = user;
+        updateTimeEntryMethodInStorage();      
+        chrome.storage.sync.get(['stopwatch'], function (items) {
+            // Check for abandoned stopwatch
+            if ('stopwatch' in items) {
+                var now = new Date();
+                var stopwatch = items.stopwatch;
+                if (stopwatch.running) {
+                    var stopwatchDate = new Date(stopwatch.startYear, stopwatch.startMonth,
+                        stopwatch.startDay, now.getHours(), now.getMinutes(), now.getSeconds(),
+                        now.getMilliseconds());
+
+                    if (now > stopwatchDate) {
+                        // There is an abandoned stopwatch
+                        StopwatchService.getStartTime(function (startTime) {
+                            var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
+                                startTime.getHours(), startTime.getMinutes(), 0);
+                            var midnight = new Date(2015, 0, 1, 23, 59, 0);
+                            $scope.timeEntry.ISOStartTime = start;
+                            $scope.timeEntry.ISOEndTime = midnight;
+                            TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
+                        })
+                        $scope.abandonedStopwatch = true;
+                        $scope.runningStopwatch = false;                        
+                    } else {
+                        // There is a running stopwatch, but it isn't abandoned
+                        var now = new Date();
+                        var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+                            now.getHours(), now.getMinutes(), 0);
+                        $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
+                        stopwatch.startDay, stopwatch.startHrs, stopwatch.startMin, 0);
+                        $scope.timeEntry.ISOEndTime = end;
+                        TimeEntryService.updateInProgressEntry('startEndTimes',
+                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+
+                        $scope.endTimePromise = $interval(function() {
+                            var now = new Date();
+                            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+                                now.getHours(), now.getMinutes(), 0);
+                            $scope.timeEntry.ISOEndTime = end;
+                            TimeEntryService.updateInProgressEntry('startEndTimes',
+                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+                        }, 1000);
+                        $scope.$apply();
+                    }
+                }
+            }
+        })
+    }
+    
+    function afterGetCompany(company) {
+        if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
+            $scope.$parent.DCAASubJobError = true;
+            $scope.logout();
+        }
+        $scope.company = company;
+
+        if (company.DisplayClientSelector == true) {
+            $scope.customTerms = {
+                'clientSlash' : ' / ',
+                'clientTermSingLow' : company.ClientTermSingular,
+                'clientTermPlurLow' : company.ClientTermPlural,
+                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
+                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
+                'jobTermSingLow' : company.JobTermSingular,
+                'jobTermPlurLow' : company.JobTermPlural,
+                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                'taskTermSingLow' : company.TaskTermSingular,
+                'taskTermPlurLow' : company.TaskTermPlural,
+                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            }
+        } else if (company.DisplayClientSelector == false) {
+            $scope.customTerms = {
+                'clientTermSingLow' : '',
+                'clientTermPlurLow' : '',
+                'clientTermSingHigh' : '',
+                'clientTermPlurHigh' : '',
+                'jobTermSingLow' : company.JobTermSingular,
+                'jobTermPlurLow' : company.JobTermPlural,
+                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
+                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
+                'taskTermSingLow' : company.TaskTermSingular,
+                'taskTermPlurLow' : company.TaskTermPlural,
+                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
+                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
+            }
+        }
+    }
+
+    function afterGetJobClients(jobClientsList) {
+        $scope.jobClients = jobClientsList;
+
+        if ($scope.jobClients.length == 0) {
+            $scope.HasEmptyEntities = true;
+            $scope.jobClient = undefined;
+
+            $scope.$apply();
+        } else {
+            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
+                if (inProgressEntry.job != undefined) {
+                    var filteredJobClients = $scope.jobClients.filter(function (jobClient) { 
+                        return jobClient.job.JobID == inProgressEntry.job.JobID 
+                            && jobClient.job.ClientID == inProgressEntry.client.ClientID
+                            && jobClient.client.ClientID == inProgressEntry.client.ClientID;
+                    })
+
+                    if (filteredJobClients.length > 0) {
+                        // If in progress entity is in the entity list
+                        $scope.jobClient = filteredJobClients[0];
+                        $scope.timeEntry.job = inProgressEntry.job;
+                        $scope.timeEntry.JobID = inProgressEntry.JobID;
+                        $scope.timeEntry.client = inProgressEntry.client;
+          
+                        $scope.$apply();
+                        return;
+                    }           
+                } 
+                // No in progress entity
+                $scope.jobClient = $scope.jobClients[0];
+                $scope.timeEntry.job = $scope.jobClient.job;
+                $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
+                $scope.timeEntry.client = $scope.jobClient.client;
+                TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
+                    TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
+                });
+
+                $scope.$apply();
+            
+            })
+        }
+    }
+
     //////// ONLOAD: Initialization. This will get executed upon opening the chrome extension. /////////
 
-      // If populated with 4 entites, then scope is done refreshing:
 
     // Refresh function
     /** Force an update to all entity lists from the API. Do not check local storage first.
@@ -997,11 +1183,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     }
                 }
             }
-
             if (jobClientsList.length == 0) {
                 $scope.HasEmptyEntities = true;
             }
-
         }
 
         function afterGetTasks(tasksList) {
@@ -1036,7 +1220,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                         $scope.timeEntry.TaskID = $scope.task.TaskID;
                     }
                     TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                   // $scope.$apply();
                 } else {
                     var currentJob = $scope.timeEntry.job;
                     if ($scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
@@ -1070,7 +1253,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
                             TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);                    
-                           // $scope.$apply();
                         } else {
                             $scope.allTasks = tasksList;
                             if ($scope.jobClient) {
@@ -1086,9 +1268,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             } else {
                                 $scope.tasks = tasksList;    
                             }
-                            // if ($scope.tasks.length > 0) {
-                            //     $scope.task = $scope.tasks[0];
-                            // }
                             var taskIndex = EntityService.indexTask($scope.tasks, currentTask);
                             if (taskIndex != -1) {
                                 $scope.task = $scope.tasks[taskIndex];
@@ -1101,17 +1280,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                                 $scope.timeEntry.TaskID = $scope.task.TaskID;
                             }
                             TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                            //$scope.$apply();
                         }
                     }
                 }
             }
-
         }
 
         function afterGetUser(user) {
             var currentUser = $scope.user;
-
             if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
                 $scope.setError("userConflict", "We're sorry but the "
                             + "time entry method" + " "
@@ -1135,68 +1311,24 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                   })
                 }
               $scope.$apply();
-              return;
+            } else {
+                $scope.user = user;
             }
-            $scope.user = user;
-
         }
 
-        function afterGetCompany(company) {
-            $scope.company = company;
-            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
-                $scope.$parent.DCAASubJobError = true;
-                $scope.logout();
-            }
-
-            if (company.DisplayClientSelector == true) {
-                $scope.customTerms = {
-                    'clientSlash' : ' / ',
-                    'clientTermSingLow' : company.ClientTermSingular,
-                    'clientTermPlurLow' : company.ClientTermPlural,
-                    'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                    'jobTermSingLow' : company.JobTermSingular,
-                    'jobTermPlurLow' : company.JobTermPlural,
-                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                    'taskTermSingLow' : company.TaskTermSingular,
-                    'taskTermPlurLow' : company.TaskTermPlural,
-                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-                }
-            } else if (company.DisplayClientSelector == false) {
-                $scope.customTerms = {
-                    'clientTermSingLow' : '',
-                    'clientTermPlurLow' : '',
-                    'clientTermSingHigh' : '',
-                    'clientTermPlurHigh' : '',
-                    'jobTermSingLow' : company.JobTermSingular,
-                    'jobTermPlurLow' : company.JobTermPlural,
-                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                    'taskTermSingLow' : company.TaskTermSingular,
-                    'taskTermPlurLow' : company.TaskTermPlural,
-                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-                }
-            }
-          
-
-
-            $scope.pageReady = true;
-        }
-       
         $q.all([EntityService.getJobClients($scope.Session, false).then(afterGetJobClients),
                 EntityService.getTasks($scope.Session, false).then(afterGetTasks),
                 EntityService.getUser($scope.Session, false).then(afterGetUser),
                 EntityService.getCompany($scope.Session, false).then(afterGetCompany)])
             .then(function() {
+                $scope.sendPageReady();
                 deferred.resolve();
             })
         return deferred.promise;
     }
 
     $scope.sendPageReady = function() {
+        $scope.pageReady = true;
         chrome.runtime.sendMessage({
             pageReady: true
         })
@@ -1219,7 +1351,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             })
         })
     }
-
 
     /** Get the session, from sync storage if it exists, otherwise call the API.
         Then get all entities. */
@@ -1284,197 +1415,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
         })
 
-        function afterGetTasks(tasksList) {
-            $scope.allTasks = tasksList;
-            if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
-                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                var permittedTasks = [];
-                for (i in tasksList) {
-                    var t = tasksList[i];
-                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                        permittedTasks.push(t);
-                    }
-                }
-                $scope.tasks = permittedTasks;
-            } else {
-                $scope.tasks = tasksList;    
-            }
-            if (tasksList.length == 0) {
-                $scope.HasEmptyEntities = true;
-
-                return;
-            }
-            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                if (inProgressEntry.task != undefined) {
-                    var filteredTasks = $scope.tasks.filter(function (task) { 
-                        return task.TaskID == inProgressEntry.task.TaskID
-                    })
-
-                    if (filteredTasks.length > 0) {
-                        // If in progress entity is in the entity list
-                        $scope.task = filteredTasks[0];
-                        $scope.timeEntry.task = inProgressEntry.task;
-                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;            
-                        $scope.$apply();
-                        return;
-                    }           
-                }
-                // No in progress entity
-                $scope.task = tasksList[0];
-                if ($scope.task) {
-                    $scope.timeEntry.task = $scope.task;
-                    $scope.timeEntry.TaskID = $scope.task.TaskID;
-                }
-                TimeEntryService.updateInProgressEntry("task", $scope.task);
-                $scope.$apply();
-            })
-        }
-
-        function afterGetUser(user) {
-            if (user.RequireStopwatch) {
-                $scope.$parent.RequireStopwatch = true;
-                $scope.logout();
-            }
-
-            $scope.user = user;
-            updateTimeEntryMethodInStorage();      
-            chrome.storage.sync.get(['stopwatch'], function (items) {
-                // Check for abandoned stopwatch
-                if ('stopwatch' in items) {
-                    var now = new Date();
-                    var stopwatch = items.stopwatch;
-                    if (stopwatch.running) {
-                        var stopwatchDate = new Date(stopwatch.startYear, stopwatch.startMonth,
-                            stopwatch.startDay, now.getHours(), now.getMinutes(), now.getSeconds(),
-                            now.getMilliseconds());
-
-                        if (now > stopwatchDate) {
-                            // There is an abandoned stopwatch
-                            StopwatchService.getStartTime(function (startTime) {
-                                var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
-                                    startTime.getHours(), startTime.getMinutes(), 0);
-                                var midnight = new Date(2015, 0, 1, 23, 59, 0);
-                                $scope.timeEntry.ISOStartTime = start;
-                                $scope.timeEntry.ISOEndTime = midnight;
-                                TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
-                            })
-                            $scope.abandonedStopwatch = true;
-                            $scope.runningStopwatch = false;
-
-                            
-                            $('#notes-field').css({'width': '448px', 'max-width': '448px'});
-                        } else {
-                            // There is a running stopwatch, but it isn't abandoned
-                            var now = new Date();
-                            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                                now.getHours(), now.getMinutes(), 0);
-                            $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
-                            stopwatch.startDay, stopwatch.startHrs, stopwatch.startMin, 0);
-                            $scope.timeEntry.ISOEndTime = end;
-                            TimeEntryService.updateInProgressEntry('startEndTimes',
-                                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-
-                            $scope.endTimePromise = $interval(function() {
-                                var now = new Date();
-                                var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                                    now.getHours(), now.getMinutes(), 0);
-                                $scope.timeEntry.ISOEndTime = end;
-                                TimeEntryService.updateInProgressEntry('startEndTimes',
-                                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-                            }, 1000);
-                            $scope.$apply();
-                        }
-                    }
-                }
-            })
-        }
-        
-        function afterGetCompany(company) {
-            if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
-                $scope.$parent.DCAASubJobError = true;
-                $scope.logout();
-            }
-            $scope.company = company;
-
-            if (company.DisplayClientSelector == true) {
-                $scope.customTerms = {
-                    'clientSlash' : ' / ',
-                    'clientTermSingLow' : company.ClientTermSingular,
-                    'clientTermPlurLow' : company.ClientTermPlural,
-                    'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                    'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                    'jobTermSingLow' : company.JobTermSingular,
-                    'jobTermPlurLow' : company.JobTermPlural,
-                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                    'taskTermSingLow' : company.TaskTermSingular,
-                    'taskTermPlurLow' : company.TaskTermPlural,
-                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-                }
-            } else if (company.DisplayClientSelector == false) {
-                $scope.customTerms = {
-                    'clientTermSingLow' : '',
-                    'clientTermPlurLow' : '',
-                    'clientTermSingHigh' : '',
-                    'clientTermPlurHigh' : '',
-                    'jobTermSingLow' : company.JobTermSingular,
-                    'jobTermPlurLow' : company.JobTermPlural,
-                    'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                    'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                    'taskTermSingLow' : company.TaskTermSingular,
-                    'taskTermPlurLow' : company.TaskTermPlural,
-                    'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                    'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-                }
-            }
-
-
-        }
-
-        function afterGetJobClients(jobClientsList) {
-            $scope.jobClients = jobClientsList;
-
-            if ($scope.jobClients.length == 0) {
-                $scope.HasEmptyEntities = true;
-                $scope.jobClient = undefined;
-
-                $scope.$apply();
-            } else {
-                TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                    if (inProgressEntry.job != undefined) {
-                        var filteredJobClients = $scope.jobClients.filter(function (jobClient) { 
-                            return jobClient.job.JobID == inProgressEntry.job.JobID 
-                                && jobClient.job.ClientID == inProgressEntry.client.ClientID
-                                && jobClient.client.ClientID == inProgressEntry.client.ClientID;
-                        })
-
-                        if (filteredJobClients.length > 0) {
-                            // If in progress entity is in the entity list
-                            $scope.jobClient = filteredJobClients[0];
-                            $scope.timeEntry.job = inProgressEntry.job;
-                            $scope.timeEntry.JobID = inProgressEntry.JobID;
-                            $scope.timeEntry.client = inProgressEntry.client;
-              
-                            $scope.$apply();
-                            return;
-                        }           
-                    } 
-                    // No in progress entity
-                    $scope.jobClient = $scope.jobClients[0];
-                    $scope.timeEntry.job = $scope.jobClient.job;
-                    $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
-                    $scope.timeEntry.client = $scope.jobClient.client;
-                    TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
-                        TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
-                    });
-
-                    $scope.$apply();
-                
-                })
-            }
-        }
-
         $q.all([EntityService.getJobClients(session, true).then(afterGetJobClients),
                     EntityService.getTasks(session, true).then(afterGetTasks),
                     EntityService.getUser(session, true).then(afterGetUser),
@@ -1482,12 +1422,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     EntityService.getTimeEntries(session).then(afterGetTimeEntries)])
             .then(function() {
                 $scope.sendPageReady();
-                $scope.pageReady = true;
             })
     }
 
     // call on every page load 
     EntityService.getSession()
-        .then(afterGetSession, function() {bootbox.alert('Session could not be found');})
-      
+        .then(afterGetSession, 
+            function() {
+                bootbox.alert('Session could not be found');
+            })
 }])

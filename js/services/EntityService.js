@@ -552,8 +552,6 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
             chrome.storage.local.set({
                 'jobClientsByRecent' : jobClientsByRecent,
                 'tasksByRecent' : tasksByRecent
-            }, function () {
-                console.log("Saved most recent lists to local storage");
             })
         })
 

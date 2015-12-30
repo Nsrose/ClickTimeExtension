@@ -1,5 +1,5 @@
-myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'APIService', 'CTService', 'EntityService', 'TimeEntryService', 'StopwatchService', '$http',
-    function ($scope, $q, $interval, $timeout, $location, APIService, CTService, EntityService, TimeEntryService, StopwatchService, $http) {
+myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout', '$location', 'CTService', 'EntityService', 'TimeEntryService', '$http', 'RefreshUtilMethods', 'AfterGetSessionUtilMethods',
+    function ($scope, $q, $interval, $timeout, $location, CTService, EntityService, TimeEntryService, $http, RefreshUtilMethods, AfterGetSessionUtilMethods) {
     
     //google analytics
     ga('send', 'pageview', '/main.html'); 
@@ -453,45 +453,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearStopwatch();
     }
 
-    /* Update the hour display if you're using duration as your time entry method*/
-    function updateDurationDisplay() {
-        if ($scope.timeEntryMethod == "duration") {
-            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                $scope.timeEntry.Hours = inProgressEntry.Hours;
-                if (($scope.timeEntryMethod == "duration" && !inProgressEntry.Hours)
-                    || ($scope.timeEntryMethod == "start-end" && (!inProgressEntry.ISOEndTime || 
-                    !inProgressEntry.ISOStartTime))) {
-                    $scope.showStartTimer = true;    
-                }
-            })
-        }
-    }
     
     /////////////////////////////// Time entry ///////////////////////////////////////
  
     // Time entry methods
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
-
-    // Change the template time entry method
-    function changeTimeEntryMethod(timeEntryMethod) {
-      $scope.timeEntryMethod = timeEntryMethod;
-    	switch (timeEntryMethod) {
-    		case "duration":
-    			$scope.showHourEntryField = true;
-    			$scope.showStopwatch = false;
-    			$scope.showStartEndTimes = false;
-    			break;
-    		case "start-end":
-    			$scope.showHourEntryField = false;
-    			$scope.showStartEndTimes = true;
-    			$scope.showStopwatch = false;
-    			break;
-    		default:
-    			bootbox.alert("Invalid time entry method");
-    			break;
-    	}
-    }
 
     /** Prevalidate a time entry. We have to convert the scope's timeEntry into a suitable
         clickTimeEntry that can actually be POSTed to the API. This requires some conversion
@@ -600,7 +567,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.generalSuccess = true;
                             $scope.$broadcast("timeEntrySuccess");
                             EntityService.updateRecentEntities(timeEntry);
-                            EntityService.getTimeEntries($scope.Session).then(afterGetTimeEntries);
+                            EntityService.getTimeEntries($scope.Session).then(function(res) {
+                                AfterGetSessionUtilMethods.afterGetTimeEntries(res, $scope)
+                            })
                         })
                         .catch(function (response) {
                             if (response.data == null) {
@@ -753,9 +722,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
 
-    /// Logging out and dealing with local storage /////
+    /////////////////////////////// Logging out and dealing with local storage /////////////////////////////////
 
     // Logout function - will remove local and sync storage variables.
     $scope.logout = function() {
@@ -784,72 +752,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         })
     }
 
-    /* 
-      Set time entry settings according to the managerial permissions set by the CT admin. 
-
-      Since allowReminder is not a ct-specified property, We will look to see if allow reminders has been set before. 
-        - if it's been set before
-            - same user: keep their old settings (don't do anything -- old settings already in storage)
-            - not same user: allow reminders by default (we can't make it persistent with the user because
-              no database)
-        - if it's not been set before
-            - allow reminders by default
-
-       Notifications are started in both cases, provided that there isn't already a notification interval running
-    */
-    function updateTimeEntryMethodInStorage() {
-        var UserID, RequireStopwatch, RequireStartEndTime, method;
-        var pollPeriod = chrome.extension.getBackgroundPage().NOTIFICATION_POLL_PERIOD;
-
-        function timeEntryMethodSyncSetter() {
-            chrome.storage.sync.set({
-                'timeEntryMethod' : {
-                    'method' : method,
-                    'UserID' : UserID
-                }
-            }, function() {
-                changeTimeEntryMethod(method);
-                updateDurationDisplay();
-                chrome.extension.getBackgroundPage().createNotifications(pollPeriod);
-            });
-        }
-
-        function allowRemindersSyncSetter() {
-            chrome.storage.sync.get(['allowReminders'], function (items) {
-                if (!('allowReminders' in items) || !(UserID == items.allowReminders.UserID)) {
-                    chrome.storage.sync.set({
-                        'allowReminders' : {
-                            'permission' : true,
-                            'UserID' : UserID 
-                        }
-                    });
-                }
-            })     
-        }
-
-        // grab permissions
-        UserID = $scope.user.UserID;
-        RequireStopwatch = $scope.user.RequireStopwatch;
-        RequireStartEndTime = $scope.user.RequireStartEndTime;
-
-        if (RequireStartEndTime || RequireStopwatch) {
-            method = 'start-end'
-            timeEntryMethodSyncSetter();
-        } else {
-            // method could be either. if s&e has never been set before, then method = duration. 
-            // but if has been set before, then method is whatever you have
-            chrome.storage.sync.get('timeEntryMethod', function(items) {
-                if ('timeEntryMethod' in items) {
-                    method = items.timeEntryMethod.method;
-                } else {
-                    method = 'duration'
-                }
-                timeEntryMethodSyncSetter();
-            })
-        }
-        // set allowReminder
-       allowRemindersSyncSetter();
-    }
 
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {
@@ -897,216 +799,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }
     })
 
-
-    ///////// afterGetSession utility methods. It runs every page load//////////////
-    function afterGetTimeEntries(timeEntries) {
-        var totalHours = 0;
-        var timeEntries = timeEntries[0].TimeEntries;
-        var arrayLength = timeEntries.length;
-        for (var i = 0; i < arrayLength; i++) {
-            totalHours += timeEntries[i].Hours;
-        }
-        var splitHrs = (totalHours + '').split(".");
-        var hrs = parseInt(splitHrs[0]);
-        var min = null;
-        if (splitHrs.length == 2) {
-            var min = parseFloat('0.' + splitHrs[1]);
-            min = Math.floor(min * 60);
-        }
-        $scope.totalHoursLogMessage = CTService.getLogMessage(hrs, min);
-        $scope.zeroHoursEncouragementMessage = CTService.getZeroHoursMessage(hrs, min);
-        $scope.totalHrs = hrs;
-        $scope.totalMin = min;
-    }
-
-    function afterGetTasks(tasksList) {
-        $scope.allTasks = tasksList;
-        if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
-            var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-            var permittedTasks = [];
-            for (i in tasksList) {
-                var t = tasksList[i];
-                if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                    permittedTasks.push(t);
-                }
-            }
-            $scope.tasks = permittedTasks;
-        } else {
-            $scope.tasks = tasksList;    
-        }
-        if (tasksList.length == 0) {
-            $scope.HasEmptyEntities = true;
-
-            return;
-        }
-        TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-            if (inProgressEntry.task != undefined) {
-                var filteredTasks = $scope.tasks.filter(function (task) { 
-                    return task.TaskID == inProgressEntry.task.TaskID
-                })
-
-                if (filteredTasks.length > 0) {
-                    // If in progress entity is in the entity list
-                    $scope.task = filteredTasks[0];
-                    $scope.timeEntry.task = inProgressEntry.task;
-                    $scope.timeEntry.TaskID = inProgressEntry.TaskID;            
-                    $scope.$apply();
-                    return;
-                }           
-            }
-            // No in progress entity
-            $scope.task = tasksList[0];
-            if ($scope.task) {
-                $scope.timeEntry.task = $scope.task;
-                $scope.timeEntry.TaskID = $scope.task.TaskID;
-            }
-            TimeEntryService.updateInProgressEntry("task", $scope.task);
-            $scope.$apply();
-        })
-    }
-
-    function afterGetUser(user) {
-        if (user.RequireStopwatch) {
-            $scope.$parent.RequireStopwatch = true;
-            $scope.logout();
-        }
-
-        $scope.user = user;
-        updateTimeEntryMethodInStorage();      
-        chrome.storage.sync.get(['stopwatch'], function (items) {
-            // Check for abandoned stopwatch
-            if ('stopwatch' in items) {
-                var now = new Date();
-                var stopwatch = items.stopwatch;
-                if (stopwatch.running) {
-                    var stopwatchDate = new Date(stopwatch.startYear, stopwatch.startMonth,
-                        stopwatch.startDay, now.getHours(), now.getMinutes(), now.getSeconds(),
-                        now.getMilliseconds());
-
-                    if (now > stopwatchDate) {
-                        // There is an abandoned stopwatch
-                        StopwatchService.getStartTime(function (startTime) {
-                            var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
-                                startTime.getHours(), startTime.getMinutes(), 0);
-                            var midnight = new Date(2015, 0, 1, 23, 59, 0);
-                            $scope.timeEntry.ISOStartTime = start;
-                            $scope.timeEntry.ISOEndTime = midnight;
-                            TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
-                        })
-                        $scope.abandonedStopwatch = true;
-                        $scope.runningStopwatch = false;                        
-                    } else {
-                        // There is a running stopwatch, but it isn't abandoned
-                        var now = new Date();
-                        var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                            now.getHours(), now.getMinutes(), 0);
-                        $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
-                        stopwatch.startDay, stopwatch.startHrs, stopwatch.startMin, 0);
-                        $scope.timeEntry.ISOEndTime = end;
-                        TimeEntryService.updateInProgressEntry('startEndTimes',
-                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-
-                        $scope.endTimePromise = $interval(function() {
-                            var now = new Date();
-                            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                                now.getHours(), now.getMinutes(), 0);
-                            $scope.timeEntry.ISOEndTime = end;
-                            TimeEntryService.updateInProgressEntry('startEndTimes',
-                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-                        }, 1000);
-                        $scope.$apply();
-                    }
-                }
-            }
-        })
-    }
-    
-    function afterGetCompany(company) {
-        if (company.DCAALoggingEnabled || company.HasModuleSubJob) {
-            $scope.$parent.DCAASubJobError = true;
-            $scope.logout();
-        }
-        $scope.company = company;
-
-        if (company.DisplayClientSelector == true) {
-            $scope.customTerms = {
-                'clientSlash' : ' / ',
-                'clientTermSingLow' : company.ClientTermSingular,
-                'clientTermPlurLow' : company.ClientTermPlural,
-                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-            }
-        } else if (company.DisplayClientSelector == false) {
-            $scope.customTerms = {
-                'clientTermSingLow' : '',
-                'clientTermPlurLow' : '',
-                'clientTermSingHigh' : '',
-                'clientTermPlurHigh' : '',
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-            }
-        }
-    }
-
-    function afterGetJobClients(jobClientsList) {
-        $scope.jobClients = jobClientsList;
-
-        if ($scope.jobClients.length == 0) {
-            $scope.HasEmptyEntities = true;
-            $scope.jobClient = undefined;
-
-            $scope.$apply();
-        } else {
-            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                if (inProgressEntry.job != undefined) {
-                    var filteredJobClients = $scope.jobClients.filter(function (jobClient) { 
-                        return jobClient.job.JobID == inProgressEntry.job.JobID 
-                            && jobClient.job.ClientID == inProgressEntry.client.ClientID
-                            && jobClient.client.ClientID == inProgressEntry.client.ClientID;
-                    })
-
-                    if (filteredJobClients.length > 0) {
-                        // If in progress entity is in the entity list
-                        $scope.jobClient = filteredJobClients[0];
-                        $scope.timeEntry.job = inProgressEntry.job;
-                        $scope.timeEntry.JobID = inProgressEntry.JobID;
-                        $scope.timeEntry.client = inProgressEntry.client;
-          
-                        $scope.$apply();
-                        return;
-                    }           
-                } 
-                // No in progress entity
-                $scope.jobClient = $scope.jobClients[0];
-                $scope.timeEntry.job = $scope.jobClient.job;
-                $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
-                $scope.timeEntry.client = $scope.jobClient.client;
-                TimeEntryService.updateInProgressEntry("job", $scope.jobClient.job, function () {
-                    TimeEntryService.updateInProgressEntry("client", $scope.jobClient.client);
-                });
-
-                $scope.$apply();
-            
-            })
-        }
-    }
-
     //////// ONLOAD: Initialization. This will get executed upon opening the chrome extension. /////////
-
 
     // Refresh function
     /** Force an update to all entity lists from the API. Do not check local storage first.
@@ -1139,187 +832,22 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
         chrome.storage.local.remove(toRemove);
 
-        function afterGetJobClients(jobClientsList) {
-            var currentJobClient = {
-                'job' : $scope.timeEntry.job,
-                'client' : $scope.timeEntry.client,
-                'DisplayName' :  $scope.timeEntry.client.DisplayName + " - " 
-                                + $scope.timeEntry.job.DisplayName 
-            }
-            if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
-                $scope.setError("jobConflict", "We're sorry but the "
-                            + $scope.customTerms.clientTermSingLow + "/"
-                            + $scope.customTerms.jobTermSingLow + " "
-                            + currentJobClient.DisplayName + " you've chosen is no longer available. "
-                            + "Please choose a different "
-                            + $scope.customTerms.clientTermSingLow + "/"
-                            + $scope.customTerms.jobTermSingLow
-                            + " or contact your company's ClickTime administrator for more details.");
-                $scope.jobClients = jobClientsList;
-                $scope.jobClient = jobClientsList[0];
-                if ($scope.jobClient) {
-                    $scope.timeEntry.job = $scope.jobClient.job;
-                    $scope.timeEntry.JobID = $scope.jobClient.job.JobID;
-                    $scope.timeEntry.client = $scope.jobClient.client;
-                }
-                TimeEntryService.updateInProgressEntry("job", $scope.timeEntry.job, function() {
-                    TimeEntryService.updateInProgressEntry("client", $scope.timeEntry.client);
+        $q.all([EntityService.getJobClients($scope.Session, false).then(function(res) {
+                    RefreshUtilMethods.afterGetJobClients(res, $scope);
+                }),
+
+                EntityService.getTasks($scope.Session, false).then(function(res) {
+                    RefreshUtilMethods.afterGetTasks(res, $scope);
+                }),
+
+                EntityService.getUser($scope.Session, false).then(function(res) {
+                    RefreshUtilMethods.afterGetUser(res, $scope);
+                }),
+
+                EntityService.getCompany($scope.Session, false).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetCompany(res, $scope);
                 })
-            } else {
-                $scope.jobClients = jobClientsList;
-                var index = EntityService.indexJobClient(jobClientsList, currentJobClient);
-                $scope.jobClient = jobClientsList[index];
-                var currentJob = $scope.jobClient.job;
-                var currentTask = $scope.task;
-                if (currentTask && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
-                    var permittedTaskIDs = currentJob.PermittedTasks.split(",");
-                    if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
-                        $scope.setError("taskConflict", "We're sorry but the "
-                                + $scope.customTerms.taskTermSingLow + " "
-                                + currentTask.DisplayName + " you've chosen is no longer available. "
-                                + "Please choose a different "
-                                + $scope.customTerms.taskTermSingLow
-                                + " or contact your company's ClickTime administrator for more details.");
-                    }
-                }
-            }
-            if (jobClientsList.length == 0) {
-                $scope.HasEmptyEntities = true;
-            }
-        }
-
-        function afterGetTasks(tasksList) {
-            var currentTask = $scope.timeEntry.task;
-            if (currentTask) {
-                if (!EntityService.hasTask(tasksList, currentTask)) {
-                    $scope.setError("taskConflict", "We're sorry but the "
-                                + $scope.customTerms.taskTermSingLow + " "
-                                + currentTask.DisplayName + " you've chosen is no longer available. "
-                                + "Please choose a different "
-                                + $scope.customTerms.taskTermSingLow
-                                + " or contact your company's ClickTime administrator for more details.");
-                    $scope.allTasks = tasksList;
-                    if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
-                        var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                        var permittedTasks = [];
-                        for (i in tasksList) {
-                            var t = tasksList[i];
-                            if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                                permittedTasks.push(t);
-                            }
-                        }
-                        $scope.tasks = permittedTasks;
-                    } else {
-                        $scope.tasks = tasksList;    
-                    }
-                    if ($scope.tasks.length > 0) {
-                        $scope.task = $scope.tasks[0];
-                    }
-                    if ($scope.task) {
-                        $scope.timeEntry.task = $scope.task;
-                        $scope.timeEntry.TaskID = $scope.task.TaskID;
-                    }
-                    TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                } else {
-                    var currentJob = $scope.timeEntry.job;
-                    if ($scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
-                        var permittedTaskIDs = currentJob.PermittedTasks.split(",");
-                        if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
-                            $scope.setError("taskConflict", "We're sorry but the "
-                                    + $scope.customTerms.taskTermSingLow + " "
-                                    + currentTask.DisplayName + " you've chosen is no longer available. "
-                                    + "Please choose a different "
-                                    + $scope.customTerms.taskTermSingLow
-                                    + " or contact your company's ClickTime administrator for more details.");
-                            $scope.allTasks = tasksList;
-                            if ($scope.jobClient) {
-                                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                                var permittedTasks = [];
-                                for (i in tasksList) {
-                                    var t = tasksList[i];
-                                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                                        permittedTasks.push(t);
-                                    }
-                                }
-                                $scope.tasks = permittedTasks;
-                            } else {
-                                $scope.tasks = tasksList;    
-                            }
-                            if ($scope.tasks.length > 0) {
-                                $scope.task = $scope.tasks[0];
-                            }
-                            if ($scope.task) {
-                                $scope.timeEntry.task = $scope.task;
-                                $scope.timeEntry.TaskID = $scope.task.TaskID;
-                            }
-                            TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);                    
-                        } else {
-                            $scope.allTasks = tasksList;
-                            if ($scope.jobClient) {
-                                var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
-                                var permittedTasks = [];
-                                for (i in tasksList) {
-                                    var t = tasksList[i];
-                                    if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
-                                        permittedTasks.push(t);
-                                    }
-                                }
-                                $scope.tasks = permittedTasks;
-                            } else {
-                                $scope.tasks = tasksList;    
-                            }
-                            var taskIndex = EntityService.indexTask($scope.tasks, currentTask);
-                            if (taskIndex != -1) {
-                                $scope.task = $scope.tasks[taskIndex];
-                            } else {
-                                $scope.task = $scope.tasks[0];
-                            }
-                            
-                            if ($scope.task) {
-                                $scope.timeEntry.task = $scope.task;
-                                $scope.timeEntry.TaskID = $scope.task.TaskID;
-                            }
-                            TimeEntryService.updateInProgressEntry('task', $scope.timeEntry.task);
-                        }
-                    }
-                }
-            }
-        }
-
-        function afterGetUser(user) {
-            var currentUser = $scope.user;
-            if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
-                $scope.setError("userConflict", "We're sorry but the "
-                            + "time entry method" + " "
-                            + " you've chosen is no longer available. "
-                            + "Please contact your company's ClickTime administrator for more details.");
-                if (user.RequireStartEndTime) {
-                  changeTimeEntryMethod("start-end");
-                  chrome.storage.sync.set({
-                    'timeEntryMethod' : {
-                      UserID: user.UserID,
-                      method: 'start-end'
-                    }
-                  })
-                } else {
-                  changeTimeEntryMethod("duration");
-                  chrome.storage.sync.set({ 
-                    'timeEntryMethod' : {
-                      UserID: user.UserID,
-                      method: 'duration'
-                    }
-                  })
-                }
-              $scope.$apply();
-            } else {
-                $scope.user = user;
-            }
-        }
-
-        $q.all([EntityService.getJobClients($scope.Session, false).then(afterGetJobClients),
-                EntityService.getTasks($scope.Session, false).then(afterGetTasks),
-                EntityService.getUser($scope.Session, false).then(afterGetUser),
-                EntityService.getCompany($scope.Session, false).then(afterGetCompany)])
+            ])
             .then(function() {
                 $scope.sendPageReady();
                 deferred.resolve();
@@ -1415,19 +943,36 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
         })
 
-        $q.all([EntityService.getJobClients(session, true).then(afterGetJobClients),
-                    EntityService.getTasks(session, true).then(afterGetTasks),
-                    EntityService.getUser(session, true).then(afterGetUser),
-                    EntityService.getCompany(session, true).then(afterGetCompany),
-                    EntityService.getTimeEntries(session).then(afterGetTimeEntries)])
-            .then(function() {
+        $q.all([EntityService.getJobClients(session, true).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetJobClients(res, $scope)
+                }),
+
+                EntityService.getTasks(session, true).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetTasks(res, $scope)
+                }),
+
+                EntityService.getUser(session, true).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetUser(res, $scope)
+                }),
+                    
+                EntityService.getCompany(session, true).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetCompany(res, $scope)
+                }),
+                
+                EntityService.getTimeEntries(session).then(function(res) {
+                    AfterGetSessionUtilMethods.afterGetTimeEntries(res, $scope)
+                })
+            ]).then(function() {
                 $scope.sendPageReady();
             })
     }
 
     // call on every page load 
     EntityService.getSession()
-        .then(afterGetSession, 
+        .then(function(res) {
+                afterGetSession(res)
+            },
+
             function() {
                 bootbox.alert('Session could not be found');
             })

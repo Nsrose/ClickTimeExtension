@@ -1,11 +1,3 @@
-css refactoring (use sass?)
-put promises in TimeEntryController.js
-remove unncessary scope variables everywhere
-TimeEntryController.js!!!
-- modularize "get x"
-- move text strings and also classes wtf why are classes here
-- make chrome storage services so that it returns promises to standardize async handling
-calendar functionality (do last) 
-desktop app functionality (do last)
+make chrome storage services so that it returns promises to standardize async handling?
 make a static base URL, like STATIC_URL instead "../" stuff
 	like TEMPLATE_URL

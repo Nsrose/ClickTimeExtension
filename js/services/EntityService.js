@@ -1,6 +1,6 @@
 // Services for accessing entities
 // These will only work once the session is open
-myApp.service('EntityService', function ($http, APIService, CTService, $apiBase, $q) {
+myApp.service('EntityService', ['$http', 'APIService', 'CTService', '$apiBase', '$q', function ($http, APIService, CTService, $apiBase, $q) {
     // The users session
     var Session = null;
     var UserName = null;
@@ -585,4 +585,4 @@ myApp.service('EntityService', function ($http, APIService, CTService, $apiBase,
         return indexOfTask(list, task);
     }
 
-})
+}])

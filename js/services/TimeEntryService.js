@@ -1,6 +1,6 @@
 // Services for entering time.
 
-myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBase) {
+myApp.service('TimeEntryService', ['$http', 'APIService', 'CTService', '$apiBase', function ($http, APIService, CTService, $apiBase) {
 	var me = this;
 
 	// Function for making async API calls.
@@ -179,4 +179,4 @@ myApp.service('TimeEntryService', function ($http, APIService, CTService, $apiBa
 	this.removeInProgressEntry = function() {
 		chrome.storage.sync.remove('inProgressEntry');
 	}
-})
+}])

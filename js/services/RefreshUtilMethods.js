@@ -1,5 +1,4 @@
-// refresh service methods
-
+// refresh service methods, for use in refresh function in TimeEntryController.js
 myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', function (TimeEntryService, EntityService) {
 
 	var me = this;

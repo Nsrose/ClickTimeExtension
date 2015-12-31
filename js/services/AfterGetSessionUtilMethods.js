@@ -1,3 +1,4 @@
+// getSession service methods, for use in afterGetSession function in TimeEntryController.js
 myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'EntityService', function (TimeEntryService, CTService, EntityService) {
 
 	var me = this;

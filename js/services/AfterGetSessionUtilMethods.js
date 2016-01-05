@@ -2,6 +2,7 @@
 myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'EntityService', function (TimeEntryService, CTService, EntityService) {
 
 	var me = this;
+    var now = new Date();
 
     /* Update the hour display if you're using duration as your time entry method*/
     function updateDurationDisplay($scope) {
@@ -177,11 +178,15 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         }
 
         $scope.user = user;
-        updateTimeEntryMethodInStorage($scope);      
+        updateTimeEntryMethodInStorage($scope);  
+
+        // set placeholder values
+        $scope.timeEntry.ISOStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9);
+        $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+      
+        // Check for abandoned stopwatch    
         chrome.storage.sync.get(['stopwatch'], function (items) {
-            // Check for abandoned stopwatch
             if ('stopwatch' in items) {
-                var now = new Date();
                 var stopwatch = items.stopwatch;
                 if (stopwatch.running) {
                     var stopwatchDate = new Date(stopwatch.startYear, stopwatch.startMonth,
@@ -193,7 +198,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
                         StopwatchService.getStartTime(function (startTime) {
                             var start = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(),
                                 startTime.getHours(), startTime.getMinutes(), 0);
-                            var midnight = new Date(2015, 0, 1, 23, 59, 0);
+                            var midnight = new Date(now.getFullYear(), 0, 1, 23, 59, 0);
                             $scope.timeEntry.ISOStartTime = start;
                             $scope.timeEntry.ISOEndTime = midnight;
                             TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
@@ -202,7 +207,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
                         $scope.runningStopwatch = false;                        
                     } else {
                         // There is a running stopwatch, but it isn't abandoned
-                        var now = new Date();
                         var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
                             now.getHours(), now.getMinutes(), 0);
                         $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
@@ -212,7 +216,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
                                 [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
 
                         $scope.endTimePromise = $interval(function() {
-                            var now = new Date();
                             var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
                                 now.getHours(), now.getMinutes(), 0);
                             $scope.timeEntry.ISOEndTime = end;

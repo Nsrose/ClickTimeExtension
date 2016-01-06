@@ -72,4 +72,31 @@ myApp.controller("AppController", ['$scope', '$location', '$apiBases', '$apiBase
             $scope.$apply();
         }
     }
+
+    function logoutHelper() {
+        $location.path("/login");
+        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
+        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
+        chrome.extension.getBackgroundPage().stopNotifications();
+        chrome.extension.getBackgroundPage().stopBadge();
+        $scope.$apply();
+    }
+
+
+    // Logout function - will remove local and sync storage variables.
+    $scope.logout = function() {
+        chrome.storage.sync.get('stopwatch', function (items) {
+            if ('stopwatch' in items && items.stopwatch.running) {
+                bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
+                    if (!result) {
+                        return;
+                    } else {
+                        logoutHelper();
+                    }
+                })
+            } else {
+                logoutHelper();
+            }
+        })
+    }
 }])

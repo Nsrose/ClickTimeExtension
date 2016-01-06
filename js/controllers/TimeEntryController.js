@@ -723,35 +723,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     }
 
 
-    /////////////////////////////// Logging out and dealing with local storage /////////////////////////////////
-
-    // Logout function - will remove local and sync storage variables.
-    $scope.logout = function() {
-        chrome.storage.sync.get('stopwatch', function (items) {
-            if ('stopwatch' in items && items.stopwatch.running) {
-                bootbox.confirm("Warning! If you logout, your timer will be erased. Are you sure you want to logout?", function (result) {
-                    if (!result) {
-                        return;
-                    } else {
-                        $location.path("/login");
-                        chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
-                        chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
-                        chrome.extension.getBackgroundPage().stopNotifications();
-                        chrome.extension.getBackgroundPage().stopBadge();
-                        $scope.$apply();
-                    }
-                })
-            } else {
-                $location.path("/login");
-                chrome.storage.local.remove(CHROME_LOCAL_STORAGE_VARS);
-                chrome.storage.sync.remove(CHROME_SYNC_STORAGE_VARS);
-                chrome.extension.getBackgroundPage().stopNotifications();
-                chrome.extension.getBackgroundPage().stopBadge();
-                $scope.$apply();
-            }
-        })
-    }
-
+    /////////////////////////////// dealing with local storage /////////////////////////////////
 
     // Check for update to jobClient and reset permitted task list.
     $scope.$watch('jobClient', function (newJobClient) {

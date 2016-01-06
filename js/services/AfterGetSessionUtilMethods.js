@@ -181,9 +181,9 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         updateTimeEntryMethodInStorage($scope);  
 
         // set placeholder values
-        $scope.timeEntry.ISOStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9);
+        $scope.timeEntry.ISOStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
         $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
-      
+
         // Check for abandoned stopwatch    
         chrome.storage.sync.get(['stopwatch'], function (items) {
             if ('stopwatch' in items) {

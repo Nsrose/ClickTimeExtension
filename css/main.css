@@ -39,17 +39,20 @@ a {
 }
 
 .label.label-success {
-    background-color: #464e84;
-    width: 50px;
-    height: 22px;
-    font-size: 12px;
+    background-color: white;
+    width: 37px;
+    color: #464e84;
+    height: 16px;
+    font-size: 11px;
     box-sizing: border-box;
     border: 1px solid #f5f5f5;
     border-radius: 2px;
-    padding-top: 3.5px;
+    padding-top: 6.5px;
+    padding-left: 3px;
+    line-height: 0px;
     position: absolute;
-    left: 207px;
-    top: 12px;
+    left: 204px;
+    top: 10px;
 }
 
 .clear {

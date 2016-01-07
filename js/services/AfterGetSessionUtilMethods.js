@@ -204,25 +204,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
                             TimeEntryService.updateInProgressEntry('startEndTimes', [start, midnight]);
                         })
                         $scope.abandonedStopwatch = true;
-                        $scope.runningStopwatch = false;                        
-                    } else {
-                        // There is a running stopwatch, but it isn't abandoned
-                        var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                            now.getHours(), now.getMinutes(), 0);
-                        $scope.timeEntry.ISOStartTime = new Date(stopwatch.startYear, stopwatch.startMonth,
-                        stopwatch.startDay, stopwatch.startHrs, stopwatch.startMin, 0);
-                        $scope.timeEntry.ISOEndTime = end;
-                        TimeEntryService.updateInProgressEntry('startEndTimes',
-                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-
-                        $scope.endTimePromise = $interval(function() {
-                            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                                now.getHours(), now.getMinutes(), 0);
-                            $scope.timeEntry.ISOEndTime = end;
-                            TimeEntryService.updateInProgressEntry('startEndTimes',
-                                [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
-                        }, 1000);
-                        $scope.$apply();
+                        $scope.runningStopwatch = false;
                     }
                 }
             }

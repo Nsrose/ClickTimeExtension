@@ -24,7 +24,10 @@
     </div>
 
     <div id="time-entry-main-container" ng-show="IsManagerOrAdmin || ! HasEmptyEntities">
-        <div class="total-hours-log"><a id='total-hours-log-link' my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>{{zeroHoursEncouragementMessage}}</div>
+        <div class="total-hours-log">
+           <a my-tooltip="#tooltip-total-hours-link" data-placement="top" href="http://app.clicktime.com/?dest=App%2FDayView%2F" target="_blank">{{totalHoursLogMessage}}</a>
+           {{zeroHoursEncouragementMessage}}
+        </div>
 
          <span id="tooltip-total-hours-link" ng-hide="true">Go to Day View</span>
 

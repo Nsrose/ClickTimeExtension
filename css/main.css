@@ -338,15 +338,16 @@ a {
 }
 
 .total-hours-log {
-    margin-top: 8px;
     margin-bottom: 8px;
     font-size: 14px;
     text-align: center;
+    background-color: #888FBF;
+    padding: 2px;
 }
 
 .total-hours-log a {
     text-decoration: underline;
-    color: #428bca;
+    color: #FFF; 
 }
 
 .time-entry-container {
@@ -1145,10 +1146,6 @@ input[type=time]::-webkit-inner-spin-button {
     background: none;
     border: none;
     box-shadow: none;
-}
-
-#refresh-button:active, #total-hours-log-link:active {
-    color: #37709b;
 }
 
 .fa-question-circle {

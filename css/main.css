@@ -273,9 +273,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     border-radius: 2px;
     color: #555555;
     border-radius: 2px;
-}
-
-#time-entry-form-start, #time-entry-form-end {
     width: 180px;
     font-size: 23px;
     border:  1px solid #bcbcbc;
@@ -283,6 +280,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-right: 2px;
     text-align: center;
 }
+
 
 input[type="text"].time-entry-form-hours {
     font-size: 32px;

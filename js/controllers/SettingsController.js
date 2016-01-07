@@ -36,6 +36,7 @@ myApp.controller('SettingsController', ['$scope', '$location', function ($scope,
     }
   })
 
+
 ///////////////////Allow reminders settings ///////////////////////////
 
   // pull from backend

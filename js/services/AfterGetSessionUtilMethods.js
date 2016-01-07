@@ -176,7 +176,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
             $scope.logout();
         }
 
-        $scope.user = user;
+        $scope.$parent.user = user;
         updateTimeEntryMethodInStorage($scope);  
 
         // set placeholder values

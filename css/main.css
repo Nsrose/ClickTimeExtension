@@ -1246,3 +1246,10 @@ input:focus {
     font-size: 25px;
     font-weight: 500;
 }
+
+#username-container {
+    font-size: 14px;
+    color: #555555;
+    margin-top: 20px;
+    margin-left: 20px;
+}

@@ -1,3 +1,0 @@
-make chrome storage services so that it returns promises to standardize async handling?
-make a static base URL, like STATIC_URL instead "../" stuff
-	like TEMPLATE_URL

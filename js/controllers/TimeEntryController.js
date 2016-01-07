@@ -942,9 +942,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // call on every page load 
     EntityService.getSession()
         .then(function(res) {
-                afterGetSession(res)
+                afterGetSession(res);
             },
-
             function() {
                 bootbox.alert('Session could not be found');
             })

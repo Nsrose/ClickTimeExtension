@@ -142,7 +142,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         }
         if (tasksList.length == 0) {
             $scope.HasEmptyEntities = true;
-
             return;
         }
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -258,7 +257,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         if ($scope.jobClients.length == 0) {
             $scope.HasEmptyEntities = true;
             $scope.jobClient = undefined;
-
             $scope.$apply();
         } else {
             TimeEntryService.getInProgressEntry(function (inProgressEntry) {
@@ -275,7 +273,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
                         $scope.timeEntry.job = inProgressEntry.job;
                         $scope.timeEntry.JobID = inProgressEntry.JobID;
                         $scope.timeEntry.client = inProgressEntry.client;
-          
                         $scope.$apply();
                         return;
                     }           

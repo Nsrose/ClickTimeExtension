@@ -5,7 +5,7 @@ var TIMEOUT = 10000;
 var timeString = null;
 
 // Mapping from Month numbers to Month strings
-monthToStrings = {
+var monthToStrings = {
     0 : "January",
     1 : "February",
     2 : "March",

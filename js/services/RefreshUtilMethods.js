@@ -12,13 +12,13 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
         }
         if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
             $scope.setError("jobConflict", "We're sorry but the "
-                        + $scope.customTerms.clientTermSingLow + "/"
-                        + $scope.customTerms.jobTermSingLow + " "
-                        + currentJobClient.DisplayName + " you've chosen is no longer available. "
-                        + "Please choose a different "
-                        + $scope.customTerms.clientTermSingLow + "/"
-                        + $scope.customTerms.jobTermSingLow
-                        + " or contact your company's ClickTime administrator for more details.");
+                + $scope.customTerms.clientTermSingLow + "/"
+                + $scope.customTerms.jobTermSingLow + " "
+                + currentJobClient.DisplayName + " you've chosen is no longer available. "
+                + "Please choose a different "
+                + $scope.customTerms.clientTermSingLow + "/"
+                + $scope.customTerms.jobTermSingLow
+                + " or contact your company's ClickTime administrator for more details.");
             $scope.jobClients = jobClientsList;
             $scope.jobClient = jobClientsList[0];
             if ($scope.jobClient) {
@@ -39,11 +39,11 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                 var permittedTaskIDs = currentJob.PermittedTasks.split(",");
                 if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
                     $scope.setError("taskConflict", "We're sorry but the "
-                            + $scope.customTerms.taskTermSingLow + " "
-                            + currentTask.DisplayName + " you've chosen is no longer available. "
-                            + "Please choose a different "
-                            + $scope.customTerms.taskTermSingLow
-                            + " or contact your company's ClickTime administrator for more details.");
+                        + $scope.customTerms.taskTermSingLow + " "
+                        + currentTask.DisplayName + " you've chosen is no longer available. "
+                        + "Please choose a different "
+                        + $scope.customTerms.taskTermSingLow
+                        + " or contact your company's ClickTime administrator for more details.");
                 }
             }
         }
@@ -138,7 +138,6 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                         } else {
                             $scope.task = $scope.tasks[0];
                         }
-                        
                         if ($scope.task) {
                             $scope.timeEntry.task = $scope.task;
                             $scope.timeEntry.TaskID = $scope.task.TaskID;
@@ -154,9 +153,9 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
         var currentUser = $scope.user;
         if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
             $scope.setError("userConflict", "We're sorry but the "
-                        + "time entry method" + " "
-                        + " you've chosen is no longer available. "
-                        + "Please contact your company's ClickTime administrator for more details.");
+                + "time entry method" + " "
+                + " you've chosen is no longer available. "
+                + "Please contact your company's ClickTime administrator for more details.");
             if (user.RequireStartEndTime) {
               changeTimeEntryMethod("start-end");
               chrome.storage.sync.set({
@@ -174,10 +173,8 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                 }
               })
             }
-          $scope.$apply();
         } else {
             $scope.user = user;
         }
 	}
-
 }])

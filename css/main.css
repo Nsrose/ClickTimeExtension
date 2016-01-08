@@ -453,8 +453,6 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     width: 180px;
     font-size: 23px;
     border:  1px solid #bcbcbc;
-    padding: 0 0 0 8px;
-    margin-right: 2px;
     text-align: center;
 }
 

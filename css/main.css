@@ -1253,3 +1253,8 @@ input:focus {
     margin-top: 20px;
     margin-left: 20px;
 }
+
+input[type=time]::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+};

@@ -12,12 +12,12 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
         }
         if (!EntityService.hasJobClient(jobClientsList, currentJobClient)) {
             $scope.setError("jobConflict", "We're sorry but the "
-                + $scope.customTerms.clientTermSingLow + "/"
-                + $scope.customTerms.jobTermSingLow + " "
+                + $scope.company.ClientTermSingular + "/"
+                + $scope.company.JobTermSingular + " "
                 + currentJobClient.DisplayName + " you've chosen is no longer available. "
                 + "Please choose a different "
-                + $scope.customTerms.clientTermSingLow + "/"
-                + $scope.customTerms.jobTermSingLow
+                + $scope.company.ClientTermSingular + "/"
+                + $scope.ccompany.JobTermSingular
                 + " or contact your company's ClickTime administrator for more details.");
             $scope.jobClients = jobClientsList;
             $scope.jobClient = jobClientsList[0];
@@ -39,10 +39,10 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                 var permittedTaskIDs = currentJob.PermittedTasks.split(",");
                 if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
                     $scope.setError("taskConflict", "We're sorry but the "
-                        + $scope.customTerms.taskTermSingLow + " "
+                        + $scope.company.TaskTermSingular + " "
                         + currentTask.DisplayName + " you've chosen is no longer available. "
                         + "Please choose a different "
-                        + $scope.customTerms.taskTermSingLow
+                        + $scope.company.TaskTermSingular
                         + " or contact your company's ClickTime administrator for more details.");
                 }
             }
@@ -57,10 +57,10 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
         if (currentTask) {
             if (!EntityService.hasTask(tasksList, currentTask)) {
                 $scope.setError("taskConflict", "We're sorry but the "
-                            + $scope.customTerms.taskTermSingLow + " "
+                            + $scope.company.TaskTermSingular + " "
                             + currentTask.DisplayName + " you've chosen is no longer available. "
                             + "Please choose a different "
-                            + $scope.customTerms.taskTermSingLow
+                            + $scope.company.TaskTermSingular
                             + " or contact your company's ClickTime administrator for more details.");
                 $scope.allTasks = tasksList;
                 if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
@@ -90,10 +90,10 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                     var permittedTaskIDs = currentJob.PermittedTasks.split(",");
                     if (!EntityService.hasTaskID(permittedTaskIDs, currentTask.TaskID)) {
                         $scope.setError("taskConflict", "We're sorry but the "
-                                + $scope.customTerms.taskTermSingLow + " "
+                                + $scope.company.TaskTermSingular + " "
                                 + currentTask.DisplayName + " you've chosen is no longer available. "
                                 + "Please choose a different "
-                                + $scope.customTerms.taskTermSingLow
+                                + $scope.company.TaskTermSingular
                                 + " or contact your company's ClickTime administrator for more details.");
                         $scope.allTasks = tasksList;
                         if ($scope.jobClient) {

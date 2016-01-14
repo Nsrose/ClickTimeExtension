@@ -216,39 +216,6 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
             $scope.logout();
         }
         $scope.company = company;
-
-        if (company.DisplayClientSelector == true) {
-            $scope.customTerms = {
-                'clientSlash' : ' / ',
-                'clientTermSingLow' : company.ClientTermSingular,
-                'clientTermPlurLow' : company.ClientTermPlural,
-                'clientTermSingHigh' : company.ClientTermSingular.capitalize(),
-                'clientTermPlurHigh' : company.ClientTermPlural.capitalize(),
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-            }
-        } else if (company.DisplayClientSelector == false) {
-            $scope.customTerms = {
-                'clientTermSingLow' : '',
-                'clientTermPlurLow' : '',
-                'clientTermSingHigh' : '',
-                'clientTermPlurHigh' : '',
-                'jobTermSingLow' : company.JobTermSingular,
-                'jobTermPlurLow' : company.JobTermPlural,
-                'jobTermSingHigh' : company.JobTermSingular.capitalize(),
-                'jobTermPlurHigh' : company.JobTermPlural.capitalize(),
-                'taskTermSingLow' : company.TaskTermSingular,
-                'taskTermPlurLow' : company.TaskTermPlural,
-                'taskTermSingHigh' : company.TaskTermSingular.capitalize(),
-                'taskTermPlurHigh' : company.TaskTermPlural.capitalize(),
-            }
-        }
 	}
 
 	this.afterGetJobClients = function(jobClientsList, $scope) {

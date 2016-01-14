@@ -10,7 +10,7 @@
             <div ng-click="refresh()" class="btn btn-custom settings-width" id="refresh-button">
                 Refresh my lists<i my-tooltip="#tooltip-refresh-lists" data-placement="bottom" class="fa fa-question-circle"></i>
             </div>  
-            <span id="tooltip-refresh-lists" ng-hide="true">Refresh data for your {{customTerms.clientTermSingHigh}}, {{customTerms.jobTermSingHigh}}, and {{customTerms.taskTermSingHigh}} lists</span>
+            <span id="tooltip-refresh-lists" ng-hide="true">Refresh data for your {{company.ClientTermSingular.capitalize()}}, {{company.JobTermSingular.capitalize()}}, and {{company.TaskTermSingular.capitalize()}} lists</span>
         </div>
     </div>
 

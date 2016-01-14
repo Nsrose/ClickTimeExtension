@@ -27,9 +27,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $("#task-dropdown ul[role=menu] li[role=presentation]:nth-child(7)").before(all)    
     }
     
-    //Company custom terms
-    $scope.customTerms = {};
-
     // All tasks for a company. Used to filter by permitted Task ID.
     $scope.allTasks = [];
 
@@ -279,14 +276,11 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             if (!startTime && !endTime) {
                 $scope.showStartTimer = true;
                 return;
-            }
-            else if (!startTime) {
+            } else if (!startTime) {
                 TimeEntryService.updateInProgressEntry('ISOEndTime', endTime);
-            }
-            else if (!endTime) {
+            } else if (!endTime) {
                 TimeEntryService.updateInProgressEntry('ISOStartTime', startTime);
-            }
-            else {
+            } else {
                 var hourDiff = CTService.difference(endTime, startTime, $scope.company.MinTimeIncrement);
                 if (hourDiff <= 0) {
                      $scope.setError("startEndTimes", "Oops! Please enter an end time later than your start time.");

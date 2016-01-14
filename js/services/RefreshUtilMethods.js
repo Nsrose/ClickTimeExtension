@@ -149,9 +149,10 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
         }
 	}
 
+    // $scope.user is the old user. 
+    // user in the param is the new user pulled from api
 	this.afterGetUser = function(user, $scope) {
-        var currentUser = $scope.user;
-        if (currentUser.RequireStartEndTime != user.RequireStartEndTime) {
+        if ($scope.user.RequireStartEndTime != user.RequireStartEndTime) {
             $scope.setError("userConflict", "We're sorry but the "
                 + "time entry method" + " "
                 + " you've chosen is no longer available. "
@@ -173,8 +174,6 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
                 }
               })
             }
-        } else {
-            $scope.user = user;
         }
 	}
 }])

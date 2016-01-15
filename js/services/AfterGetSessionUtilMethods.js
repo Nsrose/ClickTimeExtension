@@ -130,7 +130,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         if ($scope.jobClient && $scope.company && $scope.company.TaskRestrictionMethod == "byjob") {
             var permittedTaskIDs = $scope.jobClient.job.PermittedTasks.split(",");
             var permittedTasks = [];
-            for (i in tasksList) {
+            for (var i in tasksList) {
                 var t = tasksList[i];
                 if (EntityService.hasTaskID(permittedTaskIDs, t.TaskID)) {
                     permittedTasks.push(t);
@@ -218,6 +218,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         $scope.company = company;
 	}
 
+    // Could separate in prog entry updating from these funcs
 	this.afterGetJobClients = function(jobClientsList, $scope) {
         $scope.jobClients = jobClientsList;
 

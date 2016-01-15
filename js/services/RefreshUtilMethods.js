@@ -3,6 +3,9 @@ myApp.service('RefreshUtilMethods', ['TimeEntryService', 'EntityService', functi
 
 	var me = this;
 
+    //TODO Yuan: move all setError strings into into the template. ng-show on $scope var
+    // move error setting into the save function because it doesn't make sense for it to be 
+    // in refresh
 	this.afterGetJobClients = function(jobClientsList, $scope) {
         var currentJobClient = {
             'job' : $scope.timeEntry.job,

@@ -5,13 +5,13 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 		var minDisp = elapsedObj.elapsedMin % 60 + '';
 		var hrsDisp = elapsedObj.elapsedHrs + '';
 		if (secDisp.length == 1) {
-			secDisp = "0" + secDisp;
+			secDisp = '0' + secDisp;
 		}
 		if (minDisp.length == 1) {
-			minDisp = "0" + minDisp;
+			minDisp = '0' + minDisp;
 		}
 		if (hrsDisp.length == 1) {
-			hrsDisp = "0" + hrsDisp;
+			hrsDisp = '0' + hrsDisp;
 		}
 		$scope.elapsedSec = secDisp;
 		$scope.elapsedMin = minDisp;
@@ -38,26 +38,15 @@ myApp.controller('StopwatchController', ['$scope', 'StopwatchService', '$interva
 
     $scope.running = false;
 
-    $scope.$on("timeEntryError", function() {
-    	clear();
-    })
+    $scope.$on("timeEntryError", clear);
 
-    $scope.$on("timeEntrySuccess", function() {
-    	clear();
-    })
+    $scope.$on("timeEntrySuccess", clear);
 
-    $scope.$on("clearStopwatch", function() {
-        clear();
-    })
+    $scope.$on("clearStopwatch", clear);
 
-    $scope.$on("startStopwatch", function() {
-        // $scope.start();
-        start();
-    })
+    $scope.$on("startStopwatch", start);
 
-    $scope.$on("stopStopwatch", function() {
-        stop();
-    })
+    $scope.$on("stopStopwatch", stop);
 
     function clear() {
     	$scope.elapsedSec = "00";

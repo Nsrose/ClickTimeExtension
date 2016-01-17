@@ -144,6 +144,11 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
             $scope.HasEmptyEntities = true;
             return;
         }
+        this.resetInProgressTask(tasksList, $scope);
+	}
+
+    // Upon jobClient update of some kind, reset the in progress task
+    this.resetInProgressTask = function(tasksList, $scope) {
         TimeEntryService.getInProgressEntry(function (inProgressEntry) {
             if (inProgressEntry.task != undefined) {
                 var filteredTasks = $scope.tasks.filter(function (task) { 
@@ -168,7 +173,7 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
             TimeEntryService.updateInProgressEntry("task", $scope.task);
             $scope.$apply();
         })
-	}
+    }
 
 	this.afterGetUser = function(user, $scope) {
         if (user.RequireStopwatch) {

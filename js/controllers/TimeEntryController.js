@@ -454,79 +454,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.timeEntryMethods = ['duration', 'start-end'];
     $scope.timeEntryMethod = $scope.timeEntryMethods[0];
 
-    /** Prevalidate a time entry. We have to convert the scope's timeEntry into a suitable
-        clickTimeEntry that can actually be POSTed to the API. This requires some conversion
-        of formats. Also, this will check for preliminary errors in user input.
-
-        TODO Nick: MAKE THIS NOT A PROMISE
-
-        Wait until just before POST to assemble ClickTimeEntry object
-        Combine prevalidate & validate?
-
-    */
-    $scope.prevalidateTimeEntry = function (timeEntry, clickTimeEntry) {
-        var deferred = $q.defer();
-
-        if ($scope.showHourEntryField && !$scope.saveFromTimer && !$scope.abandonedStopwatch) {
-            if (!timeEntry.Hours) {
-                $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
-                return;
-            }
-            clickTimeEntry.Hours = CTService.toDecimal(timeEntry.Hours);
-        }
-
-        if (!$scope.saveFromTimer && $scope.showStartEndTimes || $scope.abandonedStopwatch) {
-            if (!timeEntry.ISOStartTime) {
-                $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
-                return;
-            }
-            if (!timeEntry.ISOEndTime) {
-                $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
-                return;
-            }
-            var hourDiff = CTService.difference(timeEntry.ISOEndTime, timeEntry.ISOStartTime, $scope.company.MinTimeIncrement);
-            clickTimeEntry.Hours = hourDiff;
-            timeEntry.Hours = hourDiff;
-            var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
-            var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
-            clickTimeEntry.ISOStartTime = ISOStartTime;
-            clickTimeEntry.ISOEndTime = ISOEndTime;
-        }
-
-        if ($scope.saveFromTimer || $scope.showStopwatch && !$scope.abandonedStopwatch) {
-            var hrs = parseFloat($scope.elapsedHrs);
-            var min = parseFloat($scope.elapsedMin);
-            var sec = parseFloat($scope.elapsedSec);
-            var compiledHours = CTService.compileHours(hrs, min, sec, $scope.company.MinTimeIncrement);
-            clickTimeEntry.Hours = CTService.toDecimal(compiledHours);
-            timeEntry.Hours = compiledHours;
-            if ($scope.showStartEndTimes) {
-                var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
-                var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
-                if (ISOStartTime == ISOEndTime) {
-                    var endSplit = ISOEndTime.split(":");
-                    ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
-                }
-                clickTimeEntry.ISOStartTime = ISOStartTime;
-                clickTimeEntry.ISOEndTime = ISOEndTime;
-            }
-        }
-
-        if ($scope.user.RequireStopwatch) {
-            var ISOEndTime = CTService.convertISO(timeEntry.ISOEndTime);
-            var ISOStartTime = CTService.convertISO(timeEntry.ISOStartTime);
-            if (ISOStartTime == ISOEndTime) {
-                var endSplit = ISOEndTime.split(":");
-                ISOEndTime = endSplit[0] + ":" + (parseInt(endSplit[1]) + 1) + ":" + endSplit[2];
-            }
-            clickTimeEntry.ISOStartTime = ISOStartTime;
-            clickTimeEntry.ISOEndTime = ISOEndTime;
-        }
-
-        deferred.resolve(clickTimeEntry);
-        return deferred.promise;
-    }
-
     /** Check a time Entry object for general errors. If none, return a clickTimeEntry object that can be directly
         saved to the ClickTime API. */
     function validateTimeEntry(timeEntry) {
@@ -793,34 +720,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.task = undefined;
             }
             $scope.tasks = permittedTasks;
-
-            //TODO: NICK LOOK AT ME and fix me. why do you need this function call here? 
-            //credit: pbs
-            // use afterGetSEssion.afterGetTasks
-            TimeEntryService.getInProgressEntry(function (inProgressEntry) {
-                if (inProgressEntry.task != undefined) {
-                    var filteredTasks = $scope.tasks.filter(function (task) { 
-                        return task.TaskID == inProgressEntry.task.TaskID
-                    })
-
-                    if (filteredTasks.length > 0) {
-                        // If in progress entity is in the entity list
-                        $scope.task = filteredTasks[0];
-                        $scope.timeEntry.task = inProgressEntry.task;
-                        $scope.timeEntry.TaskID = inProgressEntry.TaskID;
-                        $scope.$apply();
-                        return;
-                    }           
-                }
-                // No in progress entity
-                $scope.task = permittedTasks[0];
-                if ($scope.task) {
-                    $scope.timeEntry.task = $scope.task;
-                    $scope.timeEntry.TaskID = $scope.task.TaskID;
-                }
-                TimeEntryService.updateInProgressEntry("task", $scope.task);
-                $scope.$apply();
-            })
+            AfterGetSessionUtilMethods.resetInProgressTask(permittedTasks, $scope);
         }
     })
 

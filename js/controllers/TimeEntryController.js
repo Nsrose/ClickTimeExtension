@@ -423,8 +423,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.timeEntry.Comment = "";
         $scope.$broadcast("clearStopwatch");
-        $scope.timeEntry.ISOStartTime = null;
-        $scope.timeEntry.ISOEndTime = null;
+        var now = new Date();
+        $scope.timeEntry.ISOStartTime =  new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+        $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
         $interval.cancel($scope.endTimePromise);
         $scope.clearAllErrors();
         $scope.saveFromTimer = false;

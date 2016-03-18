@@ -30,6 +30,7 @@ var DEFAULT_EMPTY_HOURS = null;
 
 var myApp = angular.module('ClickTimeExtension', ['ngRoute', 'ui.bootstrap'])
 	.constant("$apiBases", {
+		dev11: "https://dev11.clicktime.com:8443/api/1.3/",
 		dev99: "https://dev99.clicktime.com:8443/api/1.3/",
 		live: "https://app.clicktime.com/api/1.3/",
 		stage: 'https://appstage.clicktime.com/api/1.3/',

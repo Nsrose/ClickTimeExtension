@@ -411,7 +411,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     margin-left: 4px;
 }
 
-#notes-field {
+.notes-field {
     display: inline-block;
     float: left;
     width: 448px;
@@ -427,7 +427,7 @@ a.dropdown-toggle.ng-scope:focus, #task-dropdown:focus {
     color: #555555;
 }
 
-#notes-field:focus{
+.notes-field:focus{
     border: 1px solid #428bca;
 }
 
@@ -483,7 +483,6 @@ input[type="text"].time-entry-form-hours {
 
 .fieldtitle {
     font-size: 14px;
-    font-weight: bold;
     margin-left: 23.6px;
     margin-top: 0px;
     margin-bottom: 4px;

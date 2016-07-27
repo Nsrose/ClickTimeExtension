@@ -46,9 +46,25 @@
 
         <!-- Notes field -->
         <form name="entry" class="notes-field-container">
-            <div class="fieldtitle" id="fieldtitle-notes">Notes</div>
-            <span ng-show='notesError' id="notes-error-text">Oops! Please enter some notes in order to save this entry.</span>
-            <textarea id="notes-field" name="text" ng-model="timeEntry.Comment" placeholder="" rows="4" cols="50" maxlength="4000" ng-maxlength="4000" ng-focus="focusNotes()" ng-blur="updateNotes()" ng-click="notesError = false"></textarea><br> 
+            <div class="fieldtitle" ng-class="{'text-error': notesError}">
+                <strong>Notes </strong>
+                <span ng-show='notesError'>Oops! Please enter some notes in order to save this entry.</span>
+            </div> 
+            <textarea 
+                class="notes-field" 
+                name="text" 
+                ng-model="timeEntry.Comment" 
+                placeholder="" 
+                rows="4" 
+                cols="50" 
+                maxlength="4000"
+                ng-class="{'field-error': notesError}" 
+                ng-maxlength="4000" 
+                ng-focus="focusNotes()" 
+                ng-blur="updateNotes()" 
+                ng-click="notesError = false">
+            </textarea>
+            <br /> 
         </form>
 
         <!-- Time entry form -->

@@ -328,8 +328,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $("#time-entry-field-hours-title").removeClass('text-error');
                 break;
             case "notes":
-                $("#notes-field").removeClass('field-error');
-                $("#fieldtitle-notes").removeClass('text-error')
                 break;
             case "startTime":
                 $("#time-entry-form-start").removeClass('field-error');
@@ -367,8 +365,6 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "notes":
-                $("#notes-field").addClass('field-error');
-                $("#fieldtitle-notes").addClass('text-error');
                 $scope.generalError = false;
                 ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;

@@ -47,8 +47,7 @@
         <!-- Notes field -->
         <form name="entry" class="notes-field-container">
             <div class="fieldtitle" ng-class="{'text-error': notesError}">
-                <strong>Notes </strong>
-                <span ng-show='notesError'>Oops! Please enter some notes in order to save this entry.</span>
+                Notes<span ng-show='notesError'> Oops! Please enter some notes in order to save this entry.</span>
             </div> 
             <textarea 
                 class="notes-field" 
@@ -73,25 +72,53 @@
             <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
                 <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
                 <div class="time-entry-form">
-                    <input class="time-entry-form-input time-entry-form-hours" id="time-entry-form-hours" type="text" name="hours" ng-model="timeEntry.Hours" ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" ng-focus="swapAction('hours')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch" maxlength="5" placeholder="00:00">
+                    <input 
+                        class="time-entry-form-input time-entry-form-hours" 
+                        id="time-entry-form-hours" 
+                        type="text" 
+                        name="hours" 
+                        ng-model="timeEntry.Hours" 
+                        ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" 
+                        ng-focus="swapAction('hours')" 
+                        ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
+                        ng-disabled="runningStopwatch" 
+                        maxlength="5" 
+                        placeholder="00:00">
                 </div>
                 <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
             </div>
 
             <!-- Start time -->
             <div class="time-entry-item" id="time-entry-item-start" ng-show="showStartEndTimes && !abandonedStopwatch">
-                <div class="fieldtitle time-entry" id="time-entry-form-start-title">Start Time</div>
+                <div class="fieldtitle time-entry" ng-class="{'text-error': startTimeError}">Start Time</div>
                 <div class="time-entry-form">
-                   <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch">
-
+                    <input 
+                        class="time-entry-form-input" 
+                        type="time" 
+                        name="start"
+                        ng-class="{'field-error': startTimeError}"
+                        ng-model="timeEntry.ISOStartTime" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-focus="swapAction('startTime')" 
+                        ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
+                        ng-disabled="runningStopwatch || user.RequireStopwatch">
                 </div>
             </div>
 
             <!-- End time -->
             <div class="time-entry-item" id="time-entry-item-end" ng-show="showStartEndTimes && !abandonedStopwatch">
-                <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
+                <div class="fieldtitle time-entry" ng-class="{'text-error': endTimeError}">End Time</div>
                 <div class="time-entry-form">
-                    <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('endTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-disabled="runningStopwatch || user.RequireStopwatch">
+                    <input
+                        class="time-entry-form-input" 
+                        type="time" 
+                        name="end"
+                        ng-class="{'field-error': endTimeError}"
+                        ng-model="timeEntry.ISOEndTime" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-focus="swapAction('endTime')" 
+                        ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
+                        ng-disabled="runningStopwatch || user.RequireStopwatch">
                 </div>
             </div>
         </div>
@@ -100,14 +127,32 @@
             <div class="time-entry-item" id="time-entry-item-start">
                 <div class="fieldtitle time-entry">Start Time</div>
                 <div class="time-entry-form">
-                    <input class="time-entry-form-input" id="time-entry-form-start" type="time" name="start" ng-model="timeEntry.ISOStartTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-focus="swapAction('startTime')" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" required="required">
+                    <input 
+                        class="time-entry-form-input" 
+                        id="time-entry-form-start" 
+                        type="time" 
+                        name="start" 
+                        ng-model="timeEntry.ISOStartTime" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-focus="swapAction('startTime')" 
+                        ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
+                        required="required">
                 </div>
             </div>
 
             <div class="time-entry-item" id="time-entry-item-end">
                 <div class="fieldtitle time-entry" id="time-entry-form-end-title">End Time</div>
                 <div class="time-entry-form">
-                    <input class="time-entry-form-input" id="time-entry-form-end" type="time" name="end" ng-model="timeEntry.ISOEndTime" ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" ng-focus="swapAction('endTime')" required="required">
+                    <input 
+                        class="time-entry-form-input" 
+                        id="time-entry-form-end" 
+                        type="time" 
+                        name="end" 
+                        ng-model="timeEntry.ISOEndTime" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
+                        ng-focus="swapAction('endTime')" 
+                        required="required">
                 </div>
             </div>
 

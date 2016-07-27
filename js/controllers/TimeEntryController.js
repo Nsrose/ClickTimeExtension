@@ -330,12 +330,10 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             case "notes":
                 break;
             case "startTime":
-                $("#time-entry-form-start").removeClass('field-error');
-                $("#time-entry-form-start-title").removeClass('text-error');
+                $scope.startTimeError = false;
                 break;
             case "endTime":
-                $("#time-entry-form-end").removeClass('field-error');
-                $("#time-entry-form-end-title").removeClass('text-error')
+                $scope.endTimeError = false;
                 break;
             case "startEndTimes":
                 $scope.clearError('startTime');
@@ -366,16 +364,15 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 break;
             case "notes":
                 $scope.generalError = false;
+                $scope.notesError = true;
                 ga('send', 'event', 'User Error', 'post', 'Missing notes'); 
                 break;
             case "startTime":
-                $("#time-entry-form-start").addClass('field-error');
-                $("#time-entry-form-start-title").addClass('text-error');
+                $scope.startTimeError = true;
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "endTime":
-                $("#time-entry-form-end").addClass('field-error');
-                $("#time-entry-form-end-title").addClass('text-error');
+                $scope.endTimeError = true;
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "startEndTimes":
@@ -533,9 +530,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             return;
         }
 
-        if ($scope.user.RequireComments && (timeEntry.Comment == undefined || 
-            timeEntry.Comment == "")) {
-            $scope.notesError = true;
+        if ($scope.user.RequireComments && (timeEntry.Comment == undefined || timeEntry.Comment == "")) {
             $scope.setError("notes", "");
             return;
         }
@@ -546,26 +541,33 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
                 return;
             }
+
             if (!timeEntry.ISOEndTime) {
                 $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                 return;
             }
+
             var hourDiff = CTService.difference(timeEntry.ISOEndTime, timeEntry.ISOStartTime, $scope.company.MinTimeIncrement);
             if (hourDiff <=0 ) {
                 $scope.setError("startEndTimes", "Please enter an end time later than your start time.");
                 return;
-            } else if (hourDiff > 24) {
+            } 
+            else if (hourDiff > 24) {
                 $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
                 return;
-            } else if (!timeEntry.Hours) {
+            } 
+            else if (!timeEntry.Hours) {
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return;
-            } else {
+            } 
+            else {
                 var totalMin = $scope.totalMin;
                 var totalHrs = $scope.totalHrs;
+
                 if ((totalMin + '').length == 1) {
                     totalMin = "0" + totalMin;
                 }
+
                 var timeSoFar = CTService.toDecimal(totalHrs + ":" + totalMin);
                 if (timeSoFar + hourDiff > 24) {
                     $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");

@@ -268,27 +268,39 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Validate start end times on blur.
     $scope.validateStartEndTimes = function(startTime, endTime) {
+        $scope.clearError("startTime");
+        $scope.clearError("endTime");
+        $scope.clearError("startEndTimes");
+
         if ($scope.showStartEndTimes) {
             if ($scope.noValidateStartEndTimes) {
                 // don't validate if saving from timer
                 return;
             }
+
             if (!startTime && !endTime) {
                 $scope.showStartTimer = true;
                 return;
-            } else if (!startTime) {
+            } 
+            else if (!startTime) {
+                $scope.setError("startTime", "Oops! Please enter a start time to save this entry.");
                 TimeEntryService.updateInProgressEntry('ISOEndTime', endTime);
-            } else if (!endTime) {
+            } 
+            else if (!endTime) {
+                $scope.setError("endTime", "Oops! Please enter an end time to save this entry.");
                 TimeEntryService.updateInProgressEntry('ISOStartTime', startTime);
-            } else {
+            } 
+            else {
                 var hourDiff = CTService.difference(endTime, startTime, $scope.company.MinTimeIncrement);
                 if (hourDiff <= 0) {
                      $scope.setError("startEndTimes", "Oops! Please enter an end time later than your start time.");
                      return;
                 }
+
                 if (hourDiff > 24) {
                     $scope.setError("startEndTimes", "Please make sure your daily hourly total is less than 24 hours.");
-                } else {
+                } 
+                else {
                     $scope.clearError('startEndTimes');
                     $scope.clearSuccessMessage();
                     $scope.showStartTimer = false;

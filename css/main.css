@@ -1210,10 +1210,6 @@ input.ng-invalid {
     border: 1px solid #de6a66;
 }
 
-input.ng-untouched {
-    border: 1px solid #b4b4b4;
-}
-
 input:focus {
     border: 1px solid #428bca;
 }

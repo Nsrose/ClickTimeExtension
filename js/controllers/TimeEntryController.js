@@ -51,6 +51,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     // How much time has been logged, total
     $scope.totalHrs = 0;
     $scope.totalMin = 0;
+
+    // Placeholder text for hours field
+    $scope.hoursPlaceHolder = '00:00'
   
     // Link to the settings page
     $scope.settingsPage = function () {
@@ -100,6 +103,14 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     /////////////////////////////////////////// Interface logic /////////////////////////////////////
 
+    $scope.clearHoursPlaceHolder = function () {
+            $scope.hoursPlaceHolder = '';
+    }
+
+    $scope.replaceHoursPlaceHolder = function (timeEntryHours) {
+        if (timeEntryHours === null || timeEntryHours === '')
+            $scope.hoursPlaceHolder = '00:00';
+    }
     // Send a notification immediately for demonstration purposes
     $scope.sendNotification = function () {
         chrome.extension.getBackgroundPage().sendOneNotification();
@@ -248,7 +259,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
             var roundedDecHrs = CTService.roundToNearestDecimal(decimalHrs, timeToIncrement);
 
-            if (roundedDecHrs == 0) {
+            if (roundedDecHrs == 0 && !$scope.company.AllowZeroHourTimeEntries) {
                 $scope.setError("hours", "Oops! Please log some time in order to save this entry.");
                 return;
             }
@@ -336,8 +347,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.generalError = false;
         switch (errorField) {
             case "hours":
-                $("#time-entry-form-hours").removeClass('field-error');
-                $("#time-entry-field-hours-title").removeClass('text-error');
+                $scope.hoursError = false;
                 break;
             case "notes":
                 break;
@@ -370,8 +380,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.generalError = true;
         switch (errorField) {
             case "hours":
-                $("#time-entry-form-hours").addClass('field-error');
-                $("#time-entry-field-hours-title").addClass('text-error');
+                $scope.hoursError = true;
                 ga('send', 'event', 'User Error', 'post', 'hours/time format'); 
                 break;
             case "notes":

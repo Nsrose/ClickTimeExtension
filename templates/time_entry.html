@@ -69,21 +69,21 @@
         <!-- Time entry form -->
         <div class="time-entry-container" ng-show="!abandonedStopwatch">
 
-            <div class="time-entry-item" id="time-entry-item-hours" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
-                <div class="fieldtitle time-entry" id="time-entry-field-hours-title">Hours</div>
+            <div class="time-entry-item" ng-show="showHourEntryField && !abandonedStopwatch && !runningStopwatch">
+                <div class="fieldtitle time-entry" ng-class="{'text-error' : hoursError}">Hours</div>
                 <div class="time-entry-form">
                     <input 
                         class="time-entry-form-input time-entry-form-hours" 
-                        id="time-entry-form-hours" 
                         type="text" 
                         name="hours" 
+                        ng-class="{'field-error' : hoursError}"
                         ng-model="timeEntry.Hours" 
-                        ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement)" 
-                        ng-focus="swapAction('hours')" 
+                        ng-blur="roundHour(timeEntry.Hours, company.MinTimeIncrement); replaceHoursPlaceHolder(timeEntry.Hours)" 
+                        ng-focus="swapAction('hours'); clearHoursPlaceHolder()" 
                         ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
                         ng-disabled="runningStopwatch" 
                         maxlength="5" 
-                        placeholder="00:00">
+                        placeholder="{{ hoursPlaceHolder }}">
                 </div>
                 <div class="time-entry-item-clear" ng-click="clearHours()" ng-hide="runningStopwatch">Clear hours</div>
             </div>

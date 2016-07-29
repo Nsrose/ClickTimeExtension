@@ -54,7 +54,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Placeholder text for hours field
     $scope.hoursPlaceHolder = '00:00'
-  
+
     // Link to the settings page
     $scope.settingsPage = function () {
         $location.path("/settings");
@@ -85,7 +85,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) {
             if (request.updateIntegration) {
-                $scope.timeEntry.ISOStartTime = new Date(JSON.parse(request.startTime));
+                $scope.timeEntry.ISOStartTime = null;//new Date(JSON.parse(request.startTime));
                 $scope.timeEntry.ISOEndTime = new Date(JSON.parse(request.endTime));
                 $scope.timeEntry.Comment = request.timeInfo;
                 $scope.showStartTimer = false;
@@ -129,8 +129,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.clearError("notes");
         if ($scope.showHourEntryField && !$scope.timeEntry.Hours) {
             $scope.showStartTimer = true;
-        } else if ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime 
-            && !$scope.timeEntry.ISOEndTime)) {
+        } 
+        else if ($scope.showStartEndTimes && (!$scope.timeEntry.ISOStartTime && !$scope.timeEntry.ISOEndTime)) {
             $scope.showStartTimer = true;
         } 
         else {
@@ -148,10 +148,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             $scope.clearError(input);
             return;
         }
+
         if ($scope.showHourEntryField && $scope.timeEntry.Hours) {
             // Cannot swap action if user has entered hours
             return;
         }
+
         if ($scope.showStartEndTimes) {
             if ($scope.showStartTimer) {
                 $scope.clearSuccessMessage();
@@ -160,10 +162,12 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
             }
             return;
         }
+
         if ($scope.showStartTimer) {
             $scope.clearSuccessMessage();
             $scope.showStartTimer = false;
-        } else {
+        } 
+        else {
             $scope.showStartTimer = true;
         }
     }
@@ -175,25 +179,23 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
     $scope.startStopwatch = function () {
         $scope.clearSuccessMessage();
         $scope.showStartTimer = false;
+
         if ($scope.showHourEntryField) {
             $scope.$broadcast("startStopwatch");
-        } else {
+        } 
+        else {
             $scope.noValidateStartEndTimes = true;
             $scope.$broadcast("startStopwatch");
             var now = new Date();
-            var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                now.getHours(), now.getMinutes(), 0);
+            var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0);
             $scope.timeEntry.ISOStartTime = start;
             $scope.timeEntry.ISOEndTime = start;
-            TimeEntryService.updateInProgressEntry('startEndTimes',
-                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+            TimeEntryService.updateInProgressEntry('startEndTimes', [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
             $scope.endTimePromise = $interval(function() {
                 var now = new Date();
-                var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                    now.getHours(), now.getMinutes(), 0);
+                var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0);
                 $scope.timeEntry.ISOEndTime = end;
-                TimeEntryService.updateInProgressEntry('startEndTimes',
-                    [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
+                TimeEntryService.updateInProgressEntry('startEndTimes', [$scope.timeEntry.ISOStartTime, $scope.timeEntry.ISOEndTime]);
             }, 1000);
         }
     }
@@ -323,8 +325,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
 
     // Clear in progress start end times
     $scope.clearStartEndTimes = function() {
-        $scope.timeEntry.ISOStartTime = null;
-        $scope.timeEntry.ISOEndTime = null;
+        var now = new Date();
+        $scope.timeEntry.ISOStartTime =  new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+        $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
         $scope.showStartTimer = true;
         $scope.clearAllErrors();
         TimeEntryService.removeInProgressEntry();

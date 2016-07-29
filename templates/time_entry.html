@@ -38,10 +38,27 @@
         <div class="system-message" id="abandoned-entry-message" ng-show="abandonedEntry"><i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;You have an unsaved time entry from {{abandonedDateString}}. Please save, edit, or cancel the entry. Note: entry will be saved for {{abandonedDateString}} if you choose to save.</div>
 
         <div class="fieldtitle" id="fieldtitle-jobclient">{{company.ClientTermSingular.capitalize()}} / {{company.JobTermSingular.capitalize()}}</div>
-        <div custom-select autofocus ng-model="jobClient" ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" ng-click="addEntityTimeEntry('jobClient', jobClient)" ng-disabled="abandonedStopwatch" id="jobClient-dropdown" ng-focus="clearError('jobClient')" ng-form="jobClientForm"></div>
+        <div 
+            custom-select 
+            autofocus 
+            ng-model="jobClient" 
+            ng-options="jobClient as jobClient.DisplayName group by jobClient.client for jobClient in jobClients" 
+            ng-click="addEntityTimeEntry('jobClient', jobClient)" 
+            ng-disabled="abandonedStopwatch" 
+            id="jobClient-dropdown" 
+            ng-focus="clearError('jobClient')" 
+            ng-form="jobClientForm">
+        </div>
 
         <div class="fieldtitle" id="fieldtitle-task">{{company.TaskTermSingular.capitalize()}}</div>
-        <div custom-select ng-model="task" ng-options="task as task.DisplayName for task in tasks" ng-click="addEntityTimeEntry('task', task)" ng-disabled="abandonedStopwatch" id="task-dropdown" ng-focus="clearError('task')">
+        <div 
+            custom-select 
+            ng-model="task" 
+            ng-options="task as task.DisplayName for task in tasks" 
+            ng-click="addEntityTimeEntry('task', task)" 
+            ng-disabled="abandonedStopwatch" 
+            id="task-dropdown" 
+            ng-focus="clearError('task')">
         </div>
 
         <!-- Notes field -->

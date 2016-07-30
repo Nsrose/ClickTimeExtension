@@ -185,8 +185,30 @@ myApp.service('AfterGetSessionUtilMethods', ['TimeEntryService', 'CTService', 'E
         updateTimeEntryMethodInStorage($scope);  
 
         // set placeholder values
-        $scope.timeEntry.ISOStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+        $scope.timeEntry.ISOStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());;
+        chrome.storage.local.get("TimeEntryStartTime", function(startTime) {
+            if (startTime.hasOwnProperty("TimeEntryStartTime")) {
+                var savedStartTime = new Date(startTime.TimeEntryStartTime);
+                var today = $scope.timeEntry.ISOStartTime;
+
+                if (today.getFullYear() === savedStartTime.getFullYear() && today.getMonth() === savedStartTime.getMonth() && today.getDate() === savedStartTime.getDate()) {
+                    $scope.timeEntry.ISOStartTime = savedStartTime;
+                }
+            }            
+        });
+        
         $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+        chrome.storage.local.get("TimeEntryEndTime", function(endTime) {
+            if (endTime.hasOwnProperty("TimeEntryEndTime")) {
+                var savedEndTime = new Date(endTime.TimeEntryEndTime);
+                var today = $scope.timeEntry.ISOEndTime;
+
+                if (today.getFullYear() === savedEndTime.getFullYear() && today.getMonth() === savedEndTime.getMonth() && today.getDate() === savedEndTime.getDate()) {
+                    $scope.timeEntry.ISOEndTime = savedEndTime;
+                }
+            }            
+        });
+        
 
         // Check for abandoned stopwatch    
         chrome.storage.sync.get(['stopwatch'], function (items) {

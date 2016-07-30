@@ -323,13 +323,31 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         }       
     }
 
+    $scope.saveStartTime = function (startTime) {
+        if ($scope.startTimeError === false) {
+            chrome.storage.local.set({ 'TimeEntryStartTime' : (new Date(startTime)).toString() });
+        }
+    }
+
+    $scope.saveEndTime = function (endTime) {
+        if ($scope.endTimeError === false) {
+            chrome.storage.local.set({ 'TimeEntryEndTime' : (new Date(endTime)).toString() });
+        }
+    }
+
     // Clear in progress start end times
     $scope.clearStartEndTimes = function() {
         var now = new Date();
         $scope.timeEntry.ISOStartTime =  new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
         $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
-        $scope.showStartTimer = true;
+        chrome.storage.local.remove('TimeEntryStartTime');
+        chrome.storage.local.remove('TimeEntryEndTime');
         $scope.clearAllErrors();
+
+    }
+
+    $scope.cancelStartEndTimesEntry = function () {
+        $scope.showStartTimer = true;
         TimeEntryService.removeInProgressEntry();
     }
 
@@ -440,11 +458,8 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.timeEntry.Hours = DEFAULT_EMPTY_HOURS;
         $scope.timeEntry.Comment = "";
         $scope.$broadcast("clearStopwatch");
-        var now = new Date();
-        $scope.timeEntry.ISOStartTime =  new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
-        $scope.timeEntry.ISOEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+        $scope.clearStartEndTimes();
         $interval.cancel($scope.endTimePromise);
-        $scope.clearAllErrors();
         $scope.saveFromTimer = false;
         $scope.showStartTimer = true;
         $scope.abandonedStopwatch = false;
@@ -459,6 +474,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
         $scope.abandonedEntry = false;
         if ($scope.showStartEndTimes) {
             $scope.clearStartEndTimes();
+            $scope.cancelStartEndTimesEntry();
         } else if ($scope.showHourEntryField) {
             $scope.clearHours();
         }

@@ -115,7 +115,7 @@
                         name="start"
                         ng-class="{'field-error': startTimeError}"
                         ng-model="timeEntry.ISOStartTime" 
-                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime); saveStartTime(timeEntry.ISOStartTime);" 
                         ng-focus="swapAction('startTime')" 
                         ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
                         ng-disabled="runningStopwatch || user.RequireStopwatch">
@@ -132,7 +132,7 @@
                         name="end"
                         ng-class="{'field-error': endTimeError}"
                         ng-model="timeEntry.ISOEndTime" 
-                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime)" 
+                        ng-blur="validateStartEndTimes(timeEntry.ISOStartTime, timeEntry.ISOEndTime); saveEndTime(timeEntry.ISOEndTime);" 
                         ng-focus="swapAction('endTime')" 
                         ng-keydown="$event.which === 13 && saveTimeEntry(Session, timeEntry)" 
                         ng-disabled="runningStopwatch || user.RequireStopwatch">

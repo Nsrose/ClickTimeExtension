@@ -31,7 +31,7 @@ myApp.service('APIService', ['$http', '$q', '$apiBase', 'InternetConnectivity', 
             headers: {
                 'Authorization' : 'Basic ' + credentials,
                 'client': btoa(JSON.stringify({
-                    'appname': 'chromeExtension',
+                    'appname': 'ClickTime Chrome Extension',
                     'version': version
                 }))
             },

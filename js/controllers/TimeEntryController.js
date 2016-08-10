@@ -320,6 +320,9 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                     TimeEntryService.updateInProgressEntry('startEndTimes', [startTime, endTime]);
                 }
             }
+
+            $scope.saveStartTime(startTime);
+            $scope.saveEndTime(endTime);
         }       
     }
 

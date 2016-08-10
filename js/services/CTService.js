@@ -104,21 +104,6 @@ myApp.service('CTService', function() {
         }
     }
 
-    /** Return the 'hours and minutes' representation of a h.mm format. */
-    this.toHoursForSuccessMessage = function(time) {
-        var splitTime = time.toString().split(".");
-        var splitHrs = splitTime[0];
-        if (splitTime.length == 1) {
-            return splitHrs + ":00";
-        } else if (splitTime.length == 2) {
-            var mm = (("." + splitTime[1]) * 60).toString();
-            return splitHrs + ":" + mm;
-        } else {
-            console.log("Invalid time to convert to hours: " + time);
-            return;
-        }
-    }
-
     /** Return true if a string is numeric. */
     this.isNumeric = function (n) {
         return this.isTime(n) || (!isNaN(parseFloat(n)) && isFinite(n));
@@ -195,45 +180,6 @@ myApp.service('CTService', function() {
         }
         var roundedHrs = me.roundToNearestDecimal(exactHrs, timeIncrement);
         return parseFloat(roundedHrs);
-    }
-
-    // Get a string in plain english of a successfully saved entry's hours nad minutes
-    this.getSuccessTotalFormatted = function (successMessageTotalRaw) {
-
-        var returnString = "";
-        var unsplitTotal = successMessageTotalRaw;
-        var splitTotal = unsplitTotal.split(":");
-        var hoursFormatted = splitTotal[0];
-        var minutesFormatted = splitTotal[1];
-
-        if (parseInt(hoursFormatted) < 1) {
-
-            returnString = minutesFormatted + " mins";
-
-            return returnString;
-        }
-
-        if (parseInt(hoursFormatted) >= 1) {
-
-            returnString = returnString + hoursFormatted + " hr";
-        }
-
-        if (parseInt(hoursFormatted) >= 2) {
-
-            returnString = returnString + "s";
-        }
-
-        if (parseInt(minutesFormatted.slice(0,1)) == 0 && parseInt(minutesFormatted.slice(1,2)) > 0) {
-
-           returnString =  returnString + " and " + minutesFormatted.slice(1,2) + " mins";
-        }
-
-        else if (parseInt(minutesFormatted.slice(0,1)) > 0 && parseInt(minutesFormatted.slice(1,2)) >= 0) {
-
-            returnString = returnString + " and " + minutesFormatted + " mins";
-        }
-
-        return returnString;
     }
 
     /** Return a string of the current number of logged hrs */

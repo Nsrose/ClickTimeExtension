@@ -674,11 +674,7 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                 .then(function (response) {
                     var d = new Date();
                     TimeEntryService.removeInProgressEntry();
-                    var successMessageTotalRaw = CTService.roundToNearestDecimal(clickTimeEntry.Hours, $scope.company.MinTimeIncrement);
-                    var successHoursAsTimeClock = CTService.toHoursForSuccessMessage(successMessageTotalRaw);
-                    var successMessageHrsMinsFormatted = CTService.getSuccessTotalFormatted(successHoursAsTimeClock);
 
-                    $scope.successMessage = successMessageHrsMinsFormatted + " saved!";
                     $scope.generalSuccess = true;
                     $scope.$broadcast("timeEntrySuccess");
                     EntityService.updateRecentEntities(timeEntry);

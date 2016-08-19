@@ -697,7 +697,13 @@ myApp.controller("TimeEntryController", ['$scope', '$q', '$interval', '$timeout'
                             $scope.$broadcast("timeEntryError");
                         }
                     } else {
-                        $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");
+                        if (response.data.Detail !== null || response.data.Detail !== '') {
+                            $scope.setError(null, response.data.Detail);
+                        }
+                        else {
+                            $scope.setError(null, "There has been an unknown error. Please contact customer support at support@clicktime.com.");    
+                        }
+
                         if (!$scope.abandonedStopwatch) {
                             $scope.$broadcast("timeEntryError");
                         }
